@@ -1,0 +1,895 @@
+/* =========================================================
+   MAP STYLE.CSS
+   Organized by Functional Regions
+   ========================================================= */
+
+/* #region Root Variables ---------------------------------*/
+
+:root {
+  --sl-color-primary-600: var(--highlight-green); /* Default thumb color */
+  --sl-color-primary-500: var(--highlight-green); /* Hover/active thumb color */
+
+  /* Primary Colors */
+  --primary-blue: #0d6aff;
+  --primary-grey: #403c3f;
+  
+  /* Secondary Colors */
+  --blue: #2827f7;
+  --dark-blue: #062390;
+  --darker-blue: #071F78;
+  --sky-blue: #68c2fb;
+  --aqua-blue: #6fe6fd;
+  
+  /* Greens */
+  --mint-green: #85fbeb;
+  --lime-green: #7af9b4;
+  --spring-green: #71e68b;
+  --apple-green: #82f984;
+  --grass-green: #6cd46f;
+  --forest-green: #43894d;
+  
+  /* Neutral Colors */
+  --bg-white: #ffffff;
+  --bg-light: #f3f4f6;
+  --bg-gray: #e5e7eb;
+  --bg-dark: #1f2937;
+  
+  /* Text Colors */
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-light: #9ca3af;
+  
+  /* Border Colors */
+  --border-light: #e5e7eb;
+  --border-medium: #d1d5db;
+  
+  /* Highlight Colors */
+  --highlight-green: #82f984;
+  --highlight-yellow: #f9ea46;
+  --error: #ef4444;
+  --info: #3b82f6;
+  
+  /* Opacity variants */
+  --overlay-dark: rgba(0, 0, 0, 0.5);
+  --overlay-light: rgba(255, 255, 255, 0.9);
+}
+
+/* #endregion */
+
+/* #region Fonts -------------------------------------------*/
+
+h2 {
+  color: white;
+  font-size: 20px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+}
+
+#count {
+  font-family: 'Poppins', sans-serif;
+  color: var(--highlight-green);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+#subtitle {
+  font-family: 'Open Sans', sans-serif;
+  color: lightgrey;
+  font-size: 12px;
+  font-weight: 300;
+}
+
+p {
+  color: white;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 15px;
+}
+
+/* #endregion */
+
+/* #region Body --------------------------------------------*/
+
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  background-color: var(--dark-blue);
+  z-index: 0;
+}
+
+#map {
+  position: absolute;
+  top: 30px;
+  bottom: 30px;
+  left: 30px;
+  width: 60%;
+  background-color: rgba(200, 200, 200, 0.3);
+  border: 1px solid #333;
+  border-radius: 20px;
+  z-index: 1;
+  padding: 10px;
+}
+
+/* #endregion */
+
+/* #region Legend/Menu -------------------------------------*/
+
+#legend-container {
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  z-index: 10;
+}
+
+#legend-container sl-icon {
+  font-size: 22px;
+  color: white;
+  background-color: transparent;
+}
+
+#legend-container sl-details::part(summary-icon) {
+  display: none;
+}
+
+#legend-container sl-details {
+  width: auto;
+}
+
+#legend-container sl-details[open] {
+  width: 200px;
+}
+
+#legend-container sl-details:not([open])::part(base) {
+  opacity: 1;
+}
+
+#legend-container sl-details::part(summary) {
+  background-color: transparent;
+  font-weight: 600;
+}
+
+#legend-container sl-details::part(base) {
+  background-color: var(--dark-blue);
+  opacity: 0.7;
+  padding: 0px;
+  border: 1px solid rgba(255,255,255, 1);
+  overflow: visible;
+  border-radius: 4px;
+}
+
+#legend-container sl-details::part(body) {
+  padding: 15px;
+  overflow: visible;
+}
+
+#legend-container sl-details:not([open])::part(base):hover {
+  background-color: #062490b4;
+  transition: background-color 0.3s ease, color 0.3s;
+}
+
+/* #endregion */
+
+/* #region Opacity Slider ----------------------------------*/
+
+sl-range {
+  margin-top: 4px;
+  margin-bottom: 15px;
+  padding-left: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100% !important;
+  tooltip: bottom;
+
+  --track-color-active: rgba(255, 255, 255, 0.781);
+  --track-color-inactive: rgba(255, 255, 255, 0.452);
+  --thumb-size: 15px;
+}
+
+sl-range::part(thumb) {
+  background-color: #ffffff;
+  border: 2px solid #000;
+}
+
+/* #endregion */
+
+/* #region Checkbox Styling --------------------------------*/
+
+.group-checkbox::part(base) {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: white;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+}
+
+.group-checkbox::part(control) {
+  border: 1.5px solid white;
+  background: transparent;
+  width: 15px;
+  height: 15px;
+}
+
+.group-checkbox::part(checked-icon) {
+  color: var(--darker-blue);
+  transform: scale(1.2);
+}
+
+.group-checkbox::part(control--checked) {
+  background: var(--highlight-green);
+  border-color: var(--highlight-green, #73ffba);
+}
+
+.group-checkbox::part(base):hover::part(label) {
+  color: var(--highlight-green, #73ffba);
+}
+
+.group-checkbox:focus-visible::part(base) {
+  outline: 1px solid var(--highlight-green, #73ffba);
+  outline-offset: 2px;
+}
+
+/* #endregion */
+
+/* #region Panel -------------------------------------------*/
+
+#panel {
+  position: absolute;
+  top: 30px;
+  bottom: 30px;
+  right: 30px;
+  width: 31.5%;
+  background-color: transparent;
+  border: transparent;
+  border-radius: 0px;
+  padding: 20px;
+  z-index: 1;
+  overflow-y: auto;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 900px;
+  font-size: 20px;
+  color: white;
+}
+
+#panel sl-details {
+  width: 100%;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+#panel sl-details::part(header) {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#panel sl-details::part(base) {
+  border-radius: 0px;
+  background-color: transparent;
+  border-color: white;
+  border-style: dashed; 
+}
+
+#panel sl-details::part(summary) {
+  border-radius: 0px;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.1em;  
+  font-weight: 900;
+}
+
+#panel sl-details::part(toggle) {
+  color: #fff;
+}
+
+#panel sl-details::part(content) {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: white;
+  line-height: 1.4;
+  background-color: var(--darker-blue);
+  border-radius: 0px;
+}
+
+#panel sl-details::part(header):hover {
+  background-color: var(--highlight-green);
+  cursor: pointer;
+  color: var(--dark-blue);
+  transition: background-color 0.3s ease;
+}
+
+#panel sl-details[open]::part(header) {
+  background-color: var(--highlight-green);
+  color: var(--dark-blue);
+}
+
+#panel sl-details::part(header) {
+  transition: background-color 0.3s ease;
+}
+
+.image-70 {
+  width: 70%;
+  height: auto;
+  border-radius: 0px;
+  margin-top: 10px;
+}
+
+.image-100 {
+  width: 100%;
+  height: auto;
+  border-radius: 0px;
+  margin-top: 10px;
+}
+
+#reset{
+  width: 100%;
+  height: auto;
+  margin-top: 5px;
+  margin-bottom: 5px;
+
+  background: transparent;
+
+}
+
+#reset::part(base){
+  color: white;
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.1em;  
+  font-weight: 900;
+  font-size:20px;
+  text-transform: uppercase;
+  justify-content: flex-start;
+  text-align: left;
+  align-items: center;
+  height: 60px;
+  border: 1px dashed white;
+  border-radius: 0px;
+  
+}
+
+#reset::part(base):hover {
+  background-color: var(--highlight-green);
+  color: var(--darker-blue);
+}
+
+#reset::part(label):hover {
+  color: var(--darker-blue);
+}
+
+/* Active state - when button is clicked */
+#reset.active::part(base) {
+  background-color: var(--highlight-green);
+  color: var(--darker-blue);
+}
+
+#reset.active::part(label) {
+  color: var(--darker-blue);
+}
+
+
+/* #endregion */
+
+/* #region Callout -----------------------------------------*/
+
+.line-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 0px;
+}
+
+.callout-line {
+  width: 2px;
+  height: 100px;
+  background: #2827f7;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.callout-line::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2827f7;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(40, 39, 247, 0.4);
+}
+
+.callout-text {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.callout-title {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  color: #2827f7;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.callout-subtitle {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  color: #666;
+  line-height: 1;
+}
+
+/* #endregion */
+
+/* #region Toggle ------------------------------------------*/
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50%;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--darker-blue);
+  transition: .4s;
+  border: 2px dotted var(--highlight-yellow);
+}
+
+.slider-text,
+.slider-text-checked {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5em;
+  color: var(--darker-blue);
+  transition: opacity 0.4s;
+  pointer-events: none;
+  z-index: 4;
+  width: 50%;
+  text-align: center;
+}
+
+.slider-text { left: 0; }
+.slider-text-checked {
+  right: 0;
+  left: auto;
+  color: white;
+  opacity: 0.5;
+}
+
+input:checked ~ .slider .slider-text {
+  color: white;
+  opacity: 0.5;
+}
+
+input:checked ~ .slider .slider-text-checked {
+  color: var(--darker-blue);
+  opacity: 1;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 100%;
+  width: 50%;
+  left: 0px;
+  bottom: 0px;
+  background-color: var(--highlight-yellow);
+  transition: .4s;
+  z-index: 2;
+}
+
+input:checked + .slider:before {
+  transform: translateX(100%);
+}
+
+.slider.round { border-radius: 0px; }
+.slider.round:before { border-radius: 0px; }
+
+/* #endregion */
+
+/* #region Panel Components --------------------------------*/
+
+#valley_info {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr 1fr; 
+  grid-gap: 20px; 
+}
+
+#lakes_counter {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr 1fr 1fr; 
+  grid-gap: 20px; 
+}
+
+#lakes_trace_container {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr 1fr 1fr 1fr; 
+  grid-gap: 20px; 
+}
+
+#info {
+  font-size: 15px;
+  margin: 5px;
+  padding: 15px;
+  border: 1px solid #ffffff6b;
+}
+
+#valleys-detail sl-button {
+  width: 100%;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  height: 40px;
+}
+
+#valleys-detail  sl-button::part(base) {
+  border-radius: 0;
+  background-color: transparent;
+  border-color: white;
+  font-family: 'Poppins', open-sans;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: white;
+  font-size: 12px;
+  box-shadow: 0 2px 10px #0002;
+}
+
+/* Button hover & active states */
+#hn_valley::part(base):hover {
+  background-color: #85fbeb;
+  color: var(--darker-blue);
+  border-color: var(--darker-blue);
+}
+
+#kc_valley::part(base):hover {
+  background-color: #7af9b4;
+  color: var(--darker-blue);
+  border-color: var(--darker-blue);
+}
+
+#a_valley::part(base):hover {
+  background-color: #3a59af;
+  color: white;
+  border-color: white;
+}
+
+#v_valley::part(base):hover {
+  background-color: #6fe6fd;
+  color: var(--darker-blue);
+  border-color: var(--darker-blue);
+}
+
+#s_valley::part(base):hover {
+  background-color: #43894d;
+  color: white;
+  border-color: white;
+}
+
+#panel sl-button::part(base):active {
+  border-color: var(--darker-blue);
+  opacity: 0.5;
+}
+
+/* Active Button States */
+#hn_valley.active::part(base) {
+  background-color: #85fbeb;
+  color: var(--darker-blue);
+}
+
+#kc_valley.active::part(base) {
+  background-color: #7af9b4;
+  color: var(--darker-blue);
+}
+
+#a_valley.active::part(base) {
+  background-color: #3a59af;
+  color: white;
+}
+
+#v_valley.active::part(base) {
+  background-color: #6fe6fd;
+  color: var(--darker-blue);
+}
+
+#s_valley.active::part(base) {
+  background-color: #43894d;
+  color: white;
+}
+
+/* #endregion */
+
+/* #region Popup -------------------------------------------*/
+
+.feature-option-container {
+  max-height: 300px;
+  overflow-y: auto;
+  background: transparent;
+}
+
+.feature-option {
+  display: block;
+  padding: 8px 10px;
+  margin: 0;
+  background: #f0f0f0;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+  height: auto;
+  line-height: 1.4;
+}
+
+.feature-option + .feature-option {
+  margin-top: 6px;
+}
+
+.feature-option:hover {
+  background: #e0e0e0;
+}
+
+.feature-detail-container {
+  margin: 0;
+  padding: 10px 8px;
+  background: white;
+  font-size: 11px;
+  font-family: 'Open Sans', 'sans-serif';
+}
+
+.feature-detail-container #heading {
+  font-size: 13px;
+  font-family: 'Open Sans', 'sans-serif';
+}
+
+.feature-option-heading {
+  margin-bottom: 15px;
+  margin-top: 5px;
+  padding: 0px;
+  font-weight: 700;
+  color: black;
+  font-size: 15px;
+  font-family: 'Poppins', sans-serif;
+  background: var(--highlight-green);
+  overflow-wrap: break-word;
+}
+
+.mapboxgl-popup-content {
+  background: transparent;
+  padding-top: 30px;
+  padding-bottom: 10px;
+  border-radius: 0px;
+  box-shadow: 0 0px 0px #0000001a;
+}
+
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+  align-self: center;
+  border-bottom: none;
+  border-top-color: var(--highlight-green);
+}
+
+.mapboxgl-popup-close-button {
+  font-size: 0px;
+}
+
+/* #endregion */
+
+
+/* #region Lakes Timeline Buttons --------------------------*/
+
+#lakes_trace_container sl-button {
+  width: 100%;
+  height: 40px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+#lakes_trace_container sl-button::part(base) {
+  border-radius: 0;
+  background-color: transparent;
+  border: 1px solid white;
+  border-style: solid;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: white;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 10px #0002;
+  transition: all 0.3s ease;
+}
+
+#lakes_trace_container sl-button::part(label) {
+  color: white;
+}
+
+/* Hover state - all timeline buttons */
+#lakes_trace_1800::part(base):hover,
+#lakes_trace_1900::part(base):hover,
+#lakes_trace_2000::part(base):hover {
+  background-color: var(--highlight-green);
+  color: var(--darker-blue);
+  border-color: var(--highlight-green);
+  box-shadow: 0 4px 15px rgba(130, 249, 132, 0.3);
+}
+
+#lakes_trace_1800::part(label):hover,
+#lakes_trace_1900::part(label):hover,
+#lakes_trace_2000::part(label):hover {
+  color: var(--darker-blue);
+}
+
+/* Active state - when button is clicked */
+#lakes_trace_1800.active::part(base),
+#lakes_trace_1900.active::part(base),
+#lakes_trace_2000.active::part(base) {
+  background-color: var(--highlight-green);
+  color: var(--darker-blue);
+  border-color: var(--highlight-green);
+  box-shadow: 0 0 12px rgba(130, 249, 132, 0.6), inset 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+#lakes_trace_1800.active::part(label),
+#lakes_trace_1900.active::part(label),
+#lakes_trace_2000.active::part(label) {
+  color: var(--darker-blue);
+}
+
+/* Reset button - danger variant */
+#lakes_trace_reset::part(base) {
+  border-radius: 0;
+  background-color: transparent;
+  border: 1px solid var(--error);
+  border-style: solid;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--error);
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 10px #0002;
+  transition: all 0.3s ease;
+}
+
+#lakes_trace_reset::part(label) {
+  color: var(--error);
+}
+
+#lakes_trace_reset::part(base):hover {
+  background-color: var(--error);
+  color: white;
+  border-color: var(--error);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+#lakes_trace_reset::part(label):hover {
+  color: white;
+}
+
+#lakes_trace_reset::part(base):active {
+  opacity: 0.8;
+}
+
+/* #endregion */
+
+/* #region typology panel*/
+
+
+
+
+#typology-info{
+
+  padding: 0px; 
+  color: rgb(255, 255, 255);
+}
+
+.typology-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.typology-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  font-family: 'Poppins';
+  font-size: 15px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.typology-header {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  font-weight: 500;
+  font-size: 1.1em;
+  
+}
+
+
+.typology-header strong {
+  font-size: 1.2em;
+  color: var(--highlight-green);
+  text-align: right;
+}
+
+.typology-column {
+  padding: 12px;
+  text-align: left;
+}
+
+.typology-lhs {
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.typology-label {
+  font-size: 0.9em;
+  color: #ccc;
+  margin-bottom: 4px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+
+.typology-code {
+  font-size: 1.3em;
+  font-weight: bold;
+  text-transform: uppercase;
+  color:rgb(255, 255, 255);
+  letter-spacing: 0.1em;
+}
+
+.typology-description {
+  font-size: 0.8em;
+  color: rgb(255, 255, 255);
+  margin-top: 4px;
+  line-height: 1.3;
+  font-weight: 700;
+  max-width: 150px;
+}
+
+.typology-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0px;
+  margin-top: 12px;
+}
+
+/* #endregion */

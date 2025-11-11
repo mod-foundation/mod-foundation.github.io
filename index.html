@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+
+    <title>Bengaluru Watershed</title>
+
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+
+    <!-- Mapbox CSS -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css" rel="stylesheet">
+    
+
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+
+    <!--shoelace-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/light.css">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace-autoloader.js"></script>
+
+    <!--turf-->
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="map-style.css">
+
+    <!--GSAPP for transitions-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.14.0/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+
+
+
+
+    
+
+</head>
+<body>
+
+    <div id="legend-container">
+        <sl-details open="false">
+            <sl-icon slot="summary" name="layers"></sl-icon>
+            <!-- Layer control template -->
+            <!-- 🔸 Template for each layer item -->
+            
+            <div id="legend-list"> </div>
+            
+    </div>
+        </sl-details>
+    </div>
+    
+    <div id="background"></div>
+
+    <div id="map"></div>
+
+    <div id="panel">
+            <sl-details id="dem-detail" summary="How does Water flow?">
+                <p>Water flows from higher grounds to lower grounds.</p>
+                <img src="images/dem_legend.png" alt="DEM visualization" class="image-70"> <br> <br>
+                <p>The gradient map is the DEM (Digital elevation model) of Bangalore which represents the terrain of the city.<br> <br> 
+                    Red represents the higher grounds and blue represents the lower grounds. </p>
+            </sl-details>
+
+            <sl-details id="valleys-detail" summary="Valleys">
+                    <div style="margin-top: 5px; padding-top: 5px; padding-bottom: 5px">
+                            <label class="switch">
+                              <input type="checkbox" id="valley-view-toggle">
+                              <span class="slider round">
+                                <span class="slider-text">LOCAL</span>
+                                <span class="slider-text-checked">REGIONAL</span>
+                              </span>
+                            </label>
+                          </div>
+
+                    <p>The city lies within two sub basins of the Indian subcontinent: the Cauvery Basin and the Ponnaiyar Basin. The city has 5 major catchment valleys, divided by the ridge line. 
+                   
+
+                    <div id="valley_info"> 
+                        <div id="buttons">
+                         <sl-button variant="default" outline id="hn_valley">Hebbal Nagawara Valley</sl-button>   
+                         <br><sl-button variant="default" outline id="kc_valley">Koramangala Challaghatta Valley</sl-button>  
+                         <br><sl-button variant="default" outline id="a_valley">Arkavathi Valley</sl-button>  
+                         <br><sl-button variant="default" outline id="v_valley">Vrishabhavati Valley</sl-button>  
+                         <br><sl-button variant="default" outline id="s_valley">Suvarnamukhi Valley</sl-button>  
+                        </div>
+
+                        <div id="info">
+
+                                <p>Select a valley to view its details. </p>
+                        </div>
+
+                    </div>
+                         
+                        <br> <br> On the east are the Hebbal Nagawara Valley and Koramangala Challaghata Valley which drain into the Dakshina Pinakini River, in the <span style="color: #c2f476;">Ponnaiyar Basin</span>.
+                        <br> <br> On the west are the Arkavathi, Vrishabhavati and Suvarnamukhi Valleys that drain into the <span style="color: #39d4f3;">Cauvery Basin</span>. The Arkavathi Valley drains into the Arkavathi River and the Vrishabhavati and Suvarnamukhi Valleys drain into the Vrishabhavati River.
+                    </p>
+                    
+                    
+            </sl-details>
+            
+            <sl-details id="lakes-detail" summary="Tanks">
+                <div id="lakes_trace_container">
+                        <sl-button id="lakes_trace_1800">1870</sl-button>
+                        <sl-button id="lakes_trace_1900">1969</sl-button>
+                        <sl-button id="lakes_trace_2000">Present</sl-button>
+                        <sl-button id="lakes_trace_reset">RESET</sl-button>
+                </div>
+                <p> Bengaluru doesn't have natural lakes, all the waterbodies are man-made tanks built since the 16th century. 
+                        <br><br> Over the last 4 centuries, these tanks have been built over - they have reduced in size with most 
+                        of them disappearing completely. We have identified 210 lost lakes of Bengaluru from historic maps
+                         - use the buttons above to explore the loss of tanks over time. </p>
+                         <br>
+                  <div id="lakes_counter" >
+                      
+                      <div id="existing_lakes" style="border-right: #ffffff71 1px solid; padding: 5px;">
+                          <h2 style ="color: #82f984;">Existing Tanks</h2>
+                          <p id="count">175</p>
+                          <p id="subtitle">Source: Open City Lakes documentation</p>
+                      </div>
+                      <div id="lost_lakes" style="border-right: #ffffff71 1px solid; padding: 5px;">
+                          <h2 style=" color: red;">Lost Tanks</h2>
+                          <p id="count" style="color: red">146</p>
+                          <p id="subtitle">Traced from Historical maps of 1870, 1896 and 1969</p>
+                      </div>
+                      <div id="existing_lakes" style= "padding: 5px;">
+                          <h2>Total Count</h2>  
+                          <p id="count" style = "color: white;">321</p>
+                      </div>
+                      
+                  </div>
+                  <br>
+                  <p>Click on the tanks for more information.</p>
+                   
+            </sl-details>
+
+            <sl-details id="drains-detail" summary="Primary Drains">
+              <p>Historically, water used to travel from tank to tank through naturally formed low-lying stormwater streams. <br><br>
+                  Most of these streams have now been concretised with concrete retaining walls, and some of them have been built over. 
+
+                  The map shows the existing rajkaluves. The image below is typically how primary drains with retaining walls look like around you. 
+                  <br><br>
+                  <img src="images/primarydrains_rajakaluve.png" alt="MOD Foundation" class="image-100"> <br> <br>
+                    Click on the drains for more information.
+                
+                </p>
+            </sl-details>
+          
+            <sl-details id="secondary-drains-detail" summary="Secondary Drains">
+              <p>The secondary drains carry stormwater runoff to the primary drains, which in turn connect to lakes and further on rivers, forming the larger cascading stormwater system. 
+                  
+            According to GOK: Secondary Drains: These are natural or manmade network of drains connecting to a 
+            primary drain or a water body. They originate from a particular watershed region and 
+            receive water from one or more micro watershed regions through tertiary drainage 
+            network or from road side drains during their course of flow. </p>
+            </sl-details>
+
+            <sl-details id="typology-detail" summary="Typologies">
+                    <p>Click on a typology feature to see LHS and RHS values</p>
+                <div id="typology-info" >
+                    <div class="typology-panel">
+                        <table class="typology-table">
+                            <tr>
+                                <td colspan="2" class="typology-header">
+                                    Drain ID: <strong id="typology-drain-id">—</strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="typology-column typology-lhs">
+                                    <div class="typology-label">LHS</div>
+                                    <div class="typology-code" id="typology-lhs-code">—</div>
+                                    <div class="typology-description" id="typology-lhs-label">Select to view</div>
+                                </td>
+                                <td class="typology-column typology-rhs">
+                                    <div class="typology-label">RHS</div>
+                                    <div class="typology-code" id="typology-rhs-code">—</div>
+                                    <div class="typology-description" id="typology-rhs-label">Select to view</div>
+                                </td>
+                            </tr>
+                        </table>
+                        <img id="typology-image" class="typology-image" alt="Typology diagram" style="display: none;">
+                    </div>
+                </div>
+            </sl-details>
+
+            <sl-button id="reset">Reset
+                </sl-button>
+                
+    </div> 
+
+
+
+    <!-- Mapbox JS -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js"></script>
+    <!-- Your JS -->
+    <script src="main.js"></script>
+
+</body>
+</html>
