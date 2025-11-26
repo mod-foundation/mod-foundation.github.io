@@ -9,15 +9,21 @@
 
     <!-- Mapbox CSS -->
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css" rel="stylesheet">
+
+    <!-- Search      -->
+    <script id="search-js" defer="" src="https://api.mapbox.com/search-js/v1.5.0/web.js"></script>
     
 
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!--shoelace-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/light.css">
     <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace-autoloader.js"></script>
+
+    <!-- Web Awesome CSS -->
+    <script src="https://kit.webawesome.com/f432acd2a16749ed.js" crossorigin="anonymous"></script>
 
     <!--turf-->
     <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
@@ -30,10 +36,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 
-
-
-
-    
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 
 </head>
 <body>
@@ -43,13 +46,15 @@
             <sl-icon slot="summary" name="layers"></sl-icon>
             <!-- Layer control template -->
             <!-- 🔸 Template for each layer item -->
-            
+
             <div id="legend-list"> </div>
-            
+
     </div>
         </sl-details>
     </div>
-    
+
+ 
+
     <div id="background"></div>
 
     <div id="map"></div>
@@ -62,7 +67,7 @@
                     Red represents the higher grounds and blue represents the lower grounds. </p>
             </sl-details>
 
-            <sl-details id="valleys-detail" summary="Valleys">
+            <sl-details id="valleys-detail" summary="Watershed and Valleys">
                     <div style="margin-top: 5px; padding-top: 5px; padding-bottom: 5px">
                             <label class="switch">
                               <input type="checkbox" id="valley-view-toggle">
@@ -71,19 +76,53 @@
                                 <span class="slider-text-checked">REGIONAL</span>
                               </span>
                             </label>
-                          </div>
+                    </div>
 
-                    <p>The city lies within two sub basins of the Indian subcontinent: the Cauvery Basin and the Ponnaiyar Basin. The city has 5 major catchment valleys, divided by the ridge line. 
+                    <br><p>The city lies within two sub basins of the Indian subcontinent: 
+                        the Cauvery Basin and the Ponnaiyar Basin. 
+                        <br><br>The city has 5 major catchment valleys, divided by the ridge line:<br>
+                        1. Hebbal Nagavara Valley<br>
+                        2. Koramangala Challaghatta Valley <br>
+                        3. Vrishabhavati Valley <br>
+                        4. Suvarnamukhi Valley<br>
+                        5. Arkavathi Valley<br>
+
+                   </p>
                    
+                   <div id="basin_play_container">
+                   <sl-icon-button id="basin-play-button" name="play-circle" label="Play timeline"></sl-icon-button>
+                    <h4>Trace the flow of water from Bengaluru to the Bay of Bengal:</h4></div>
+                    <div id="basin_container">
+                    <div class="timeline-line"></div>        
+                        <button class="timeline-button" id="basin_1">
+                            <div class="timeline-circle"></div>
+                            <span class="timeline-label">From the high grounds</span>
+                        </button> 
+                        <button class="timeline-button" id="basin_2">
+                            <div class="timeline-circle"></div>
+                            <span class="timeline-label">the City Valleys</span>
+                        </button>
+                        <button class="timeline-button" id="basin_3">
+                            <div class="timeline-circle"></div>
+                            <span class="timeline-label">the Tributaries</span>
+                        </button>
+                        <button class="timeline-button" id="basin_4">
+                            <div class="timeline-circle"></div>
+                            <span class="timeline-label">the Rivers</span>
+                        </button>
+                        <button class="timeline-button" id="basin_5">
+                            <div class="timeline-circle"></div>
+                            <span class="timeline-label">to the Bay of Bengal</span>
+                        </button>
 
+                    </div>
+
+                    
                     <div id="valley_info"> 
-                        <div id="buttons">
-                         <sl-button variant="default" outline id="hn_valley">Hebbal Nagawara Valley</sl-button>   
-                         <br><sl-button variant="default" outline id="kc_valley">Koramangala Challaghatta Valley</sl-button>  
-                         <br><sl-button variant="default" outline id="a_valley">Arkavathi Valley</sl-button>  
-                         <br><sl-button variant="default" outline id="v_valley">Vrishabhavati Valley</sl-button>  
-                         <br><sl-button variant="default" outline id="s_valley">Suvarnamukhi Valley</sl-button>  
-                        </div>
+                        <div id="basin_buttons">
+                         <sl-button variant="default" outline id="p_basin">Ponnaiyar Basin</sl-button>   
+                         <sl-button variant="default" outline id="c_basin">Cauvery Basin</sl-button>  
+                         </div>
 
                         <div id="info">
 
@@ -91,57 +130,94 @@
                         </div>
 
                     </div>
-                         
-                        <br> <br> On the east are the Hebbal Nagawara Valley and Koramangala Challaghata Valley which drain into the Dakshina Pinakini River, in the <span style="color: #c2f476;">Ponnaiyar Basin</span>.
-                        <br> <br> On the west are the Arkavathi, Vrishabhavati and Suvarnamukhi Valleys that drain into the <span style="color: #39d4f3;">Cauvery Basin</span>. The Arkavathi Valley drains into the Arkavathi River and the Vrishabhavati and Suvarnamukhi Valleys drain into the Vrishabhavati River.
-                    </p>
-                    
+
+                      <a href="/datasets/valleys.geojson" download="MOD_Foundation_valleys.geojson" id="link">
+                        Download the valleys dataset.
+                    </a><br>
+                    <a href="/datasets/streamorder.geojson" download="MOD_Foundation_streamorder.geojson" id="link">
+                        Download the streamorder dataset.
+                    </a>
                     
             </sl-details>
             
             <sl-details id="lakes-detail" summary="Tanks">
-                <div id="lakes_trace_container">
-                        <sl-button id="lakes_trace_1800">1870</sl-button>
-                        <sl-button id="lakes_trace_1900">1969</sl-button>
-                        <sl-button id="lakes_trace_2000">Present</sl-button>
-                        <sl-button id="lakes_trace_reset">RESET</sl-button>
-                </div>
-                <p> Bengaluru doesn't have natural lakes, all the waterbodies are man-made tanks built since the 16th century. 
-                        <br><br> Over the last 4 centuries, these tanks have been built over - they have reduced in size with most 
-                        of them disappearing completely. We have identified 210 lost lakes of Bengaluru from historic maps
-                         - use the buttons above to explore the loss of tanks over time. </p>
-                         <br>
-                  <div id="lakes_counter" >
-                      
-                      <div id="existing_lakes" style="border-right: #ffffff71 1px solid; padding: 5px;">
-                          <h2 style ="color: #82f984;">Existing Tanks</h2>
-                          <p id="count">175</p>
-                          <p id="subtitle">Source: Open City Lakes documentation</p>
-                      </div>
-                      <div id="lost_lakes" style="border-right: #ffffff71 1px solid; padding: 5px;">
-                          <h2 style=" color: red;">Lost Tanks</h2>
-                          <p id="count" style="color: red">146</p>
-                          <p id="subtitle">Traced from Historical maps of 1870, 1896 and 1969</p>
-                      </div>
-                      <div id="existing_lakes" style= "padding: 5px;">
-                          <h2>Total Count</h2>  
-                          <p id="count" style = "color: white;">321</p>
-                      </div>
-                      
-                  </div>
-                  <br>
-                  <p>Click on the tanks for more information.</p>
+                <p> Sitting at 900m above sea level with no perennial rivers, Bangalore 
+                    has relied on man-made tanks as its primary water source since the city's establishment in the 16th century.
+                </p>
+                <p> Over the last 4 centuries, these tanks have been built over - they have reduced in size with most 
+                    of them disappearing completely. We have identified 113 lost lakes of Bengaluru from historic maps
+                </p>
+
+            <p> Explore the loss of lakes over time:</p>
+
+            <!-- Keep reset button separate             <sl-button id="lakes_trace_reset">RESET</sl-button>
+            <br><br>-->
+                                
+            <!-- Replace your lakes_trace_container section with this -->
+            <div id="lakes_trace_container">
+                <div class="timeline-line"></div>
+                <button class="timeline-button" id="lakes_trace_1800" data-year="1870">
+                    <div class="timeline-circle"></div>
+                    <span class="timeline-label">1870</span>
+                </button>
+                <button class="timeline-button" id="lakes_trace_1900" data-year="1969">
+                    <div class="timeline-circle"></div>
+                    <span class="timeline-label">1969</span>
+                </button>
+                <button class="timeline-button" id="lakes_trace_2000" data-year="Present">
+                    <div class="timeline-circle"></div>
+                    <span class="timeline-label">Present</span>
+                </button>
+            </div> <br>
+
+                <div id="lakes_counter" >
+                        
+                        <div id="existing_lakes" style="border-right: #ffffff71 1px solid; padding: 5px;">
+                            <h2 style ="color: #82f984;">Existing Tanks</h2>
+                            <p id="count">175</p>
+                            <p id="subtitle">Source: Open City Lakes documentation</p>
+                        </div>
+                        <div id="lost_lakes" style="border-right: #ffffff71 1px solid; padding: 5px;">
+                            <h2 style=" color: red;">Lost Tanks</h2>
+                            <p id="count" style="color: red">146</p>
+                            <p id="subtitle">Traced from Historical maps of 1870, 1896 and 1969</p>
+                        </div>
+                        <div id="existing_lakes" style= "padding: 5px;">
+                            <h2>Total Count</h2>  
+                            <p id="count" style = "color: white;">321</p>
+                        </div>
+                        
+                </div><br>
+
+
+                <br>
+
+                <!-- With this -->
+            <a href="/datasets/lakes_existing.geojson" download="MOD_Foundation_tanks_existing.geojson" id="link">
+                Download the existing tanks dataset.
+            </a><br>
+            <a href="/datasets/lakes_lost.geojson" download="MOD_Foundation_tanks_lost.geojson" id="link">
+                Download the lost tanks dataset.
+            </a>
                    
             </sl-details>
 
             <sl-details id="drains-detail" summary="Primary Drains">
-              <p>Historically, water used to travel from tank to tank through naturally formed low-lying stormwater streams. <br><br>
-                  Most of these streams have now been concretised with concrete retaining walls, and some of them have been built over. 
+              <p>Historically, water used to travel from tank to tank through naturally formed 
+                low-lying stormwater streams. <br><br>
+                  Most of these streams have now been concretised with retaining walls, 
+                  and some of them have been built over. 
 
-                  The map shows the existing rajkaluves. The image below is typically how primary drains with retaining walls look like around you. 
+                  The map shows the existing rajkaluves. The image below is typically how 
+                  primary drains with retaining walls look like around you. 
                   <br><br>
                   <img src="images/primarydrains_rajakaluve.png" alt="MOD Foundation" class="image-100"> <br> <br>
                     Click on the drains for more information.
+
+                    <!-- Add filter dropdown -->
+                    <!-- Add filter dropdowns -->
+
+    <br>
                 
                 </p>
             </sl-details>
@@ -153,6 +229,140 @@
             primary drain or a water body. They originate from a particular watershed region and 
             receive water from one or more micro watershed regions through tertiary drainage 
             network or from road side drains during their course of flow. </p>
+            </sl-details>
+
+            
+            <sl-details id="filterandfind-detail" summary="Filter & Find">
+
+                
+                
+                <h4> Filter by:</h4>
+                <div class="filter-container">
+                    <!-- Valley Filter -->
+                    <div class="dropdown-checkboxes">
+                        <wa-dropdown id="valley-filter-dropdown">
+                            <wa-button slot="trigger" with-caret>Valley</wa-button>
+                        </wa-dropdown>
+                    </div>
+
+                    <!-- Ward Filter -->
+                    <div class="dropdown-checkboxes">
+                        <wa-dropdown id="ward-filter-dropdown">
+                            <wa-button slot="trigger" with-caret>Ward</wa-button>
+                        </wa-dropdown>
+                    </div>
+
+                    <!-- Reset Filters Button -->
+                     <sl-button class="reset_button" id="reset-all-filters" variant="default" outline>Reset Filters</sl-button>
+
+
+                    
+                </div><br>
+
+                <h4> Filter the Tanks by:</h4>
+                <div class="lake-filter-container">
+
+                    <!-- Category Filter -->
+                    <div class="dropdown-checkboxes">
+                        <wa-dropdown id="category-filter-dropdown">
+                            <wa-button slot="trigger" with-caret>Category</wa-button>
+                        </wa-dropdown>
+                    </div>
+
+                    <!-- Custodian Filter -->
+                    <div class="dropdown-checkboxes">
+                        <wa-dropdown id="custodian-filter-dropdown">
+                            <wa-button slot="trigger" with-caret>Custodian</wa-button>
+                        </wa-dropdown>
+                    </div>
+
+                    <!-- Condition Filter -->
+                    <div class="dropdown-checkboxes">
+                        <wa-dropdown id="year-filter-dropdown">
+                            <wa-button slot="trigger" with-caret>Condition</wa-button>
+                        </wa-dropdown>
+                    </div>
+
+
+                    
+                </div><br>
+
+                <h4> Filter the Drains by:</h4>
+                <div class="drains-filter-container">
+
+                    <!-- Drain Number Filter -->
+                    <div class="dropdown-checkboxes">
+                        <wa-dropdown id="primary-number-filter-dropdown">
+                            <wa-button slot="trigger" with-caret>Primary Drain ID</wa-button>
+                        </wa-dropdown>
+                    </div>
+
+                    <!-- Drain Number Filter -->
+                    <div class="dropdown-checkboxes">
+                        <wa-dropdown id="secondary-number-filter-dropdown">
+                            <wa-button slot="trigger" with-caret>Secondary Drain ID</wa-button>
+                        </wa-dropdown>
+                    </div>
+
+                    <!-- 🔥 NEW: Filter secondary by primary button -->
+                    <sl-button class="reset_button"  id="filter-secondary-by-primary" variant="default" outline >
+                        Filter by Pri ID
+                    </sl-button>
+
+                </div>
+
+                <!-- 🔥 UPDATED: Filter Results Counter -->
+                <div class="filter-results-counter">
+                    <div class="counter-section">
+                        <div class="counter-item">
+                            <span class="counter-label">Existing Lakes:</span>
+                            <span class="counter-value" id="filter-existing-count">—</span>
+                        </div>
+                        <div class="counter-item">
+                            <span class="counter-label">Lost Lakes:</span>
+                            <span class="counter-value" id="filter-lost-count">—</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 🔥 UPDATED: Primary Drains with Length -->
+                    <div class="counter-section">
+                        <div class="counter-item full-width">
+                            <div class="drain-header">
+                                <span class="counter-label">Primary Drain IDs:</span>
+                                <span class="drain-length" id="filter-primary-length">Total: —</span>
+                            </div>
+                            <div class="counter-list" id="filter-primary-drains-list">—</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 🔥 UPDATED: Secondary Drains with Length -->
+                    <div class="counter-section">
+                        <div class="counter-item full-width">
+                            <div class="drain-header">
+                                <span class="counter-label">Secondary Drain IDs:</span>
+                                <span class="drain-length" id="filter-secondary-length">Total: —</span>
+                            </div>
+                            <div class="counter-list" id="filter-secondary-drains-list">—</div>
+                        </div>
+                    </div>
+                    
+                    <div class="counter-section">
+                        <div class="counter-item full-width">
+                            <span class="counter-label">Wards:</span>
+                            <div class="counter-list" id="filter-wards-list">—</div>
+                        </div>
+                    </div>
+
+                        <!-- 🔥 NEW: Download Options -->
+                <div class="download-options">
+                    <sl-button id="download-csv" variant="default" size="small" outline>
+                        <sl-icon slot="prefix" name="file-earmark-spreadsheet"></sl-icon>
+                        Download as CSV
+                    </sl-button>
+                </div>
+                    
+                </div>
+
             </sl-details>
 
             <sl-details id="typology-detail" summary="Typologies">
@@ -187,7 +397,6 @@
                 </sl-button>
                 
     </div> 
-
 
 
     <!-- Mapbox JS -->
