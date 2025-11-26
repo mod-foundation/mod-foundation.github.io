@@ -65,6 +65,21 @@ h2 {
   font-weight: 600;
 }
 
+h4 {
+  color: rgb(219, 219, 219);
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+h6 {
+  color: rgb(219, 219, 219);
+  font-size: 14px;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+}
+
 #count {
   font-family: 'Poppins', sans-serif;
   color: var(--highlight-green);
@@ -82,7 +97,16 @@ h2 {
 p {
   color: white;
   font-family: 'Open Sans', sans-serif;
-  font-size: 15px;
+  font-size: 14px;
+}
+
+a{
+  font-family: 'Open Sans', sans-serif;
+  color: var(--highlight-yellow);
+  text-decoration: underline;
+  font-size: 13px;
+  font-weight: 300;
+
 }
 
 /* #endregion */
@@ -119,8 +143,84 @@ body {
 
 /* #endregion */
 
-/* #region Legend/Menu -------------------------------------*/
+/* #region Search Bar --------------------------------------*/
 
+
+
+/* #endregion */
+
+/* #region Legend/Menu -------------------------------------*/
+/* Legend Group Styling */
+.legend-group-container {
+    margin-bottom: 15px;
+}
+
+.legend-group-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    user-select: none;
+}
+
+.legend-group-header:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.group-arrow {
+    font-size: 10px;
+    transition: transform 0.2s;
+    color: var(--highlight-yellow);
+}
+
+.group-label {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: white;
+}
+
+.legend-group-children {
+    padding-left: 20px;
+    margin-top: 8px;
+    display: none; /* Start collapsed */
+}
+
+.legend-group-children .group-control {
+    margin-bottom: 10px;
+}
+
+/* Legend header with dropdown arrow on right */
+#legend::part(summary) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+}
+
+#legend::part(summary-icon) {
+    order: -1; /* Keep layers icon on left */
+    margin-right: 10px;
+}
+
+#legend::part(summary)::after {
+    content: '';
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid currentColor;
+    transition: transform 0.2s ease;
+}
+
+#legend[open]::part(summary)::after {
+    transform: rotate(180deg);
+}
 #legend-container {
   position: absolute;
   top: 50px;
@@ -185,8 +285,8 @@ sl-range {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  width: 100% !important;
-  tooltip: bottom;
+  width: 80% !important;
+  /*tooltip: bottom;*/
 
   --track-color-active: rgba(255, 255, 255, 0.781);
   --track-color-inactive: rgba(255, 255, 255, 0.452);
@@ -250,7 +350,7 @@ sl-range::part(thumb) {
   top: 30px;
   bottom: 30px;
   right: 30px;
-  width: 31.5%;
+  width: 35%;
   background-color: transparent;
   border: transparent;
   border-radius: 0px;
@@ -300,6 +400,7 @@ sl-range::part(thumb) {
   line-height: 1.4;
   background-color: var(--darker-blue);
   border-radius: 0px;
+  padding: 20px;
 }
 
 #panel sl-details::part(header):hover {
@@ -332,51 +433,6 @@ sl-range::part(thumb) {
   margin-top: 10px;
 }
 
-#reset{
-  width: 100%;
-  height: auto;
-  margin-top: 5px;
-  margin-bottom: 5px;
-
-  background: transparent;
-
-}
-
-#reset::part(base){
-  color: white;
-  background: transparent;
-  font-family: 'Poppins', sans-serif;
-  letter-spacing: 0.1em;  
-  font-weight: 900;
-  font-size:20px;
-  text-transform: uppercase;
-  justify-content: flex-start;
-  text-align: left;
-  align-items: center;
-  height: 60px;
-  border: 1px dashed white;
-  border-radius: 0px;
-  
-}
-
-#reset::part(base):hover {
-  background-color: var(--highlight-green);
-  color: var(--darker-blue);
-}
-
-#reset::part(label):hover {
-  color: var(--darker-blue);
-}
-
-/* Active state - when button is clicked */
-#reset.active::part(base) {
-  background-color: var(--highlight-green);
-  color: var(--darker-blue);
-}
-
-#reset.active::part(label) {
-  color: var(--darker-blue);
-}
 
 
 /* #endregion */
@@ -444,8 +500,28 @@ sl-range::part(thumb) {
 .switch {
   position: relative;
   display: inline-block;
-  width: 50%;
+  width: 100%; /* Changed from 50% to 100% */
   height: 34px;
+  max-width: 300px; /* Add a max-width to prevent it from being too wide */
+}
+
+.slider-text,
+.slider-text-checked {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px; /* Reduced from 13px */
+  font-weight: 600;
+  letter-spacing: 0.3em; /* Reduced from 0.5em */
+  color: var(--darker-blue);
+  transition: opacity 0.4s;
+  pointer-events: none;
+  z-index: 4;
+  width: 50%;
+  text-align: center;
+  padding: 0 5px; /* Add padding to prevent text touching edges */
+  box-sizing: border-box;
 }
 
 .switch input {
@@ -466,22 +542,7 @@ sl-range::part(thumb) {
   border: 2px dotted var(--highlight-yellow);
 }
 
-.slider-text,
-.slider-text-checked {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-family: 'Poppins', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.5em;
-  color: var(--darker-blue);
-  transition: opacity 0.4s;
-  pointer-events: none;
-  z-index: 4;
-  width: 50%;
-  text-align: center;
-}
+
 
 .slider-text { left: 0; }
 .slider-text-checked {
@@ -525,31 +586,25 @@ input:checked + .slider:before {
 /* #region Panel Components --------------------------------*/
 
 #valley_info {
-  display: grid;
+
   width: 100%;
-  grid-template-columns: 1fr 1fr; 
-  grid-gap: 20px; 
+
 }
 
-#lakes_counter {
+#basin_buttons {
   display: grid;
-  width: 100%;
-  grid-template-columns: 1fr 1fr 1fr; 
+  grid-template-columns: 1fr 1fr ; 
   grid-gap: 20px; 
-}
+  width:100%;
 
-#lakes_trace_container {
-  display: grid;
-  width: 100%;
-  grid-template-columns: 1fr 1fr 1fr 1fr; 
-  grid-gap: 20px; 
 }
-
 #info {
   font-size: 15px;
-  margin: 5px;
+  width: 100%;
+  margin: 15px 0; /* Changed from margin: 5px to add top/bottom spacing */
   padding: 15px;
   border: 1px solid #ffffff6b;
+  box-sizing: border-box; /* Add this to include padding in width calculation */
 }
 
 #valleys-detail sl-button {
@@ -572,66 +627,32 @@ input:checked + .slider:before {
 }
 
 /* Button hover & active states */
-#hn_valley::part(base):hover {
+#p_basin::part(base):hover {
   background-color: #85fbeb;
   color: var(--darker-blue);
   border-color: var(--darker-blue);
 }
 
-#kc_valley::part(base):hover {
-  background-color: #7af9b4;
+#c_basin::part(base):hover {
+  background-color: #a2ff57;
   color: var(--darker-blue);
   border-color: var(--darker-blue);
 }
 
-#a_valley::part(base):hover {
-  background-color: #3a59af;
-  color: white;
-  border-color: white;
-}
-
-#v_valley::part(base):hover {
-  background-color: #6fe6fd;
-  color: var(--darker-blue);
-  border-color: var(--darker-blue);
-}
-
-#s_valley::part(base):hover {
-  background-color: #43894d;
-  color: white;
-  border-color: white;
-}
-
-#panel sl-button::part(base):active {
-  border-color: var(--darker-blue);
-  opacity: 0.5;
-}
 
 /* Active Button States */
-#hn_valley.active::part(base) {
+#p_basin.active::part(base) {
   background-color: #85fbeb;
   color: var(--darker-blue);
 }
 
-#kc_valley.active::part(base) {
-  background-color: #7af9b4;
+#c_basin.active::part(base) {
+  background-color: #a2ff57;
   color: var(--darker-blue);
 }
 
-#a_valley.active::part(base) {
-  background-color: #3a59af;
-  color: white;
-}
 
-#v_valley.active::part(base) {
-  background-color: #6fe6fd;
-  color: var(--darker-blue);
-}
 
-#s_valley.active::part(base) {
-  background-color: #43894d;
-  color: white;
-}
 
 /* #endregion */
 
@@ -710,107 +731,326 @@ input:checked + .slider:before {
 
 
 /* #region Lakes Timeline Buttons --------------------------*/
-
-#lakes_trace_container sl-button {
+#lakes_counter {
+  display: grid;
   width: 100%;
-  height: 40px;
-  margin-top: 5px;
-  margin-bottom: 5px;
+  grid-template-columns: 1fr 1fr 1fr; 
+  grid-gap: 20px; 
 }
 
-#lakes_trace_container sl-button::part(base) {
-  border-radius: 0;
-  background-color: transparent;
-  border: 1px solid white;
-  border-style: solid;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: white;
-  font-size: 12px;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 10px #0002;
-  transition: all 0.3s ease;
+#lakes_trace_container {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 40px 0px 20px 0px; /* Remove left/right padding */
+    margin: 0px;
 }
 
-#lakes_trace_container sl-button::part(label) {
-  color: white;
+
+/* Horizontal timeline line */
+.timeline-line {
+    position: absolute;
+    width: 95%;
+    top: 40px;
+    left: 5px; /* Changed from 20px to 0 */
+    right: 0; /* Changed from 20px to 0 */
+    height: 1px;
+    background-color: transparent; /* Change from white to transparent */
+    border-top: 1px dashed white; /* Add dashed border */
+    z-index: 1;
 }
 
-/* Hover state - all timeline buttons */
-#lakes_trace_1800::part(base):hover,
-#lakes_trace_1900::part(base):hover,
-#lakes_trace_2000::part(base):hover {
-  background-color: var(--highlight-green);
-  color: var(--darker-blue);
-  border-color: var(--highlight-green);
-  box-shadow: 0 4px 15px rgba(130, 249, 132, 0.3);
+/* Circle on the timeline */
+.timeline-circle {
+    position: relative; /* Add this */
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: var(--darker-blue);
+    border: 3px solid white;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+    flex-shrink: 0; /* Add this to prevent shrinking */
 }
 
-#lakes_trace_1800::part(label):hover,
-#lakes_trace_1900::part(label):hover,
-#lakes_trace_2000::part(label):hover {
-  color: var(--darker-blue);
+/* Timeline button wrapper */
+.timeline-button {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
+    padding: 0;
+    transition: all 0.3s ease;
+    flex: 0 0 auto; /* Add this to prevent stretching */
 }
 
-/* Active state - when button is clicked */
-#lakes_trace_1800.active::part(base),
-#lakes_trace_1900.active::part(base),
-#lakes_trace_2000.active::part(base) {
-  background-color: var(--highlight-green);
-  color: var(--darker-blue);
-  border-color: var(--highlight-green);
-  box-shadow: 0 0 12px rgba(130, 249, 132, 0.6), inset 0 0 8px rgba(0, 0, 0, 0.1);
+/* Label below circle */
+.timeline-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: white;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    transition: all 0.3s ease;
 }
 
-#lakes_trace_1800.active::part(label),
-#lakes_trace_1900.active::part(label),
-#lakes_trace_2000.active::part(label) {
-  color: var(--darker-blue);
+/* Hover state */
+.timeline-button:hover .timeline-circle {
+    background-color: var(--highlight-yellow);
+    border-color: var(--highlight-yellow);
+    transform: scale(1.3);
+    box-shadow: 0 0 12px rgba(255, 251, 0, 0.6);
 }
 
-/* Reset button - danger variant */
-#lakes_trace_reset::part(base) {
-  border-radius: 0;
-  background-color: transparent;
-  border: 1px solid var(--error);
-  border-style: solid;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--error);
-  font-size: 12px;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 10px #0002;
-  transition: all 0.3s ease;
+.timeline-button:hover .timeline-label {
+    color: var(--highlight-yellow);
 }
 
-#lakes_trace_reset::part(label) {
-  color: var(--error);
+/* Active state */
+.timeline-button.active .timeline-circle {
+    background-color: var(--highlight-yellow);
+    border-color: var(--highlight-yellow);
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(255, 251, 3, 0.8);
 }
 
-#lakes_trace_reset::part(base):hover {
-  background-color: var(--error);
-  color: white;
-  border-color: var(--error);
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+.timeline-button.active .timeline-label {
+    color: var(--highlight-yellow);
+    font-weight: 700;
 }
 
-#lakes_trace_reset::part(label):hover {
-  color: white;
+/* Active state - add pulse animation */
+.timeline-button.active .timeline-circle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #ffd000;
+    opacity: 0;
+    animation: pulse 2s infinite;
 }
 
-#lakes_trace_reset::part(base):active {
-  opacity: 0.8;
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(3);
+        opacity: 0;
+    }
+}
+
+
+
+/* #endregion */
+
+/* #region Basin Timeline Buttons --------------------------*/
+/* Basin Play Icon Button */
+
+#basin_play_container {
+  display: flex;
+  width: 100%;
+  gap: 15px; 
+  align-items: center;
+  min-height: 40px; /* Ensure container has height */
+}
+
+#basin_play_container h4 {
+  text-align: left;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex: 1;
+  line-height: normal;
+  display: block;
+}
+
+#basin-play-button {
+  flex-shrink: 0;
+  font-size: 32px; /* Increase icon size */
+}
+
+#basin-play-button::part(base) {
+    color: white;
+}
+
+#basin-play-button::part(base):hover {
+    color: var(--highlight-green);
+}
+
+#basin-play-button.playing {
+    color: var(--highlight-yellow);
+}
+#basin_container {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 40px 0px 80px 0px;
+    margin: 0px;
+}
+
+/* Basin timeline line */
+#basin_container .timeline-line {
+    position: absolute;
+    width: calc(100% - 10px);
+    top: 50px;
+    left: 5px;
+    height: 1px;
+    background-color: transparent;
+    border-top: 1px dashed white;
+    z-index: 1;
+}
+
+/* Basin timeline circle */
+#basin_container .timeline-circle {
+    position: relative;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: var(--darker-blue);
+    border: 3px solid white;
+    transition: all 0.3s ease;
+    margin-bottom: 0px;
+    flex-shrink: 0;
+}
+
+/* Basin timeline button wrapper */
+#basin_container .timeline-button {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
+    padding: 0;
+    transition: all 0.3s ease;
+    flex: 1;
+    max-width: 20%;
+    min-height: 15px;
+}
+
+/* Arrow before active button - HIDDEN by default */
+#basin_container .timeline-button::before {
+    content: '';
+    position: absolute;
+    left: -10px; /* Changed from -30px to -10px */
+    top: 3px; /* Center aligned with 15px circle (half of 15px) */
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 12px solid var(--highlight-yellow);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 3;
+}
+
+/* Basin label - ALWAYS VISIBLE */
+#basin_container .timeline-label {
+    position: absolute;
+    top: 27px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: white;
+    letter-spacing: 0.5px;
+    white-space: normal;
+    word-wrap: break-word;
+    text-align: center;
+    width: 100%;
+    max-width: 100px;
+    line-height: 1.3;
+    
+    /* Always visible */
+    opacity: 1;
+    visibility: visible;
+    transition: all 0.3s ease;
+}
+
+/* Basin hover state */
+#basin_container .timeline-button:hover .timeline-circle {
+    background-color: var(--highlight-yellow);
+    border-color: var(--highlight-yellow);
+    transform: scale(1.3);
+    box-shadow: 0 0 12px rgba(255, 251, 0, 0.6);
+}
+
+#basin_container .timeline-button:hover .timeline-label {
+    /* Highlight text on hover */
+    color: var(--highlight-yellow);
+    font-weight: 700;
+}
+
+/* Basin active state */
+#basin_container .timeline-button.active .timeline-circle {
+    background-color: var(--highlight-yellow);
+    border-color: var(--highlight-yellow);
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(255, 251, 3, 0.8);
+}
+
+#basin_container .timeline-button.active .timeline-label {
+    /* Yellow and bold when active */
+    color: var(--highlight-yellow);
+    font-weight: 700;
+}
+
+/* Show arrow when button is active */
+#basin_container .timeline-button.active::before {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Active state - pulse animation */
+#basin_container .timeline-button.active .timeline-circle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #ffd000;
+    opacity: 0;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(3);
+        opacity: 0;
+    }
 }
 
 /* #endregion */
 
 /* #region typology panel*/
-
-
-
-
 #typology-info{
 
   padding: 0px; 
@@ -890,6 +1130,343 @@ input:checked + .slider:before {
   height: auto;
   border-radius: 0px;
   margin-top: 12px;
+}
+
+/* #endregion */
+
+
+/* #region Filter Styles ----------------------------------*/
+
+/* Filter container grid */
+.filter-container {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-gap: 15px;
+  margin-bottom: 15px;
+}
+
+.lake-filter-container {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-gap: 15px;
+  margin-bottom: 15px;
+}
+
+.drains-filter-container {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-gap: 15px;
+  margin-bottom: 15px;
+}
+
+/* results container*/
+/* Filter Results Counter */
+.filter-results-counter {
+    background: #f8f9fa;
+    border-radius: 0px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid #e0e0e0;
+}
+
+.counter-section {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.counter-section:last-child {
+    margin-bottom: 0;
+}
+
+.counter-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.counter-item.full-width {
+    flex: 1 1 100%;
+}
+
+.counter-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.counter-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+/* 🔥 NEW: Drain header with length */
+.drain-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.drain-length {
+    font-size: 11px;
+    font-weight: 700;
+    color: #4e4cf0;
+    background: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #4e4cf0;
+}
+
+.counter-list {
+    font-size: 12px;
+    color: #2c3e50;
+    line-height: 1.6;
+    max-height: 50px;
+    overflow-y: auto;
+    padding: 8px;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+}
+
+.counter-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.counter-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.counter-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.counter-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+/* Dropdown wrapper */
+.dropdown-checkboxes {
+  width: 100%;
+}
+
+.dropdown-checkboxes wa-dropdown {
+  width: 100%;
+}
+
+.dropdown-checkboxes wa-dropdown wa-button {
+  width: 100%;
+}
+
+/* Dropdown button styling */
+wa-dropdown wa-button::part(base) {
+  background-color: var(--darker-blue);
+  color: white;
+  border: 1px solid white;
+  border-radius: 0px;
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  letter-spacing: 0.08em;
+}
+
+wa-dropdown wa-button::part(base):hover,wa-dropdown[open] wa-button::part(base) {
+  background-color: var(--highlight-yellow);
+  color: var(--darker-blue);
+}
+
+wa-dropdown wa-button::part(label) {
+  flex: 1;
+  text-align: left;
+}
+
+wa-dropdown wa-button::part(caret) {
+  color: white;
+  margin-left: auto;
+}
+
+
+wa-dropdown::part(menu) {
+  margin-top: 5px;
+  background-color: white;
+  border: 1px solid var(--highlight-yellow);
+  border-radius: 0px;
+  font-family: 'Open Sans', sans-serif;}
+
+wa-dropdown-item {
+  color: var(--darker-blue);
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+wa-dropdown-item:hover {
+  background-color: var(--highlight-yellow);
+}
+
+/* Filter controls container */
+.filter-controls {
+  display: flex;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Select All and Clear buttons */
+.filter-control-btn {
+  flex: 1;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Unavailable (disabled) items */
+wa-dropdown-item.filter-unavailable::part(base),wa-dropdown-item[disabled]::part(base) {
+  background-color: #f5f5f5 !important;
+  color: #9ca3af !important;
+  opacity: 0.6;
+  cursor: not-allowed;}
+ 
+
+/* Search input in ward dropdown */
+sl-input[type="search"] {
+  --sl-input-border-color: var(--border-medium);
+  --sl-input-border-color-focus: var(--highlight-green);
+  --sl-input-border-radius-medium: 0px;
+}
+
+
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .filter-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* #endregion */
+
+/*#region buttons*/
+
+    /*#region Tanks Buttons*/
+
+        /*#region Year RESET*/
+        #reset{
+          width: 100%;
+          height: auto;
+          margin-top: 5px;
+          margin-bottom: 5px;
+          background: transparent;
+        }
+
+        #reset::part(base){
+          color: white;
+          background: transparent;
+          font-family: 'Poppins', sans-serif;
+          letter-spacing: 0.1em;  
+          font-weight: 900;
+          font-size:20px;
+          text-transform: uppercase;
+          justify-content: flex-start;
+          text-align: left;
+          align-items: center;
+          height: 60px;
+          border: 1px dashed white;
+          border-radius: 0px;          
+        }
+
+        #reset::part(base):hover {
+          background-color: var(--highlight-green);
+          color: var(--darker-blue);
+        }
+
+        #reset::part(label):hover {
+          color: var(--darker-blue);
+        }
+
+        /* Active state - when button is clicked */
+        #reset.active::part(base) {
+          background-color: var(--highlight-green);
+          color: var(--darker-blue);
+        }
+
+        #reset.active::part(label) {
+          color: var(--darker-blue);
+        }
+        /*#endregion*/
+        
+.reset_button {
+  display: block;
+  width: 100%;
+  height: 38px;
+}
+/* Reset filters button */
+.reset_button::part(base) {
+  border-radius: 0;
+  width: 100%;
+  height: 38px;
+  min-height: 38px;
+  box-sizing: border-box;
+  background-color: transparent;
+  border: 1px solid white;
+  padding: 0 20px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
+
+.reset_button::part(label) {
+  color: white;
+  padding: 0px;
+  line-height: 0px;
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.reset_button::part(base):hover {
+  background-color: var(--error);}
+
+
+
+
+    /*#endregion*/
+
+/*#endregion*/
+
+/* #region Download Options */
+.download-options {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.download-options sl-button {
+    flex: 1;
+    max-width: 150px;
+}
+
+.download-options sl-button::part(base) {
+    font-size: 12px;
 }
 
 /* #endregion */
