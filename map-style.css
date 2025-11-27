@@ -150,77 +150,7 @@ body {
 /* #endregion */
 
 /* #region Legend/Menu -------------------------------------*/
-/* Legend Group Styling */
-.legend-group-container {
-    margin-bottom: 15px;
-}
-
-.legend-group-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-    background-color: rgba(255, 255, 255, 0.1);
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-    user-select: none;
-}
-
-.legend-group-header:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-}
-
-.group-arrow {
-    font-size: 10px;
-    transition: transform 0.2s;
-    color: var(--highlight-yellow);
-}
-
-.group-label {
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 11px;
-    letter-spacing: 0.05em;
-    color: white;
-}
-
-.legend-group-children {
-    padding-left: 20px;
-    margin-top: 8px;
-    display: none; /* Start collapsed */
-}
-
-.legend-group-children .group-control {
-    margin-bottom: 10px;
-}
-
-/* Legend header with dropdown arrow on right */
-#legend::part(summary) {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 15px;
-}
-
-#legend::part(summary-icon) {
-    order: -1; /* Keep layers icon on left */
-    margin-right: 10px;
-}
-
-#legend::part(summary)::after {
-    content: '';
-    width: 0;
-    height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 6px solid currentColor;
-    transition: transform 0.2s ease;
-}
-
-#legend[open]::part(summary)::after {
-    transform: rotate(180deg);
-}
+/* Legend Container */
 #legend-container {
   position: absolute;
   top: 50px;
@@ -228,68 +158,139 @@ body {
   z-index: 10;
 }
 
-#legend-container sl-icon {
-  font-size: 22px;
-  color: white;
-  background-color: transparent;
-}
-
-#legend-container sl-details::part(summary-icon) {
-  display: none;
-}
-
+/* Legend Details Component */
 #legend-container sl-details {
   width: auto;
 }
 
 #legend-container sl-details[open] {
-  width: 200px;
+  width: 250px;
+}
+
+#legend-container sl-details::part(base) {
+  background-color: var(--dark-blue);
+  opacity: 0.9;
+  border: 1px solid white;
+  border-radius: 6px;
 }
 
 #legend-container sl-details:not([open])::part(base) {
   opacity: 1;
 }
 
-#legend-container sl-details::part(summary) {
-  background-color: transparent;
-  font-weight: 600;
-}
-
-#legend-container sl-details::part(base) {
-  background-color: var(--dark-blue);
-  opacity: 0.7;
-  padding: 0px;
-  border: 1px solid rgba(255,255,255, 1);
-  overflow: visible;
-  border-radius: 4px;
-}
-
-#legend-container sl-details::part(body) {
-  padding: 15px;
-  overflow: visible;
-}
-
 #legend-container sl-details:not([open])::part(base):hover {
-  background-color: #062490b4;
-  transition: background-color 0.3s ease, color 0.3s;
+  opacity: 0.8;
+  transition: background-color 0.3s ease;
 }
 
+
+/* Legend Summary (Header) */
+#legend-container sl-details::part(summary) {
+  padding: 0;
+  color: white;
+}
+
+#legend-container sl-details:not([open])::part(summary) {
+  padding: 3px;
+}
+
+#legend-container sl-details[open]::part(summary) {
+  padding: 12px 15px;
+}
+
+#legend-container sl-details[open]::part(header) {
+  padding: 8px;
+}
+
+#legend-container sl-icon[slot="summary"] {
+  font-size: 22px;
+  color: white;
+  transition: color 0.3s ease;
+}
+
+#legend-container sl-details::part(summary-icon) {
+  display: none;
+}
+
+/* Legend Body */
+#legend-container sl-details::part(body) {
+  padding: 0px;
+  color: white;
+}
+
+/* Legend Groups */
+.legend-group-container {
+  margin-bottom: 8px;
+}
+
+.legend-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background-color: transparent;
+  cursor: pointer;
+  border-radius: 0px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+
+.legend-group-header:hover {
+  background-color: var(--highlight-green);
+  border-color: white;
+}
+
+.legend-group-header:hover .group-label,
+.legend-group-header:hover .group-arrow {
+  color: var(--darker-blue);
+}
+
+.group-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: white;
+  flex: 1;
+  transition: color 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.group-arrow {
+  font-size: 14px;
+  color: white;
+  transition: color 0.3s ease;
+}
+
+.legend-group-children {
+  padding-left: 15px;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  margin-top: 8px;
+
+}
+
+.legend-group-children .group-control {
+  margin-bottom: 15px;
+}
 /* #endregion */
 
 /* #region Opacity Slider ----------------------------------*/
 
 sl-range {
-  margin-top: 4px;
+  margin-top: 0px;
   margin-bottom: 15px;
-  padding-left: 25px;
+  padding-left: 27px;
   display: flex;
   flex-direction: column;
   gap: 4px;
   width: 80% !important;
   /*tooltip: bottom;*/
 
-  --track-color-active: rgba(255, 255, 255, 0.781);
-  --track-color-inactive: rgba(255, 255, 255, 0.452);
+  --track-color-active: var(--highlight-yellow);
+  --track-color-inactive: #ffffff6c;
   --thumb-size: 15px;
 }
 
@@ -328,8 +329,8 @@ sl-range::part(thumb) {
 }
 
 .group-checkbox::part(control--checked) {
-  background: var(--highlight-green);
-  border-color: var(--highlight-green, #73ffba);
+  background: var(--highlight-yellow);
+  border-color: var(--highlight-yellow, #73ffba);
 }
 
 .group-checkbox::part(base):hover::part(label) {
