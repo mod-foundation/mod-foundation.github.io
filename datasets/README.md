@@ -15,17 +15,16 @@ Most of the data has been created and analysed by MOD Foundation. Some datasets 
 
 | Layer | Source | Description | Link |
 |-------|--------|-------------|------|
-| **Existing Tanks** | GIS Analysis by Mod Foundation | Reconciled the Well Labs and ATREE crowdsourced [dateset]( https://drive.google.com/drive/folders/1Vs0sDJiDlv45K-F0OeBeaMuDmueUMLUX
-https://medium.com/centre-for-social-and-environmental-innovation/crowdmapping-bengalurus-lakes-b40b1ed93446) with the data on BBMP Lakes dashboard to confirm location of lakes [dashboard](https://lms.bbmpgov.in/lake) and the comprehensive list of 201 lakes released in 2024 on custodianship [KTCDA](https://ktcda.karnataka.gov.in/storage/pdf-files/BBMP%20Lakes.pdf) |[Geojson](/datasets/lakes_existing.geojson)|
-| **Lost Tanks** | GIS Analysis by Mod Foundation | GIS Analysis performed by tracing georeferenced maps for the years 1790, 1870 and 1969. Verified with Revenue Maps of Bangalore [dashboard](https://lms.bbmpgov.in/lake)[Open City](https://lms.bbmpgov.in/lake) . The waterbodies were digitised and their names have been added in the attribute data. |[Geojson](/datasets/lakes_lost.geojson)|
+| **Existing Tanks** | GIS Analysis by Mod Foundation | Reconciled the Well Labs and ATREE crowdsourced [dateset]( https://drive.google.com/drive/folders/1Vs0sDJiDlv45K-F0OeBeaMuDmueUMLUX) with the data on BBMP Lakes [dashboard](https://lms.bbmpgov.in/lake) to confirm location of lakes. Verified with the comprehensive list of 201 lakes released in 2024 by [KTCDA](https://ktcda.karnataka.gov.in/storage/pdf-files/BBMP%20Lakes.pdf) |[Geojson](/datasets/lakes_existing.geojson)|
+| **Lost Tanks** | GIS Analysis by Mod Foundation | GIS Analysis performed by tracing georeferenced maps for the years 1790, 1870 and 1969. Verified with Revenue Maps of Bangalore [SSLR](https://www.landrecords.karnataka.gov.in/service3/Lakeencroachment.aspx) [Open City Cadastral](https://data.opencity.in/dataset/bengaluru-cadastral-maps/resource/bbmp-area-cadastral-map) . The waterbodies were digitised and their names have been added in the attribute data. |[Geojson](/datasets/lakes_lost.geojson)|
 
 ### <span style="color: #68c2fb;">Geographic Features</span>
 
-| Layer | Source | Description | Link | Resource |
-|-------|--------|-------------|------|----------|
-| **Watershed Basins** | Hydroshed | [Geojson](/datasets/all_basins.geojson) | [Hydroshed]([https://www.openstreetmap.org/](https://www.hydrosheds.org/)  |
-| **Valleys** | Hydroshed | [Geojson](/datasets/valley.geojson) | [Hydroshed]([https://www.openstreetmap.org/](https://www.hydrosheds.org/)  |
-| **Streamorder** | Hydroshed | [Geojson](/datasets/streamorder.geojson) | [Hydroshed]([https://www.openstreetmap.org/](https://www.hydrosheds.org/)  |
+| Layer | Source | Description | Link |
+|-------|--------|-------------|------|
+| **Watershed Basins** | Hydroshed | [Geojson](/datasets/all_basins.geojson) | [Hydroshed](https://www.hydrosheds.org/)  |
+| **Valleys** | Hydroshed | [Geojson](/datasets/valley.geojson) | [Hydroshed](https://www.hydrosheds.org/)   |
+| **Streamorder** | Hydroshed | [Geojson](/datasets/streamorder.geojson) | [Hydroshed](https://www.hydrosheds.org/)   |
 | **Parks** | Open City | [Geojson](/datasets/parks.geojson) | - |
 | **Wetlands** | Open City | [Geojson](/datasets/wetlands.geojson) | - |
 
@@ -41,15 +40,16 @@ https://medium.com/centre-for-social-and-environmental-innovation/crowdmapping-b
 | Layer | Source | Description | Link | Resource |
 |-------|--------|-------------|------|----------|
 | **DEM** | USGS Earth Explorer | Digital Elevation Model (DEM) 30m resolution downloaded from Earth Explorer | [TIF](/datasets/DEM.tif) | [USGS Earth Explorer](https://earthexplorer.usgs.gov/) |
-| **Roads** | Mapbox | Click on "Copy this style into your account" | [Style Link]([https://www.openstreetmap.org/](https://api.mapbox.com/styles/v1/mod-foundation/cmimsj4eh00q401qw4s9b2ogt.html?title=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34)) |
-| **Place Labels** | Mapbox | Click on "Copy this style into your account" | [Style Link]([https://www.openstreetmap.org/](https://api.mapbox.com/styles/v1/mod-foundation/cmimsj4eh00q401qw4s9b2ogt.html?title=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34)) |
-| **Basemap** | Mapbox | Click on "Copy this style into your account" | [Style Link]([https://www.openstreetmap.org/](https://api.mapbox.com/styles/v1/mod-foundation/cmimsj4eh00q401qw4s9b2ogt.html?title=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34)) |
+| **Roads** | Mapbox | Click on "Copy this style into your account" | [Style Link](https://api.mapbox.com/styles/v1/modfoundation/cmimsj4eh00q401qw4s9b2ogt.htmltitle=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34) |
+| **Place Labels** | Mapbox | Click on "Copy this style into your account" | [Style Link](https://api.mapbox.com/styles/v1/modfoundation/cmimsj4eh00q401qw4s9b2ogt.htmltitle=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34) |
+| **Basemap** | Mapbox | Click on "Copy this style into your account" | [Style Link](https://api.mapbox.com/styles/v1/modfoundation/cmimsj4eh00q401qw4s9b2ogt.htmltitle=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34) |
 
 ### <span style="color: #68c2fb;">Typologies</span>
 
 | Layer | Source | Description | Link |
 |-------|--------|-------------|------|
 | **Typology Guidebook** | Building a Resilient Bengaluru | Comprehensive guidebook on drain typologies | [Typology Guidebook](https://buildingaresilientbengaluru.com/) |
+| **Typology Analysis for C100** | MOD Foundation | Access the Streetview and Satellite imager screenshots [here](/files) | [Geojson](/datasets/typology_analysis.geojson) |
 
 ---
 
