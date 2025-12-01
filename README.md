@@ -1,4 +1,5 @@
-# Building a Resilient Bengaluru - The Campaign
+# Building A Resilient Bengaluru
+# The Bengaluru Stormwater Ecosystem Interactive Map
 
 " When we see how water flows in our cities, we understand where our city breathes — resilience begins with awareness."
 
