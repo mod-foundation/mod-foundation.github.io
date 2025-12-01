@@ -5,9 +5,9 @@
 
 The Bengaluru Stormwater Ecosystem Interactive Map is a flexible and interactive web based GIS software to quickly visualize spatial data layers from a variety of data sources.
 
-amche-atlas is currently deployed at the following urls:
+The map is currently deployed at the following urls:
 
-Homepage: https://amche.in/
+Homepage: 
 
 ## Table of Contents
 
