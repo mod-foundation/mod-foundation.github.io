@@ -68,4 +68,8 @@ Interactive versions of these datasets can be explored and downloaded through:
 
 ---
 
+## GIS DISCLAIMER
+
+While every effort has been made to ensure the accuracy of this information, Mod Foundation makes no warranty, expressed or implied, as to its absolute accuracy. This product is for informational purposes and is not suitable for legal, engineering, or surveying purposes. It does not represent an on-the-ground survey and represents only approximate relative locations.
+
 *For questions about data quality, methodology, or access, please contact MOD Foundation.*
