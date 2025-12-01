@@ -43,6 +43,10 @@ In July 2025, Mod Foundation in collaboration with Oorvani Foundation won a gran
 - Understanding the Watershed : Immersive understanding of regional to city-level watershed.
 - History of Tanks: Explore how the city lost tanks to growth and urbanisation through an immersive timeline.
 - Typologies of Drains: Understand the types of physical adjacencies of drain C100 in the Kormangala Challaghatta Valley.
+
+### Data
+
+Read through the [README in the datasets folder](https://github.com/mod-foundation/mod-foundation.github.io/tree/main/datasets) for information on sources and access.
   
 
 ## Built With
