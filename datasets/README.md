@@ -8,22 +8,22 @@ Most of the data has been created and analysed by MOD Foundation. Some datasets 
 
 | Layer | Source | Description | Link |
 |-------|--------|-------------|------|
-| **Primary Drains** | Map depicting Storm Drainage Network under BBMP | The map of SWDs has been georeferenced. Please refer to page 3 of the CAG report for SWD map. The primary and secondary drains were digitised to produce files in GIS format. The data can be downloaded from Interactive map. | [CAG Performance Audit - Open City](https://data.opencity.in/dataset/cag-performance-audit-of-stormwater-drains-in-bengaluru/resource/cag-performance-audit-of-stormwater-drains-in-bengaluru) |
-| **Secondary Drains** | Map depicting Storm Drainage Network under BBMP | The map of SWDs has been georeferenced. Please refer to page 3 of the CAG report for SWD map. The primary and secondary drains were digitised to produce files in GIS format. The data can be downloaded from Interactive map. | [CAG Performance Audit - Open City](https://data.opencity.in/dataset/cag-performance-audit-of-stormwater-drains-in-bengaluru/resource/cag-performance-audit-of-stormwater-drains-in-bengaluru) |
+| **Primary Drains** | Map depicting Storm Drainage Network under BBMP | The map of SWDs has been georeferenced. Please refer to page 3 of the CAG report for SWD map. The primary and secondary drains were digitised to produce files in GIS format. The data can be downloaded from Interactive map. | [Geojson](/datasets/primarydrains.geojson)| [CAG Performance Audit - Open City](https://data.opencity.in/dataset/cag-performance-audit-of-stormwater-drains-in-bengaluru/resource/cag-performance-audit-of-stormwater-drains-in-bengaluru) |
+| **Secondary Drains** | Map depicting Storm Drainage Network under BBMP | The map of SWDs has been georeferenced. Please refer to page 3 of the CAG report for SWD map. The primary and secondary drains were digitised to produce files in GIS format. The data can be downloaded from Interactive map. |[Geojson](/datasets/primarydrains.geojson)| [CAG Performance Audit - Open City](https://data.opencity.in/dataset/cag-performance-audit-of-stormwater-drains-in-bengaluru/resource/cag-performance-audit-of-stormwater-drains-in-bengaluru) |
 
 ### <span style="color: #68c2fb;">Tanks</span>
 
 | Layer | Source | Description | Link |
 |-------|--------|-------------|------|
-| **Existing Tanks** | GIS Analysis by Mod Foundation | GIS Analysis performed by analysing georeferenced maps for the years 1790, 1870 and 1969. The Survey of India maps were georeferenced. The waterbodies were digitised and their names have been added in the attribute data. | [Mod Foundation](https://mod.org.in/) |
-| **Lost Tanks** | GIS Analysis by Mod Foundation | GIS Analysis performed by analysing georeferenced maps for the years 1790, 1870 and 1969. The Survey of India maps were georeferenced. The waterbodies were digitised and their names have been added in the attribute data. | [Mod Foundation](https://mod.org.in/) |
+| **Existing Tanks** | GIS Analysis by Mod Foundation | GIS Analysis performed by analysing georeferenced maps for the years 1790, 1870 and 1969. The Survey of India maps were georeferenced. The waterbodies were digitised and their names have been added in the attribute data. |[Geojson](/datasets/primarydrains.geojson)|
+| **Lost Tanks** | GIS Analysis by Mod Foundation | GIS Analysis performed by analysing georeferenced maps for the years 1790, 1870 and 1969. The Survey of India maps were georeferenced. The waterbodies were digitised and their names have been added in the attribute data. |[Geojson](/datasets/primarydrains.geojson)|
 
 ### <span style="color: #68c2fb;">Geographic Features</span>
 
 | Layer | Source | Description | Link |
 |-------|--------|-------------|------|
-| **Valleys** | Mod Foundation | - | - |
-| **Greens** | OpenStreetMap | - | [OpenStreetMap](https://www.openstreetmap.org/) |
+| **Watershed Basins, Valleys and Streamorder** | Hydroshed | - | [Hydroshed](https://www.openstreetmap.org/)  |
+| **Greens** | Open City | - | |
 
 ### <span style="color: #68c2fb;">Administrative Boundaries</span>
 
