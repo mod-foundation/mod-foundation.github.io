@@ -3,20 +3,21 @@
 
 " When we see how water flows in our cities, we understand where our city breathes — resilience begins with awareness."
 
-The Bengaluru Stormwater Ecosystem Interactive Map is a flexible and interactive web based GIS software to quickly visualize spatial data layers from a variety of data sources.
+The Bengaluru Stormwater Ecosystem Interactive Map is a flexible and interactive web-map to interact spatially with stormwater related datasets.
+The map is currently deployed at:
 
-The map is currently deployed at the following urls:
+Interactive Map: https://buildingaresilientbengaluru.com/ecology-map/
 
-Homepage: 
+Homepage: https://buildingaresilientbengaluru.com/
 
 ## Table of Contents
 
-- [Background](#background)
+- [The Campaign](#the-campaign)
 - [Features](#features)
 - [Built With](#built-with)
 - [Acknowledgments](#acknowledgments)
 
-## Background - The Campaign
+## The Campaign
 
 Bengaluru stands at a critical crossroads. Once sustained by a man-made ecological network of tanks, lakes, and rajakaluves, the city nurtured thriving water ecologies, economies, and productive landscapes. Over time, however, rapid urbanisation has severed this relationship. Lakes were filled, stormwater canals narrowed, and the systems that once safeguarded the city against floods steadily dismantled. Each monsoon now exposes the cost of this neglect: inundated neighbourhoods, disrupted livelihoods, and a growing vulnerability across the urban fabric.
 
@@ -35,16 +36,16 @@ In July 2025, Mod Foundation in collaboration with Oorvani Foundation won a gran
 
 ### Features
 
-- Interactive Map - Bangalore's Stormwater Ecosystem
-- 
-- Point 3
+- Understanding the Watershed : Immersive understanding of regional to city-level watershed.
+- History of Tanks: Explore how the city lost tanks to growth and urbanisation through an immersive timeline.
+- Typologies of Drains: Understand the types of physical adjacencies of drain C100 in the Kormangala Challaghatta Valley.
+  
 
 ## Built With
 The development of the interactive map was done on Visual Studio Code with Claude Integration. Source code hosted on Github and served via Github Pages
 
 Basemap - Mapbox Studio style
-Mapbox Streets v8 vector tiles / OpenStreetMap Project
-Mapbox Satellite imagery / Maxar
+mapbox://styles/mod-foundation/cmimsj4eh00q401qw4s9b2ogt
 
 JS
 Mapbox GL JS for client side map rendering and interactivity
@@ -58,8 +59,6 @@ Google Fonts
 
 ## Acknowledgments
 
-- Hat tip to anyone whose code was used
-- Inspiration sources
-- References and tutorials
-- Third-party assets credits
+The Building a Resilient Bengaluru campaign is led by the Mod Foundation, in partnership with the Oorvani Foundation, Citizen Matters, and OpenCity. Together, we combine research, journalism, community engagement, and open data to make Bengaluru’s stormwater systems visible and actionable.
+The campaign is supported by the Bengaluru Sustainability Forum’s Small Grants Programme, enabling collaborative work that strengthens urban resilience across the city.
 
