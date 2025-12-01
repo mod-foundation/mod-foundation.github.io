@@ -6,8 +6,8 @@ Most of the data has been created and analysed by MOD Foundation. Some datasets 
 
 ### <span style="color: #68c2fb;">Drains</span>
 
-| Layer | Source | Description | Link |
-|-------|--------|-------------|------|
+| Layer | Source | Description | Link | Resource |
+|-------|--------|-------------|------|----------|
 | **Primary Drains** | Map depicting Storm Drainage Network under BBMP | The map of SWDs has been georeferenced. Please refer to page 3 of the CAG report for SWD map. The primary and secondary drains were digitised to produce files in GIS format. The data can be downloaded from Interactive map. | [Geojson](/datasets/primarydrains.geojson)| [CAG Performance Audit - Open City](https://data.opencity.in/dataset/cag-performance-audit-of-stormwater-drains-in-bengaluru/resource/cag-performance-audit-of-stormwater-drains-in-bengaluru) |
 | **Secondary Drains** | Map depicting Storm Drainage Network under BBMP | The map of SWDs has been georeferenced. Please refer to page 3 of the CAG report for SWD map. The primary and secondary drains were digitised to produce files in GIS format. The data can be downloaded from Interactive map. |[Geojson](/datasets/primarydrains.geojson)| [CAG Performance Audit - Open City](https://data.opencity.in/dataset/cag-performance-audit-of-stormwater-drains-in-bengaluru/resource/cag-performance-audit-of-stormwater-drains-in-bengaluru) |
 
