@@ -1,129 +1,138 @@
-
 //#region config
 
 //#region layerConfig
 
 // 🧱 Single source of truth for all layers and groups
 const layerConfig = {
-    'primarydrains': {
+    primarydrains: {
         label: 'Primary Drains',
         layers: ['primary-drains', 'primary-drains-interaction', 'Halo']
     },
 
-    'secondarydrains': {
+    secondarydrains: {
         label: 'Secondary Drains',
         layers: ['secondary-drains', 'secondary-drains-interaction', 'Secondary Drains Halo']
     },
 
-    'tanks': {
+    tanks: {
         label: 'Existing Tanks',
         layers: ['Lakes', 'Lakes_existing_overlap']
     },
 
-    'losttanks': {
+    losttanks: {
         label: 'Lost Tanks',
         layers: ['Lakes_lost']
     },
 
-    'tanks1800': {
+    tanks1700: {
+        label: 'Tanks 1700',
+        layers: ['lakes_1700', '1790-boundary']
+    },
+
+    tanks1800: {
         label: 'Tanks 1800',
         layers: ['lakes_lost_1800', 'lakes_existing_1800', '1870-boundary']
     },
 
-    'tanks1900': {
+    tanks1900: {
         label: 'Tanks 1900',
         layers: ['lakes_lost_1900', 'lakes_existing_1900', '1968-boundary', 'Lakes_lost_1800_1900']
     },
 
-    'existingtanks': {
+    existingtanks: {
         label: 'Existing Tanks',
         layers: ['tanks_existing', 'Lakes_lost_1900_2000']
     },
 
-    'valleys': {
+    valleys: {
         label: 'Valleys',
         layers: ['valleys']
     },
 
-    'valleyscategory': {
+    valleyscategory: {
         label: 'Valley Categories',
         layers: ['valleys category']
     },
 
-    'ridge': {
+    subvalleys: {
+        label: 'Sub Valleys',
+        layers: ['sub-valleys']
+    },
+
+    ridge: {
         label: 'Ridge Line',
         layers: ['Ridge']
     },
 
-    'streamorder': {
+    streamorder: {
         label: 'Watershed',
         layers: ['streamorder', 'streamorder-arrows']
     },
 
-    'allbasins': {
+    allbasins: {
         label: 'All Basins',
         layers: ['all-basins']
     },
 
-    'basinbg': {
+    basinbg: {
         label: 'Basin BG',
         layers: ['basin-bg']
     },
 
-    'valleylabels': {
+    valleylabels: {
         label: 'valley labels',
         layers: ['valleys-label', 'river-label', 'largerriver-label']
     },
 
-    'dem': {
+    dem: {
         label: 'DEM',
         layers: ['dem']
     },
 
-    'hillshade': {
+    hillshade: {
         label: 'Hillshade',
         layers: ['hillshade']
     },
 
-    'placelabels': {
+    placelabels: {
         label: 'Place Labels',
         layers: ['settlement-minor-label', 'settlement-subdivision-label']
     },
 
-    'bbmp': {
-        label: 'BBMP Boundary',
-        layers: ['bbmp']
+    gba: {
+        label: 'GBA Boundary',
+        layers: ['gba']
     },
 
-    'wards': {
-        label: 'BBMP Wards',
-        layers: ['bbmp-wards-line']
+    wards: {
+        label: 'GBA wards',
+        layers: ['gba-wards']
     },
 
-    'roads': {
+    roads: {
         label: 'Roads',
         layers: ['road-label', 'road-motorway-trunk', 'road-primary', 'road-secondary-tertiary']
     },
 
-    'bg': {
+    bg: {
         label: 'background',
         layers: ['background', 'satellite']
     },
 
-    'typologyanalysis': {
+    typologyanalysis: {
         label: 'typologies',
-        layers: ['typ_analysis']
+        layers: ['typ_analysis', 'typ_analysis-glow']
     },
 
-    'previousboundaries': {
+    previousboundaries: {
         label: 'Old Boundaries',
         layers: ['year-boundaries']
+    },
+
+    greens: {
+        label: 'Greens',
+        layers: ['parks', 'wetlands']
     }
-
-
-
-
-
 };
 
 // EXTRACT FROM CONFIG
@@ -138,15 +147,44 @@ const allLayerIds = Object.values(layerConfig).flatMap(group => group.layers);
 const allGroups = Object.keys(layerConfig);
 
 // Also useful: groupMapping for toggle functions
-const groupMapping = Object.fromEntries(
-    Object.entries(layerConfig).map(([key, value]) => [key, value.layers])
-);
-
+const groupMapping = Object.fromEntries(Object.entries(layerConfig).map(([key, value]) => [key, value.layers]));
 
 //#endregion
 
 //#region viewPresets
 
+// Responsive bounds-based views (SW corner, NE corner)
+const defaultViewBounds = {
+    bounds: [
+        [77.5, 12.87], // Southwest coordinates
+        [77.74, 13.1] // Northeast coordinates
+    ],
+    pitch: 0,
+    bearing: 0,
+    padding: 0
+};
+
+const dem3DViewBounds = {
+    bounds: [
+        [77.55, 12.85], // Southwest coordinates
+        [77.75, 13.05] // Northeast coordinates
+    ],
+    pitch: 45,
+    bearing: -45,
+    padding: { top: 50, bottom: 50, left: 50, right: 50 }
+};
+
+const valleyViewBounds = {
+    bounds: [
+        [77.4, 12.78], // Southwest coordinates
+        [77.85, 13.08] // Northeast coordinates
+    ],
+    pitch: 0,
+    bearing: 0,
+    padding: { top: 50, bottom: 50, left: 50, right: 50 }
+};
+
+// Legacy fallback views (for backwards compatibility)
 const defaultView = {
     center: [77.616, 12.986],
     zoom: 11.2,
@@ -155,9 +193,9 @@ const defaultView = {
 };
 
 const dem3DView = {
-    center: [77.650, 12.950],
+    center: [77.65, 12.95],
     zoom: 11,
-    pitch: 45,   // tilt for 3D
+    pitch: 45, // tilt for 3D
     bearing: -45 // rotate if you like
 };
 
@@ -173,28 +211,41 @@ const valleyView = {
 
 //#region constants
 
-
-
 const lineLayers = resolveLayers({
     layers: ['primary-drains', 'secondary-drains', 'Lakes_existing_overlap']
 });
 
 // hide on load:
 const hideLayers = resolveLayers({
-    groups: ['allbasins', 'basinbg', 'valleyscategory', 'streamorder', 'ridge', 'tanks1800', 'tanks1900', 'typologyanalysis', 'existingtanks'],
+    groups: [
+        'allbasins',
+        'basinbg',
+        'valleyscategory',
+        'streamorder',
+        'ridge',
+        'tanks1700',
+        'tanks1800',
+        'tanks1900',
+        'typologyanalysis',
+        'existingtanks'
+    ]
 });
 
-const alwaysVisible = resolveLayers(
-    { groups: ['bg', 'bbmp'] }
-);
+const alwaysVisible = resolveLayers({ groups: ['bg', 'gba'] });
 
 // interactive layers
 const interactiveLayers = [
     'primary-drains-interaction',
     'secondary-drains-interaction',
-    'Lakes', 'Lakes_lost',
-    'lakes_lost_1800', 'lakes_existing_1800',
-    'tanks_existing', 'lakes_lost_1900',
+    'Lakes',
+    'Lakes_lost',
+    'lakes_lost_1800',
+    'lakes_existing_1800',
+    'tanks_existing',
+    'lakes_lost_1900',
+    'lakes_1700',
+    'gba-wards',
+    'parks'
 ];
 
 let currentHighlight = null;
@@ -205,34 +256,28 @@ let activeCallouts = {};
 
 let basinHighlight = null;
 
-
 // Typology code to label mapping
 const typologyLabels = {
-    't1': 'Road Adjacent with Footpath',
-    't2': 'Road Adjacent without Footpath',
-    't3': 'Road Adjacent Ring Road/ Highway',
-    't4': 'Property Adjacent Abutting Buildings',
-    't5': 'Property Adjacent with Setback',
-    't6': 'Lake Adjacent with Pathway',
-    't7': 'Lake Adjacent without Pathway',
-    't8': 'Inside Private Property/ Campus',
-    't9': 'Railway Adjacent',
-    't10': 'Open Space (Parks, Playgrounds, etc) Adjacent',
-    't11': 'Agricultural Land Adjacent',
-    't12': 'Vacant Land Adjacent'
+    t1: 'Road Adjacent with Footpath',
+    t2: 'Road Adjacent without Footpath',
+    t3: 'Road Adjacent Ring Road/ Highway',
+    t4: 'Property Adjacent Abutting Buildings',
+    t5: 'Property Adjacent with Setback',
+    t6: 'Lake Adjacent with Pathway',
+    t7: 'Lake Adjacent without Pathway',
+    t8: 'Inside Private Property/ Campus',
+    t9: 'Railway Adjacent',
+    t10: 'Open Space (Parks, Playgrounds, etc) Adjacent',
+    t11: 'Agricultural Land Adjacent',
+    t12: 'Vacant Land Adjacent'
 };
 
 let basinPlayInterval = null;
 let isBasinPlaying = false;
-
-
-
-
-
-
-
-
-
+let lakesPlayInterval = null;
+let isLakesPlaying = false;
+let valleysCategoryTimeout = null;
+let demTimeouts = [];
 
 //#endregion
 
@@ -243,21 +288,26 @@ let isBasinPlaying = false;
 //#region mapsetup
 
 //api
-mapboxgl.accessToken = 'pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A';
+mapboxgl.accessToken =
+    'pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A';
 
 //map container
 const map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mod-foundation/cmgt3nndf00h101sd83sj4g7x',
-    center: [77.616, 12.986],
-    zoom: 11,
+    style: 'mapbox://styles/mod-foundation/cmimsj4eh00q401qw4s9b2ogt',
+    bounds: [
+        [77.5, 12.87], // Southwest coordinates
+        [77.74, 13.1] // Northeast coordinates
+    ],
+    pitch: 0,
+    bearing: 0,
+    padding: 0,
     preserveDrawingBuffer: true
 });
 
 //close legend on page load
 const details = document.querySelector('sl-details');
 details.open = false;
-
 
 //#endregion
 
@@ -285,22 +335,23 @@ function generateLegend() {
         {
             label: 'Valleys',
             isGroup: true,
-            children: ['valleys', 'valleylabels']
+            children: ['valleys', 'valleylabels', 'subvalleys']
         },
         {
-            label: 'DEM',
+            label: 'Greens',
             isGroup: true,
-            children: ['dem', 'hillshade']
+            children: ['greens']
         },
+
         {
             label: 'Boundaries',
             isGroup: true,
-            children: ['wards', 'bbmp']
+            children: ['wards', 'gba']
         },
         {
             label: 'Background',
             isGroup: true,
-            children: ['roads', 'placelabels', 'bg']
+            children: ['dem', 'roads', 'placelabels', 'bg']
         },
         {
             label: 'Typologies',
@@ -434,7 +485,7 @@ function createOpacitySlider(groupKey, firstLayer, layers, isVisible) {
     let currentOpacity = 1; // default
     try {
         const paintValue = map.getPaintProperty(firstLayer, opacityProp);
-        currentOpacity = (paintValue !== undefined && paintValue !== null) ? paintValue : 1;
+        currentOpacity = paintValue !== undefined && paintValue !== null ? paintValue : 1;
     } catch (e) {
         console.warn(`⚠️ Could not get paint property ${opacityProp} for ${firstLayer}:`, e);
         currentOpacity = 1;
@@ -455,11 +506,6 @@ function createOpacitySlider(groupKey, firstLayer, layers, isVisible) {
     return slider;
 }
 
-
-
-
-
-
 //#endregion
 
 //#endregion
@@ -470,10 +516,7 @@ function createOpacitySlider(groupKey, firstLayer, layers, isVisible) {
 
 //resolve groups and layers to array of layer ids
 function resolveLayers(config) {
-    return [
-        ...config.groups?.flatMap(groupKey => groupMapping[groupKey] || []) || [],
-        ...config.layers || []
-    ];
+    return [...(config.groups?.flatMap(groupKey => groupMapping[groupKey] || []) || []), ...(config.layers || [])];
 }
 
 // Helper function: Get the correct opacity property name based on layer type
@@ -483,18 +526,18 @@ function getOpacityProperty(layerId) {
     // Return null if layer not found
     if (!layer) {
         console.warn(`⚠️ Layer not found: ${layerId}`);
-        return null;  // ← FIX: Return null instead of console.log
+        return null; // ← FIX: Return null instead of console.log
     }
 
     // Map each layer type to its opacity property name
     const opacityMap = {
-        'line': 'line-opacity',
-        'fill': 'fill-opacity',
-        'circle': 'circle-opacity',
-        'raster': 'raster-opacity',
+        line: 'line-opacity',
+        fill: 'fill-opacity',
+        circle: 'circle-opacity',
+        raster: 'raster-opacity',
         'fill-extrusion': 'fill-extrusion-opacity',
-        'symbol': 'text-opacity',
-        'background': 'background-opacity'
+        symbol: 'text-opacity',
+        background: 'background-opacity'
     };
 
     // Return the opacity property for this layer type, default to fill-opacity
@@ -505,16 +548,38 @@ function getOpacityProperty(layerId) {
 
 //#region Interactive Helpers
 // Highlight selected feature
-// Highlight selected feature - FIXED to highlight entire feature
+// Highlight selected feature - FIXED to use unique property-based filtering
 function highlightFeature(feature) {
     clearHighlight();
 
     const layerId = feature.layer.id;
     const sourceLayer = feature.layer['source-layer'];
-    const featureId = feature.id;
+    const props = feature.properties;
 
-    // Create filter for this specific feature by ID
-    const filter = ['==', ['id'], featureId];
+    // Build a unique filter based on available properties
+    // Priority: fid > id_dup > Drain num > OBJECTID > feature.id
+    let filter;
+
+    if (props.fid !== undefined) {
+        filter = ['==', ['get', 'fid'], props.fid];
+    } else if (props.id_dup !== undefined) {
+        filter = ['==', ['get', 'id_dup'], props.id_dup];
+    } else if (props['Drain num'] !== undefined) {
+        filter = ['==', ['get', 'Drain num'], props['Drain num']];
+    } else if (props.OBJECTID !== undefined) {
+        filter = ['==', ['get', 'OBJECTID'], props.OBJECTID];
+    } else if (feature.id !== undefined) {
+        filter = ['==', ['id'], feature.id];
+    } else {
+        // Fallback: use name or first available unique property
+        const uniqueKey = Object.keys(props).find(k => props[k] !== null && props[k] !== undefined);
+        if (uniqueKey) {
+            filter = ['==', ['get', uniqueKey], props[uniqueKey]];
+        } else {
+            console.warn('⚠️ Cannot create unique filter for feature:', feature);
+            return;
+        }
+    }
 
     // Add highlight layer based on feature type
     if (feature.layer.type === 'line') {
@@ -531,18 +596,21 @@ function highlightFeature(feature) {
             }
         }); // Insert right above the original layer
     } else if (feature.layer.type === 'fill') {
-        map.addLayer({
-            id: 'feature-highlight',
-            type: 'line',
-            source: feature.layer.source,
-            'source-layer': sourceLayer,
-            filter: filter,
-            paint: {
-                'line-color': '#82f984',
-                'line-width': 4,
-                'line-opacity': 1
-            }
-        }, layerId);
+        map.addLayer(
+            {
+                id: 'feature-highlight',
+                type: 'line',
+                source: feature.layer.source,
+                'source-layer': sourceLayer,
+                filter: filter,
+                paint: {
+                    'line-color': '#82f984',
+                    'line-width': 4,
+                    'line-opacity': 1
+                }
+            },
+            layerId
+        );
     }
 
     currentHighlight = 'feature-highlight';
@@ -550,10 +618,21 @@ function highlightFeature(feature) {
 
 // Clear highlight
 function clearHighlight() {
-    if (currentHighlight && map.getLayer(currentHighlight)) {
+    if (!currentHighlight) return;
+
+    // Handle array of highlight layers (e.g., typology pairs)
+    if (Array.isArray(currentHighlight)) {
+        currentHighlight.forEach(layerId => {
+            if (map.getLayer(layerId)) {
+                map.removeLayer(layerId);
+            }
+        });
+    } else if (map.getLayer(currentHighlight)) {
+        // Handle single highlight layer
         map.removeLayer(currentHighlight);
-        currentHighlight = null;
     }
+
+    currentHighlight = null;
 }
 
 // Helpers
@@ -565,13 +644,15 @@ function getType(id) {
     if (id === 'Lakes_lost') return 'Lost Tank';
     if (id === 'Lakes_lost_1900') return 'Lost Tank (1969)';
     if (id === 'Lakes_lost_1800') return 'Lost Tank (1880s)';
+    if (id === 'lakes_1700') return 'Lost Tank (1700s)';
     if (id === 'Lakes_lost_1800_button') return 'Lost Tank';
     if (id === 'Lakes_lost_1900_button') return 'Lost Tank';
     if (id === 'lakes_existing_1800') return 'Existing Tank';
     if (id === 'lakes_existing_1900') return 'Existing Tank';
     if (id === 'tanks_existing') return 'Existing Tank';
     if (id === 'typ_analysis') return 'Typology';
-    //if (id === 'bbmp-wards') return 'Ward';
+    if (id === 'gba-wards') return 'Ward';
+    if (id === 'parks') return 'Park';
     return 'Feature';
 }
 
@@ -582,6 +663,7 @@ function getColor(id) {
     if (id === 'Lakes') return '#4e4cf0';
     if (id === 'Lakes_lost') return '#ae2e2e';
     if (id === 'Lakes_lost_1900') return '#ae2e2e';
+    if (id === 'lakes_1700') return '#ae2e2e';
     if (id === 'Lakes_lost_1800') return '#8e3838';
     if (id === 'Lakes_lost_1800_button') return '#0085eb';
     if (id === 'Lakes_lost_1900_button') return '#0056eb';
@@ -589,6 +671,7 @@ function getColor(id) {
     if (id === 'lakes_existing_1900') return '#0056eb';
     if (id === 'tanks_existing') return '#4e4cf0';
     if (id === 'typ_analysis') return '#FF69B4';
+    if (id === 'parks') return '#296b2f';
     return '#999';
 }
 
@@ -642,9 +725,9 @@ function getTypologyColor(typValue) {
     return '#999999';
 }
 
-// Handle click anywhere on map when typology layer is active
+/*Handle click anywhere on map when typology layer is active
 function handleTypologyMapClick(lngLat) {
-    map.on('click', (e) => {
+    map.on('click', e => {
         // Check if typology layer is visible
         const typLayer = map.getLayer('typ_analysis');
         if (!typLayer || map.getLayoutProperty('typ_analysis', 'visibility') === 'none') {
@@ -663,13 +746,13 @@ function handleTypologyMapClick(lngLat) {
             sourceLayer: 'typ_analysis-6bvc7g'
         });
 
-        console.log(`📍 Click point: ${lngLat.lng}, ${lngLat.lat}`);
-        console.log(`📊 Searching through ${allFeatures.length} features`);
+        //console.log(`📍 Click point: ${lngLat.lng}, ${lngLat.lat}`);
+        //console.log(`📊 Searching through ${allFeatures.length} features`);
 
         // Group features by drain_id
         const byDrainId = {};
         allFeatures.forEach(f => {
-            const drainId = f.properties.drain_id;
+            const drainId = f.properties['Drain num'];
             if (!byDrainId[drainId]) {
                 byDrainId[drainId] = { lhs: null, rhs: null };
             }
@@ -702,7 +785,11 @@ function handleTypologyMapClick(lngLat) {
             const pair = byDrainId[drainId];
             if (pair.lhs && pair.rhs) {
                 const totalDistance = pair.lhs.distance + pair.rhs.distance;
-                console.log(`Drain ${drainId}: LHS dist=${pair.lhs.distance.toFixed(4)}km, RHS dist=${pair.rhs.distance.toFixed(4)}km, Total=${totalDistance.toFixed(4)}km`);
+                console.log(
+                    `Drain ${drainId}: LHS dist=${pair.lhs.distance.toFixed(4)}km, RHS dist=${pair.rhs.distance.toFixed(
+                        4
+                    )}km, Total=${totalDistance.toFixed(4)}km`
+                );
 
                 if (totalDistance < bestTotalDistance) {
                     bestTotalDistance = totalDistance;
@@ -722,7 +809,7 @@ function handleTypologyMapClick(lngLat) {
             console.log('❌ No complete LHS/RHS pair found within 0.15km buffer');
         }
     });
-}
+}*/
 
 // Display both LHS and RHS features as custom popups
 function displayTypologyPair(lhsFeature, rhsFeature) {
@@ -731,7 +818,7 @@ function displayTypologyPair(lhsFeature, rhsFeature) {
 
     const lhsValue = lhsProps.typ || 'N/A';
     const rhsValue = rhsProps.typ || 'N/A';
-    const drainId = lhsProps.drain_id || 'N/A';
+    const drainId = lhsProps['drain_id'] || 'N/A'; // 🔥 CHANGED from drain_id
 
     const lhsColor = getTypologyColor(lhsValue);
     const rhsColor = getTypologyColor(rhsValue);
@@ -746,9 +833,17 @@ function displayTypologyPair(lhsFeature, rhsFeature) {
     const rhsLine = turf.lineString(rhsFeature.geometry.coordinates);
     const rhsClosestPoint = turf.nearestPointOnLine(rhsLine, clickPoint);
 
-    // Extract image URLs from img attribute
-    const lhsImgHtml = lhsProps.img ? extractImageUrl(lhsProps.img) : '';
-    const rhsImgHtml = rhsProps.img ? extractImageUrl(rhsProps.img) : '';
+    // Extract image URLs from description attribute (fallback to img attribute)
+    const lhsImgHtml = lhsProps.description
+        ? extractImageUrl(lhsProps.description)
+        : lhsProps.img
+        ? extractImageUrl(lhsProps.img)
+        : '';
+    const rhsImgHtml = rhsProps.description
+        ? extractImageUrl(rhsProps.description)
+        : rhsProps.img
+        ? extractImageUrl(rhsProps.img)
+        : '';
 
     // Close existing popups
     if (window.typologyPopups) {
@@ -762,9 +857,9 @@ function displayTypologyPair(lhsFeature, rhsFeature) {
     const lhsHtml = `<div style="background-color: white; color: ${lhsColor}; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; white-space: nowrap;">LHS: ${lhsValue}</div>${lhsImgHtml}`;
 
     const lhsPopup = new mapboxgl.Popup({
-        closeButton: false,
+        closeButton: true,
         closeOnClick: false,
-        anchor: 'right'
+        anchor: 'bottom' // Popup appears on top
     })
         .setLngLat(lhsClosestPoint.geometry.coordinates)
         .setHTML(lhsHtml)
@@ -774,9 +869,9 @@ function displayTypologyPair(lhsFeature, rhsFeature) {
     const rhsHtml = `<div style="background-color: white; color: ${rhsColor}; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; white-space: nowrap;">RHS: ${rhsValue}</div>${rhsImgHtml}`;
 
     const rhsPopup = new mapboxgl.Popup({
-        closeButton: false,
+        closeButton: true,
         closeOnClick: false,
-        anchor: 'left'
+        anchor: 'top' // Popup appears on bottom
     })
         .setLngLat(rhsClosestPoint.geometry.coordinates)
         .setHTML(rhsHtml)
@@ -875,6 +970,50 @@ function highlightTypologyPair(lhsFeature, rhsFeature) {
 
     currentHighlight = ['feature-highlight-lhs', 'feature-highlight-rhs'];
 }
+
+function resetTypologyPanel() {
+    // Reset text fields to default values
+    document.getElementById('typology-drain-id').textContent = '—';
+    document.getElementById('typology-lhs-code').textContent = '—';
+    document.getElementById('typology-lhs-label').textContent = 'Select to view';
+    document.getElementById('typology-rhs-code').textContent = '—';
+    document.getElementById('typology-rhs-label').textContent = 'Select to view';
+
+    // Reset column colors
+    const lhsColumn = document.querySelector('.typology-lhs');
+    const rhsColumn = document.querySelector('.typology-rhs');
+
+    if (lhsColumn) {
+        lhsColumn.style.backgroundColor = 'transparent';
+        lhsColumn.style.opacity = '1';
+    }
+    if (rhsColumn) {
+        rhsColumn.style.backgroundColor = 'transparent';
+        rhsColumn.style.opacity = '1';
+    }
+
+    // Reset the image reliably
+    const imageEl = document.getElementById('typology-image');
+    if (imageEl) {
+        imageEl.src = ''; // clear the src first
+        imageEl.removeAttribute('src'); // remove attribute
+        imageEl.style.display = 'none'; // hide it
+    }
+
+    // Clear typology popups forcefully
+    if (window.typologyPopups) {
+        window.typologyPopups.forEach(popup => {
+            if (popup && popup.remove) {
+                popup.remove();
+            }
+        });
+        window.typologyPopups = null;
+    }
+    window.typologyPopupsActive = false;
+
+    console.log('🔄 Typology panel fully reset');
+}
+
 // Clean up typology popups
 function clearTypologyMarkers() {
     if (window.typologyPopups) {
@@ -891,9 +1030,8 @@ function clearTypologyMarkers() {
 let existingCount = null;
 let lostCount = null;
 
-
 function countFeaturesInLayer(layerId, customFilter = null) {
-    console.log(`\n🔢 === Counting features for ${layerId} ===`);
+    //console.log(`\n🔢 === Counting features for ${layerId} ===`);
 
     const layer = map.getLayer(layerId);
     if (!layer) {
@@ -902,16 +1040,16 @@ function countFeaturesInLayer(layerId, customFilter = null) {
     }
 
     const filterToUse = customFilter !== null ? customFilter : map.getFilter(layerId);
-    console.log(`📋 Filter being used:`, filterToUse);
-    console.log(`📋 Current zoom level:`, map.getZoom());
-    console.log(`📋 Current bounds:`, map.getBounds());
+    //console.log(`📋 Filter being used:`, filterToUse);
+    //console.log(`📋 Current zoom level:`, map.getZoom());
+    //console.log(`📋 Current bounds:`, map.getBounds());
 
     const features = map.querySourceFeatures(layer.source, {
         sourceLayer: layer['source-layer'],
         filter: filterToUse
     });
 
-    console.log(`📊 Total features queried: ${features.length}`);
+    //console.log(`📊 Total features queried: ${features.length}`);
 
     // Deduplicate by fid (handles tile boundary splitting)
     const uniqueFids = new Set();
@@ -928,10 +1066,10 @@ function countFeaturesInLayer(layerId, customFilter = null) {
         }
     });
 
-    console.log(`✅ Unique features (by fid): ${uniqueFids.size}`);
+    //console.log(`✅ Unique features (by fid): ${uniqueFids.size}`);
     if (duplicates.length > 0) {
-        console.log(`🔄 Duplicates found: ${duplicates.length} features`);
-        console.log(`   Duplicate fids:`, [...new Set(duplicates)]);
+        //console.log(`🔄 Duplicates found: ${duplicates.length} features`);
+        //console.log(`   Duplicate fids:`, [...new Set(duplicates)]);
     }
 
     return uniqueFids.size;
@@ -940,11 +1078,11 @@ function countFeaturesInLayer(layerId, customFilter = null) {
 // Function to update the lakes counter display
 // Replace your updateLakesCounter function with this debug version:
 function updateLakesCounter(existingCount, lostCount, showLost = true) {
-    console.log(`\n📊 === Updating Lakes Counter ===`);
-    console.log(`  Existing: ${existingCount}`);
-    console.log(`  Lost: ${lostCount}`);
-    console.log(`  Show Lost: ${showLost}`);
-    console.log(`  Current zoom: ${map.getZoom()}`);
+    //console.log(`\n📊 === Updating Lakes Counter ===`);
+    //console.log(`  Existing: ${existingCount}`);
+    //console.log(`  Lost: ${lostCount}`);
+    //console.log(`  Show Lost: ${showLost}`);
+    //console.log(`  Current zoom: ${map.getZoom()}`);
 
     const existingElement = document.querySelector('#existing_lakes #count');
     const lostElement = document.querySelector('#lost_lakes #count');
@@ -952,7 +1090,7 @@ function updateLakesCounter(existingCount, lostCount, showLost = true) {
 
     if (existingElement) {
         existingElement.textContent = existingCount;
-        console.log(`  ✅ Set existing element to: ${existingCount}`);
+        //console.log(`  ✅ Set existing element to: ${existingCount}`);
     } else {
         console.warn(`  ⚠️ Existing element not found`);
     }
@@ -960,10 +1098,10 @@ function updateLakesCounter(existingCount, lostCount, showLost = true) {
     if (lostElement) {
         if (showLost && lostCount !== null) {
             lostElement.textContent = lostCount;
-            console.log(`  ✅ Set lost element to: ${lostCount}`);
+            //console.log(`  ✅ Set lost element to: ${lostCount}`);
         } else {
             lostElement.textContent = '—';
-            console.log(`  ℹ️ Set lost element to: —`);
+            //console.log(`  ℹ️ Set lost element to: —`);
         }
     } else {
         console.warn(`  ⚠️ Lost element not found`);
@@ -972,7 +1110,7 @@ function updateLakesCounter(existingCount, lostCount, showLost = true) {
     if (totalElement) {
         const total = showLost && lostCount !== null ? existingCount + lostCount : existingCount;
         totalElement.textContent = total;
-        console.log(`  ✅ Set total element to: ${total}`);
+        //console.log(`  ✅ Set total element to: ${total}`);
     } else {
         console.warn(`  ⚠️ Total element not found`);
     }
@@ -990,8 +1128,8 @@ function getDrainIdsAndLength(layerId) {
         filter: currentFilter
     });
 
-    console.log(`\n🔍 Analyzing ${layerId}:`);
-    console.log(`📊 Raw features queried: ${features.length}`);
+    //console.log(`\n🔍 Analyzing ${layerId}:`);
+    //console.log(`📊 Raw features queried: ${features.length}`);
 
     const drainIds = new Set();
     const uniqueSegments = new Map();
@@ -1017,8 +1155,8 @@ function getDrainIdsAndLength(layerId) {
         }
     });
 
-    console.log(`✅ Unique segments: ${uniqueSegments.size}`);
-    console.log(`📉 Duplicates removed: ${features.length - uniqueSegments.size}`);
+    //console.log(`✅ Unique segments: ${uniqueSegments.size}`);
+    //console.log(`📉 Duplicates removed: ${features.length - uniqueSegments.size}`);
 
     // Sum lengths by drain ID
     const drainLengths = new Map();
@@ -1030,13 +1168,13 @@ function getDrainIdsAndLength(layerId) {
 
     // Debug specific drains
     if (drainLengths.has('K103')) {
-        console.log(`🔍 K103 breakdown:`);
+        //console.log(`🔍 K103 breakdown:`);
         const k103Segments = Array.from(uniqueSegments.values()).filter(s => s.drainId === 'K103');
-        console.log(`  Segments found: ${k103Segments.length}`);
+        //console.log(`  Segments found: ${k103Segments.length}`);
         k103Segments.forEach((s, i) => {
-            console.log(`  Segment ${i + 1}: ${(s.length / 1000).toFixed(3)} km`);
+            //console.log(`  Segment ${i + 1}: ${(s.length / 1000).toFixed(3)} km`);
         });
-        console.log(`  ✅ Total K103: ${(drainLengths.get('K103') / 1000).toFixed(2)} km`);
+        //console.log(`  ✅ Total K103: ${(drainLengths.get('K103') / 1000).toFixed(2)} km`);
     }
 
     // Calculate total
@@ -1045,7 +1183,7 @@ function getDrainIdsAndLength(layerId) {
         totalLength += length;
     });
 
-    console.log(`📊 Total: ${(totalLength / 1000).toFixed(2)} km\n`);
+    //console.log(`📊 Total: ${(totalLength / 1000).toFixed(2)} km\n`);
 
     return {
         ids: drainIds,
@@ -1242,7 +1380,6 @@ function updateFilterCounter() {
     }
 }
 
-
 //#endregion
 
 //#endregion
@@ -1263,13 +1400,7 @@ const filterControls = {}; // Store filter control objects for cross-filter upda
  * - Search box for ward filter
  */
 function createLayerFilter(config) {
-    const {
-        dropdownId,
-        sampleLayerId,
-        attributeName,
-        layerIds,
-        onFilterChange = null
-    } = config;
+    const { dropdownId, sampleLayerId, attributeName, layerIds, onFilterChange = null } = config;
 
     // Initialize filter state
     const filterKey = dropdownId;
@@ -1350,7 +1481,10 @@ function createLayerFilter(config) {
                 // ✅ NEW: Handle comma-separated lists (for ward_name in drains)
                 if (attributeName === 'ward_name' && valueStr.includes(',')) {
                     // Split by comma, trim whitespace, and count each ward separately
-                    const wards = valueStr.split(',').map(w => w.trim()).filter(w => w !== '');
+                    const wards = valueStr
+                        .split(',')
+                        .map(w => w.trim())
+                        .filter(w => w !== '');
                     wards.forEach(ward => {
                         valueCounts[ward] = (valueCounts[ward] || 0) + 1;
                     });
@@ -1375,15 +1509,16 @@ function createLayerFilter(config) {
         return 'other';
     }
 
-
     function buildCombinedFilter(forLayerType = null) {
         const allFilters = [];
 
         Object.keys(filterStates).forEach(key => {
             const filterState = filterStates[key];
 
-            if (filterState.selectedValues.size === 0 ||
-                filterState.selectedValues.size === filterState.originalAllValues.length) {
+            if (
+                filterState.selectedValues.size === 0 ||
+                filterState.selectedValues.size === filterState.originalAllValues.length
+            ) {
                 return;
             }
 
@@ -1408,9 +1543,7 @@ function createLayerFilter(config) {
 
             const valueArray = Array.from(filterState.selectedValues);
 
-            const orFilters = valueArray.map(value =>
-                ['in', value, ['get', filterState.attributeName]]
-            );
+            const orFilters = valueArray.map(value => ['in', value, ['get', filterState.attributeName]]);
 
             allFilters.push(orFilters.length === 1 ? orFilters[0] : ['any', ...orFilters]);
         });
@@ -1428,13 +1561,19 @@ function createLayerFilter(config) {
             if (!map.getLayer(layerId)) return;
 
             // ❌ REMOVE THIS ENTIRE BLOCK:
-            // if (layerId === 'bbmp-wards-line') {
+            // if (layerId === 'gba-wards') {
             //     map.setFilter(layerId, null);
             //     return;
             // }
 
             const layerType = getLayerType(layerId);
             const combinedFilter = buildCombinedFilter(layerType);
+
+            // Debug logging for ward filter
+            if (filterKey === 'ward-filter-dropdown' && layerId === 'Lakes_lost') {
+                console.log('🔍 Ward filter for Lakes_lost:', JSON.stringify(combinedFilter, null, 2));
+            }
+
             map.setFilter(layerId, combinedFilter);
         });
 
@@ -1520,10 +1659,14 @@ function createLayerFilter(config) {
 
         // 🔍 Add search box ONLY for ward filter and drain number filters
 
-        if (dropdownId === 'ward-filter-dropdown' ||
+        if (
+            dropdownId === 'ward-filter-dropdown' ||
             dropdownId === 'drain-ward-filter-dropdown' ||
-            dropdownId === 'primary-number-filter-dropdown' ||  // ✅ ADD THIS
-            dropdownId === 'secondary-number-filter-dropdown') { // ✅ ADD THIS
+            dropdownId === 'primary-number-filter-dropdown' || // ✅ ADD THIS
+            dropdownId === 'secondary-number-filter-dropdown' ||
+            dropdownId === 'typology-primary-drain-filter' // 🔥 ADD THIS LINE
+        ) {
+            // ✅ ADD THIS
             let searchInput = dropdown.querySelector('sl-input[type="search"]');
 
             if (!searchInput) {
@@ -1551,7 +1694,7 @@ function createLayerFilter(config) {
                 dropdown.insertBefore(searchInput, dropdown.firstChild);
 
                 // Search functionality
-                searchInput.addEventListener('sl-input', (e) => {
+                searchInput.addEventListener('sl-input', e => {
                     const searchTerm = e.target.value.toLowerCase();
                     const items = dropdown.querySelectorAll('wa-dropdown-item[type="checkbox"]');
                     items.forEach(item => {
@@ -1565,8 +1708,8 @@ function createLayerFilter(config) {
                 });
 
                 // Prevent dropdown from closing
-                searchInput.addEventListener('click', (e) => e.stopPropagation());
-                searchInput.addEventListener('mousedown', (e) => e.stopPropagation());
+                searchInput.addEventListener('click', e => e.stopPropagation());
+                searchInput.addEventListener('mousedown', e => e.stopPropagation());
             }
         }
 
@@ -1630,7 +1773,6 @@ function createLayerFilter(config) {
 
         //console.log(`✅ Populated ${dropdownId} | Selected: ${state.selectedValues.size}/${state.originalAllValues.length}`);
     }
-
 
     // Refresh other filters based on current selections
     function refreshOtherFilters() {
@@ -1720,7 +1862,7 @@ function createLayerFilter(config) {
         },
         applyFilter: applyFilter,
         getSelectedValues: () => Array.from(state.selectedValues),
-        setSelectedValues: (values) => {
+        setSelectedValues: values => {
             state.selectedValues = new Set(values);
             const dropdown = document.getElementById(dropdownId);
             if (dropdown) {
@@ -1862,7 +2004,6 @@ function toggleLayerOff(layerId) {
 }
 
 function setOpa(groupKey, opacityValue) {
-
     // Fade the layer to the desired opacity
     toggleGroup(groupKey, true, opacityValue);
 
@@ -1873,15 +2014,30 @@ function setOpa(groupKey, opacityValue) {
     }
 }
 
-
-
-
 //#endregion
 
 //#region viewService
 
-function smoothFlyTo(view) {
-    map.flyTo({ ...view, duration: 3000, essential: true, easing: t => 1 - Math.pow(1 - t, 3) });
+function smoothFlyTo(view, useBounds = true) {
+    const options = {
+        duration: 3000,
+        essential: true,
+        easing: t => 1 - Math.pow(1 - t, 3)
+    };
+
+    // Check if we should use bounds-based responsive view
+    if (useBounds && view.bounds) {
+        // Use fitBounds for responsive zoom
+        map.fitBounds(view.bounds, {
+            ...options,
+            padding: view.padding || { top: 50, bottom: 50, left: 50, right: 50 },
+            pitch: view.pitch || 0,
+            bearing: view.bearing || 0
+        });
+    } else {
+        // Fallback to traditional flyTo with center/zoom
+        map.flyTo({ ...view, ...options });
+    }
 }
 
 function toggleValleyView(showRegional) {
@@ -1898,7 +2054,98 @@ function toggleValleyView(showRegional) {
         });
     } else {
         // Local view - return to valley view
-        smoothFlyTo(valleyView);
+        smoothFlyTo(valleyViewBounds);
+    }
+}
+
+/**
+ * Zooms the map to fit the bounds of all features in a given layer
+ * @param {string} layerId - The ID of the layer to zoom to
+ * @param {object} options - Optional settings for the zoom
+ * @param {number} options.padding - Padding around the bounds (default: 50)
+ * @param {number} options.pitch - Camera pitch angle (default: 0)
+ * @param {number} options.bearing - Camera bearing angle (default: 0)
+ * @param {number} options.duration - Animation duration in ms (default: 2000)
+ * @param {number} options.maxZoom - Maximum zoom level (default: 13)
+ */
+function zoomToLayerBounds(layerId, options = {}) {
+    const { padding = 0, pitch = 0, bearing = 0, duration = 2000, maxZoom = 25 } = options;
+
+    // Check if layer exists
+    const layer = map.getLayer(layerId);
+    if (!layer) {
+        console.warn(`Layer "${layerId}" not found`);
+        return;
+    }
+
+    // Function to perform the zoom
+    const performZoom = () => {
+        // Get layer configuration
+        const sourceId = layer.source;
+        const sourceLayer = layer['source-layer'];
+
+        console.log(`Querying features from source: ${sourceId}, sourceLayer: ${sourceLayer}`);
+
+        // Query all rendered features from the layer (visible on screen)
+        const renderedFeatures = map.queryRenderedFeatures({ layers: [layerId] });
+
+        // Also query source features to get all features regardless of viewport
+        const sourceFeatures = map.querySourceFeatures(sourceId, {
+            sourceLayer: sourceLayer
+        });
+
+        console.log(`Rendered features: ${renderedFeatures.length}, Source features: ${sourceFeatures.length}`);
+
+        // Use whichever has more features
+        const features = sourceFeatures.length > 0 ? sourceFeatures : renderedFeatures;
+
+        if (!features || features.length === 0) {
+            console.warn(`No features found in layer "${layerId}", will retry after sourcedata loads...`);
+            return false;
+        }
+
+        // Create a FeatureCollection and calculate bounds using Turf
+        const featureCollection = turf.featureCollection(features);
+        const bbox = turf.bbox(featureCollection);
+
+        console.log(`Calculated bbox:`, bbox);
+
+        // Convert bbox to LngLatBounds format: [[west, south], [east, north]]
+        const bounds = [
+            [bbox[0], bbox[1]], // Southwest
+            [bbox[2], bbox[3]] // Northeast
+        ];
+
+        // Fit the map to the calculated bounds with maxZoom constraint
+        map.fitBounds(bounds, {
+            padding: padding,
+            pitch: pitch,
+            bearing: bearing,
+            duration: duration,
+            maxZoom: maxZoom, // Prevent zooming out too much
+            essential: true,
+            easing: t => 1 - Math.pow(1 - t, 3)
+        });
+
+        return true;
+    };
+
+    // Try immediately first
+    const success = performZoom();
+
+    // If no features found, wait for source data to load
+    if (!success) {
+        const sourceId = layer.source;
+        const onSourceData = e => {
+            if (e.sourceId === sourceId && e.isSourceLoaded) {
+                console.log(`Source ${sourceId} loaded, retrying zoom...`);
+                const retrySuccess = performZoom();
+                if (retrySuccess) {
+                    map.off('sourcedata', onSourceData);
+                }
+            }
+        };
+        map.on('sourcedata', onSourceData);
     }
 }
 
@@ -1916,7 +2163,7 @@ function setupCheckboxEvents(checkbox, slider, groupKey) {
         }
 
         // Use toggleGroup for both show and hide
-        const targetOpacity = checkbox.checked ? (slider.value / 100) : 0;
+        const targetOpacity = checkbox.checked ? slider.value / 100 : 0;
         toggleGroup(groupKey, checkbox.checked, targetOpacity);
 
         slider.style.display = checkbox.checked ? 'block' : 'none';
@@ -1977,9 +2224,7 @@ function syncLegendToMapGroup(groupKey) {
 
 function syncLegendToMap(layerId) {
     // --- 1️⃣ Find which group this layer belongs to ---
-    const groupKey = Object.keys(layerConfig).find(key =>
-        layerConfig[key].layers.includes(layerId)
-    );
+    const groupKey = Object.keys(layerConfig).find(key => layerConfig[key].layers.includes(layerId));
 
     if (!groupKey) {
         console.warn(`Layer ${layerId} not found in any group`);
@@ -2027,9 +2272,8 @@ function syncLegendToMap(layerId) {
     });
 
     // If no valid opacities found, default to 1
-    const avgOpacity = validOpacities.length > 0
-        ? validOpacities.reduce((a, b) => a + b, 0) / validOpacities.length
-        : 1;
+    const avgOpacity =
+        validOpacities.length > 0 ? validOpacities.reduce((a, b) => a + b, 0) / validOpacities.length : 1;
 
     // --- 5️⃣ Sync the group's legend UI ---
     checkbox.checked = anyVisible;
@@ -2039,13 +2283,11 @@ function syncLegendToMap(layerId) {
 
 //#endregion
 
-
 //#region interaction Services
 // Create a duplicate interaction layer
 
 // Update setupInteraction to check if typology is active
 function setupInteraction() {
-
     // 1️⃣ Create thick invisible interaction layers for lines
 
     lineLayers.forEach(layerId => {
@@ -2064,9 +2306,7 @@ function setupInteraction() {
         });
     });
 
-
-
-    map.on('click', (e) => {
+    map.on('click', e => {
         //console.log('📍 Map clicked');
 
         // Check if typology PANEL is open
@@ -2083,7 +2323,7 @@ function setupInteraction() {
 
             // Query all features in typ_source
             const allFeatures = map.querySourceFeatures('typ_source', {
-                sourceLayer: 'typ_analysis-6bvc7g'
+                sourceLayer: 'typ_analysis-2cq5z2'
             });
 
             console.log('Total typology features:', allFeatures.length);
@@ -2111,7 +2351,7 @@ function setupInteraction() {
                 // Now run the full typology click logic
                 const byDrainId = {};
                 allFeatures.forEach(f => {
-                    const drainId = f.properties.drain_id;
+                    const drainId = f.properties['Drain num'];
                     if (!byDrainId[drainId]) {
                         byDrainId[drainId] = { lhs: null, rhs: null };
                     }
@@ -2158,6 +2398,7 @@ function setupInteraction() {
                     displayTypologyPair(bestMatch.lhsFeature, bestMatch.rhsFeature);
                 } else {
                     console.log('❌ No typology match within buffer');
+                    resetTypologyPanel();
                 }
                 return;
             }
@@ -2168,8 +2409,6 @@ function setupInteraction() {
 
         // Handle normal layer interactions (or typology panel open but outside buffer)
         //console.log('🔍 Querying features for other layers...');
-
-
 
         const features = map.queryRenderedFeatures(e.point, {
             layers: interactiveLayers.filter(l => map.getLayer(l))
@@ -2188,7 +2427,10 @@ function setupInteraction() {
             const visibility = map.getLayoutProperty(baseLayerId, 'visibility');
 
             // If typology panel is open, exclude primary drains
-            if (typologyPanelOpen && (baseLayerId.includes('primary-drains') || f.layer.id.includes('primary-drains'))) {
+            if (
+                typologyPanelOpen &&
+                (baseLayerId.includes('primary-drains') || f.layer.id.includes('primary-drains'))
+            ) {
                 return false;
             }
 
@@ -2252,27 +2494,30 @@ function setupInteraction() {
 }
 //#endregion
 
-
 //#region Lake Filters - All in One
 
 let valleyFilterControl = null;
 let categoryFilterControl = null;
 let wardFilterControl = null;
 let custodianFilterControl = null;
+let subvalleyFilterControl = null;
+let lostTankIdentifierFilterControl = null;
 
 let pridrainNumberFilterControl = null;
 let secdrainNumberFilterControl = null;
-
 
 // Initialize Condition filter (layer visibility toggle)
 function initializeConditionFilter() {
     const dropdown = document.getElementById('year-filter-dropdown');
     if (!dropdown) return;
 
+    // Clear any existing items to prevent duplicates
+    dropdown.querySelectorAll('wa-dropdown-item').forEach(item => item.remove());
+
     // State to track which layers are visible
     const layerState = {
-        'Lakes': true,
-        'Lakes_lost': true
+        Lakes: true,
+        Lakes_lost: true
     };
 
     // Create checkbox items
@@ -2299,7 +2544,7 @@ function initializeConditionFilter() {
     }
 
     // Handle clicks
-    existingTanksItem.addEventListener('click', (e) => {
+    existingTanksItem.addEventListener('click', e => {
         e.stopPropagation();
         e.preventDefault();
         const isChecked = existingTanksItem.dataset.checked === 'true';
@@ -2309,7 +2554,7 @@ function initializeConditionFilter() {
         toggleLayer('Lakes', newState);
     });
 
-    lostTanksItem.addEventListener('click', (e) => {
+    lostTanksItem.addEventListener('click', e => {
         e.stopPropagation();
         e.preventDefault();
         const isChecked = lostTanksItem.dataset.checked === 'true';
@@ -2320,8 +2565,8 @@ function initializeConditionFilter() {
     });
 
     // Prevent dropdown from closing on item mousedown
-    existingTanksItem.addEventListener('mousedown', (e) => e.stopPropagation());
-    lostTanksItem.addEventListener('mousedown', (e) => e.stopPropagation());
+    existingTanksItem.addEventListener('mousedown', e => e.stopPropagation());
+    lostTanksItem.addEventListener('mousedown', e => e.stopPropagation());
 
     //console.log('✅ Condition filter initialized');
 
@@ -2341,22 +2586,15 @@ function initializeConditionFilter() {
     };
 }
 
-
-
 // Replace the initializeDrainFilter function with this:
 
 function initializeDrainFilters() {
-
     // Filter 3: Drain number filter
     pridrainNumberFilterControl = createLayerFilter({
         dropdownId: 'primary-number-filter-dropdown',
         sampleLayerId: 'primary-drains',
         attributeName: 'Drain num',
-        layerIds: [
-            'primary-drains',
-            'primary-drains-interaction',
-            'Halo'
-        ]
+        layerIds: ['primary-drains', 'primary-drains-interaction', 'Halo']
     });
 
     // Filter 3: Drain number filter
@@ -2364,28 +2602,32 @@ function initializeDrainFilters() {
         dropdownId: 'secondary-number-filter-dropdown',
         sampleLayerId: 'secondary-drains',
         attributeName: 'Drain num',
-        layerIds: [
-            'secondary-drains', 'secondary-drains-interaction', 'Secondary Drains Halo'
-        ]
+        layerIds: ['secondary-drains', 'secondary-drains-interaction', 'Secondary Drains Halo']
     });
 
     console.log('✅ All drain filters initialized!');
 }
 
-
 // Initialize all lake filters
 function initializeLakeFilters() {
-
     // Filter 1: Valley filter
     valleyFilterControl = createLayerFilter({
         dropdownId: 'valley-filter-dropdown',
         sampleLayerId: 'Lakes',
         attributeName: 'valley',
         layerIds: [
-            'Lakes', 'Lakes_lost', 'Lakes_existing_overlap',
-            'primary-drains', 'Halo', 'primary-drains-interaction',
-            'secondary-drains', 'secondary-drains-interaction', 'Secondary Drains Halo',
-            'bbmp-wards-line'
+            'Lakes',
+            'Lakes_lost',
+            'Lakes_existing_overlap',
+            'primary-drains',
+            'Halo',
+            'primary-drains-interaction',
+            'secondary-drains',
+            'secondary-drains-interaction',
+            'Secondary Drains Halo',
+            'gba-wards',
+            'parks',
+            'wetlands'
         ],
         onFilterChange: (selectedValues, allValues) => {
             updateLakesCounterFromFilters();
@@ -2397,9 +2639,7 @@ function initializeLakeFilters() {
         dropdownId: 'category-filter-dropdown',
         sampleLayerId: 'Lakes',
         attributeName: 'Category',
-        layerIds: [
-            'Lakes',
-        ],
+        layerIds: ['Lakes'],
         onFilterChange: (selectedValues, allValues) => {
             updateLakesCounterFromFilters();
         }
@@ -2408,13 +2648,21 @@ function initializeLakeFilters() {
     // Filter 3: Ward filter (if you have this attribute)
     wardFilterControl = createLayerFilter({
         dropdownId: 'ward-filter-dropdown',
-        sampleLayerId: 'Lakes',
+        sampleLayerId: 'gba-wards',
         attributeName: 'ward_name',
         layerIds: [
-            'Lakes', 'Lakes_lost', 'Lakes_existing_overlap',
-            'primary-drains', 'Halo', 'primary-drains-interaction',
-            'secondary-drains', 'secondary-drains-interaction', 'Secondary Drains Halo',
-            'bbmp-wards-line'
+            'Lakes',
+            'Lakes_lost',
+            'Lakes_existing_overlap',
+            'primary-drains',
+            'Halo',
+            'primary-drains-interaction',
+            'secondary-drains',
+            'secondary-drains-interaction',
+            'Secondary Drains Halo',
+            'gba-wards',
+            'parks',
+            'wetlands'
         ],
         onFilterChange: (selectedValues, allValues) => {
             updateLakesCounterFromFilters();
@@ -2426,9 +2674,7 @@ function initializeLakeFilters() {
         dropdownId: 'custodian-filter-dropdown',
         sampleLayerId: 'Lakes',
         attributeName: 'custodian',
-        layerIds: [
-            'Lakes',
-        ],
+        layerIds: ['Lakes'],
         onFilterChange: (selectedValues, allValues) => {
             updateLakesCounterFromFilters();
         }
@@ -2437,21 +2683,208 @@ function initializeLakeFilters() {
     // Filter 5: Condition filter (layer visibility toggle)
     conditionFilterControl = initializeConditionFilter();
 
+    // Filter 6: Sub valley filter
+    subvalleyFilterControl = createLayerFilter({
+        dropdownId: 'subvalley-filter-dropdown',
+        sampleLayerId: 'sub-valleys',
+        attributeName: 'subvalley',
+        layerIds: [
+            'Lakes',
+            'Lakes_lost',
+            'Lakes_existing_overlap',
+            'primary-drains',
+            'Halo',
+            'primary-drains-interaction',
+            'secondary-drains',
+            'secondary-drains-interaction',
+            'Secondary Drains Halo',
+            'gba-wards',
+            'sub-valleys',
+            'parks',
+            'wetlands'
+        ],
+        onFilterChange: (selectedValues, allValues) => {
+            updateLakesCounterFromFilters();
+        }
+    });
+
     //console.log('✅ All lake filters initialized!');
+}
+
+// Helper function to populate lost tanks table
+function populateLostTanksTable(filterType) {
+    const tableContainer = document.getElementById('lost_tanks_table_container');
+    const tableBody = document.getElementById('lost_tanks_table_body');
+    const sourceDiv = document.getElementById('lost_tanks_source');
+
+    if (!tableContainer || !tableBody || !sourceDiv) return;
+
+    // Clear existing table
+    tableBody.innerHTML = '';
+
+    // Set source based on filter type
+    const sourceUrl =
+        filterType === 'bbmp'
+            ? 'https://data.opencity.in/dataset/bengaluru-lakes-and-their-maintainers/resource/bbmp-maintained-lakes-2024'
+            : 'https://bpac.in/wp-content/uploads/2016/06/Death_of_lakes_and_the_future_of_bangalore.pdf';
+
+    sourceDiv.innerHTML = `<a href="${sourceUrl}" target="_blank" style="color: var(--highlight-yellow); text-decoration: underline;">Click here for the source</a>`;
+
+    // Get the layer
+    const layer = map.getLayer('Lakes_lost');
+    if (!layer) return;
+
+    // Query features based on filter type
+    const filterExpression =
+        filterType === 'bbmp'
+            ? ['==', ['get', 'bbmp'], 'Recognised by BBMP']
+            : ['==', ['get', 'bpac'], 'Recognised by BPAC'];
+
+    const features = map.querySourceFeatures(layer.source, {
+        sourceLayer: layer['source-layer'],
+        filter: filterExpression
+    });
+
+    // Deduplicate by fid and collect unique features
+    const uniqueFeatures = new Map();
+    features.forEach(feature => {
+        const fid = feature.properties.fid;
+        if (fid && !uniqueFeatures.has(fid)) {
+            uniqueFeatures.set(fid, feature);
+        }
+    });
+
+    // Populate table rows with serial numbers
+    let serialNumber = 1;
+    uniqueFeatures.forEach(feature => {
+        const name = feature.properties.name || 'Unnamed';
+        const status = feature.properties.Status || 'N/A';
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${serialNumber}</td>
+            <td>${name}</td>
+            <td>${status}</td>
+        `;
+
+        // Add click handler to highlight feature on map
+        row.addEventListener('click', () => {
+            // Remove highlight from all rows
+            tableBody.querySelectorAll('tr').forEach(r => r.classList.remove('highlighted'));
+
+            // Highlight clicked row
+            row.classList.add('highlighted');
+
+            // Highlight feature on map - create a layer-like object for highlightFeature
+            const featureWithLayer = {
+                ...feature,
+                layer: {
+                    id: 'Lakes_lost',
+                    type: 'fill',
+                    source: layer.source,
+                    'source-layer': layer['source-layer']
+                }
+            };
+            highlightFeature(featureWithLayer);
+        });
+
+        tableBody.appendChild(row);
+        serialNumber++;
+    });
+
+    // Show the table
+    tableContainer.style.display = 'block';
+}
+
+// Helper function to hide lost tanks table
+function hideLostTanksTable() {
+    const tableContainer = document.getElementById('lost_tanks_table_container');
+    if (tableContainer) {
+        tableContainer.style.display = 'none';
+    }
+}
+
+// Initialize BBMP/BPAC filter buttons for Lost Tanks
+function initializeLostTankIdentifierFilters() {
+    const bbmpButton = document.getElementById('bbmp_tank_filter');
+    const bpacButton = document.getElementById('bpac_tank_filter');
+
+    if (!bbmpButton || !bpacButton) return;
+
+    let activeLostTankFilter = null; // Track which filter is active
+
+    // BBMP button click handler
+    bbmpButton.addEventListener('click', () => {
+        if (activeLostTankFilter === 'bbmp') {
+            // Clicking again - remove filter
+            if (map.getLayer('Lakes_lost')) {
+                map.setFilter('Lakes_lost', null);
+            }
+            bbmpButton.classList.remove('active');
+            activeLostTankFilter = null;
+            hideLostTanksTable();
+        } else {
+            // Apply BBMP filter - show only features recognized by BBMP
+            if (map.getLayer('Lakes_lost')) {
+                map.setFilter('Lakes_lost', ['==', ['get', 'bbmp'], 'Recognised by BBMP']);
+            }
+            bbmpButton.classList.add('active');
+            bpacButton.classList.remove('active');
+            activeLostTankFilter = 'bbmp';
+            populateLostTanksTable('bbmp');
+        }
+        updateLakesCounterFromFilters();
+    });
+
+    // BPAC button click handler
+    bpacButton.addEventListener('click', () => {
+        if (activeLostTankFilter === 'bpac') {
+            // Clicking again - remove filter
+            if (map.getLayer('Lakes_lost')) {
+                map.setFilter('Lakes_lost', null);
+            }
+            bpacButton.classList.remove('active');
+            activeLostTankFilter = null;
+            hideLostTanksTable();
+        } else {
+            // Apply BPAC filter - show only features recognized by BPAC
+            if (map.getLayer('Lakes_lost')) {
+                map.setFilter('Lakes_lost', ['==', ['get', 'bpac'], 'Recognised by BPAC']);
+            }
+            bpacButton.classList.add('active');
+            bbmpButton.classList.remove('active');
+            activeLostTankFilter = 'bpac';
+            populateLostTanksTable('bpac');
+        }
+        updateLakesCounterFromFilters();
+    });
+
+    // Return reset function
+    return {
+        reset: () => {
+            if (map.getLayer('Lakes_lost')) {
+                map.setFilter('Lakes_lost', null);
+            }
+            bbmpButton.classList.remove('active');
+            bpacButton.classList.remove('active');
+            activeLostTankFilter = null;
+            hideLostTanksTable();
+        }
+    };
 }
 
 // Update counter based on all active filters
 
 function updateLakesCounterFromFilters() {
-    console.log(`\n⏰ updateLakesCounterFromFilters called`);
+    //console.log(`\n⏰ updateLakesCounterFromFilters called`);
 
     // ✅ Wait for map to be fully idle (all tiles loaded)
     const doCount = () => {
-        console.log(`\n🔄 Map is idle, now counting...`);
-        console.log(`Current map state:`);
-        console.log(`  - Zoom: ${map.getZoom()}`);
-        console.log(`  - Lakes filter:`, map.getFilter('Lakes'));
-        console.log(`  - Lakes_lost filter:`, map.getFilter('Lakes_lost'));
+        //console.log(`\n🔄 Map is idle, now counting...`);
+        //console.log(`Current map state:`);
+        //console.log(`  - Zoom: ${map.getZoom()}`);
+        //console.log(`  - Lakes filter:`, map.getFilter('Lakes'));
+        //console.log(`  - Lakes_lost filter:`, map.getFilter('Lakes_lost'));
 
         const existingCount = countFeaturesInLayer('Lakes');
         const lostCount = countFeaturesInLayer('Lakes_lost');
@@ -2470,14 +2903,19 @@ function updateLakesCounterFromFilters() {
 
 // Reset all lake filters - SELECT ALL (show everything)
 
-// Combined reset function for ALL filters
-// Update your resetAllFilters function to include clearing the button state
-
 function resetAllFilters() {
-    console.log('🔄 === RESETTING ALL FILTERS (Lakes + Drains) ===');
+    smoothFlyTo(defaultViewBounds);
+
+    //console.log('🔄 === RESETTING ALL FILTERS (Lakes + Drains + Typology) ===');
 
     // Reset ALL lake filter controls
-    [valleyFilterControl, categoryFilterControl, wardFilterControl, custodianFilterControl].forEach((control) => {
+    [
+        subvalleyFilterControl,
+        valleyFilterControl,
+        categoryFilterControl,
+        wardFilterControl,
+        custodianFilterControl
+    ].forEach(control => {
         if (control && control.reset) {
             control.reset();
         }
@@ -2488,14 +2926,27 @@ function resetAllFilters() {
         conditionFilterControl.reset();
     }
 
+    // Reset lost tank identifier filter
+    if (lostTankIdentifierFilterControl && lostTankIdentifierFilterControl.reset) {
+        lostTankIdentifierFilterControl.reset();
+    }
+
     // Reset BOTH drain filter controls
-    [pridrainNumberFilterControl, secdrainNumberFilterControl].forEach((control) => {
+    [pridrainNumberFilterControl, secdrainNumberFilterControl].forEach(control => {
         if (control && control.reset) {
             control.reset();
         }
     });
 
-    // 🔥 NEW: Clear active state from filter button
+    // 🔥 Reset BOTH typology filters
+    if (typologyTypeFilterControl && typologyTypeFilterControl.reset) {
+        typologyTypeFilterControl.reset();
+    }
+    if (typologyPrimaryDrainFilterControl && typologyPrimaryDrainFilterControl.reset) {
+        typologyPrimaryDrainFilterControl.reset();
+    }
+
+    // 🔥 Clear active state from filter button
     const filterSecByPriBtn = document.getElementById('filter-secondary-by-primary');
     if (filterSecByPriBtn) {
         filterSecByPriBtn.classList.remove('active');
@@ -2534,7 +2985,12 @@ function resetAllFilters() {
         map.setFilter('Secondary Drains Halo', null);
     }
 
-    console.log('✅ All filters reset');
+    // Clear typology layer filter
+    if (map.getLayer('typ_analysis')) {
+        map.setFilter('typ_analysis', null);
+    }
+
+    console.log('✅ All filters reset (including both typology filters)');
 
     // Update lakes counter with totals
     updateLakesCounter(TOTAL_EXISTING_LAKES, TOTAL_LOST_LAKES, true);
@@ -2565,13 +3021,13 @@ setTimeout(() => {
 // Add this function in your //#region Lake Filters section
 
 function filterSecondaryByPrimaryDrains() {
-    console.log('🔍 === Filtering Secondary Drains by Primary ===');
+    //console.log('🔍 === Filtering Secondary Drains by Primary ===');
 
     // Get selected primary drain IDs
     const selectedPrimaryDrains = pridrainNumberFilterControl.getSelectedValues();
 
-    console.log('📊 Selected Primary Drains:', selectedPrimaryDrains);
-    console.log('📊 Number of selected primaries:', selectedPrimaryDrains.length);
+    //console.log('📊 Selected Primary Drains:', selectedPrimaryDrains);
+    //console.log('📊 Number of selected primaries:', selectedPrimaryDrains.length);
 
     if (selectedPrimaryDrains.length === 0) {
         alert('Please select at least one Primary Drain first.');
@@ -2585,13 +3041,13 @@ function filterSecondaryByPrimaryDrains() {
         return;
     }
 
-    console.log('✅ Secondary layer found:', secondaryLayer);
+    //console.log('✅ Secondary layer found:', secondaryLayer);
 
     const allSecondaryFeatures = map.querySourceFeatures(secondaryLayer.source, {
         sourceLayer: secondaryLayer['source-layer']
     });
 
-    console.log('📊 Total secondary features queried:', allSecondaryFeatures.length);
+    //console.log('📊 Total secondary features queried:', allSecondaryFeatures.length);
 
     // Find secondary drains with matching pri_Drain num
     const matchingSecondaryDrainIds = new Set();
@@ -2603,7 +3059,7 @@ function filterSecondaryByPrimaryDrains() {
         const wardName = feature.properties.ward_name;
 
         if (priDrainNum && selectedPrimaryDrains.includes(priDrainNum)) {
-            console.log('✅ Match found! Secondary Drain:', drainNum, 'matches Primary:', priDrainNum);
+            //console.log('✅ Match found! Secondary Drain:', drainNum, 'matches Primary:', priDrainNum);
 
             if (drainNum) matchingSecondaryDrainIds.add(drainNum);
 
@@ -2618,9 +3074,9 @@ function filterSecondaryByPrimaryDrains() {
         }
     });
 
-    console.log('📊 Matching Secondary Drains:', Array.from(matchingSecondaryDrainIds));
-    console.log('📊 Number of matching secondaries:', matchingSecondaryDrainIds.size);
-    console.log('📊 Matching Wards from Secondary:', Array.from(matchingWards));
+    //console.log('📊 Matching Secondary Drains:', Array.from(matchingSecondaryDrainIds));
+    //console.log('📊 Number of matching secondaries:', matchingSecondaryDrainIds.size);
+    //console.log('📊 Matching Wards from Secondary:', Array.from(matchingWards));
 
     // Step 2: Also get wards from the selected primary drains
     const primaryLayer = map.getLayer('primary-drains');
@@ -2629,14 +3085,14 @@ function filterSecondaryByPrimaryDrains() {
             sourceLayer: primaryLayer['source-layer']
         });
 
-        console.log('📊 Total primary features queried:', primaryFeatures.length);
+        //console.log('📊 Total primary features queried:', primaryFeatures.length);
 
         primaryFeatures.forEach(feature => {
             const drainNum = feature.properties['Drain num'];
             const wardName = feature.properties.ward_name;
 
             if (drainNum && selectedPrimaryDrains.includes(drainNum)) {
-                console.log('✅ Primary Drain:', drainNum, 'Ward:', wardName);
+                //console.log('✅ Primary Drain:', drainNum, 'Ward:', wardName);
 
                 if (wardName) {
                     if (wardName.includes(',')) {
@@ -2649,8 +3105,8 @@ function filterSecondaryByPrimaryDrains() {
         });
     }
 
-    console.log('📊 All Matching Wards (Primary + Secondary):', Array.from(matchingWards));
-    console.log('📊 Total matching wards:', matchingWards.size);
+    //console.log('📊 All Matching Wards (Primary + Secondary):', Array.from(matchingWards));
+    //console.log('📊 Total matching wards:', matchingWards.size);
 
     // Check if we found any matches
     if (matchingSecondaryDrainIds.size === 0) {
@@ -2670,9 +3126,10 @@ function filterSecondaryByPrimaryDrains() {
 
     // Filter secondary drains
     const secondaryDrainIds = Array.from(matchingSecondaryDrainIds);
-    const secondaryFilter = secondaryDrainIds.length === 1
-        ? ['==', ['get', 'Drain num'], secondaryDrainIds[0]]
-        : ['in', ['get', 'Drain num'], ['literal', secondaryDrainIds]];
+    const secondaryFilter =
+        secondaryDrainIds.length === 1
+            ? ['==', ['get', 'Drain num'], secondaryDrainIds[0]]
+            : ['in', ['get', 'Drain num'], ['literal', secondaryDrainIds]];
 
     console.log('🔧 Secondary filter:', JSON.stringify(secondaryFilter));
 
@@ -2691,9 +3148,10 @@ function filterSecondaryByPrimaryDrains() {
     });
 
     // Keep primary drains visible
-    const primaryFilter = selectedPrimaryDrains.length === 1
-        ? ['==', ['get', 'Drain num'], selectedPrimaryDrains[0]]
-        : ['in', ['get', 'Drain num'], ['literal', selectedPrimaryDrains]];
+    const primaryFilter =
+        selectedPrimaryDrains.length === 1
+            ? ['==', ['get', 'Drain num'], selectedPrimaryDrains[0]]
+            : ['in', ['get', 'Drain num'], ['literal', selectedPrimaryDrains]];
 
     console.log('🔧 Primary filter:', JSON.stringify(primaryFilter));
 
@@ -2713,25 +3171,26 @@ function filterSecondaryByPrimaryDrains() {
 
     // Filter wards
     const wardsArray = Array.from(matchingWards);
-    const wardFilter = wardsArray.length === 1
-        ? ['in', wardsArray[0], ['get', 'ward_name']]
-        : ['any', ...wardsArray.map(ward => ['in', ward, ['get', 'ward_name']])];
+    const wardFilter =
+        wardsArray.length === 1
+            ? ['in', wardsArray[0], ['get', 'ward_name']]
+            : ['any', ...wardsArray.map(ward => ['in', ward, ['get', 'ward_name']])];
 
     console.log('🔧 Ward filter:', JSON.stringify(wardFilter));
 
     // Apply ward filter to ward layer
-    if (map.getLayer('bbmp-wards-line')) {
-        console.log('✅ Applying filter to bbmp-wards-line');
-        map.setFilter('bbmp-wards-line', wardFilter);
+    if (map.getLayer('gba-wards')) {
+        console.log('✅ Applying filter to gba-wards');
+        map.setFilter('gba-wards', wardFilter);
 
-        const vis = map.getLayoutProperty('bbmp-wards-line', 'visibility');
+        const vis = map.getLayoutProperty('gba-wards', 'visibility');
         if (vis !== 'visible') {
-            map.setLayoutProperty('bbmp-wards-line', 'visibility', 'visible');
+            map.setLayoutProperty('gba-wards', 'visibility', 'visible');
         }
     }
 
     // Filter lakes by wards
-    ['Lakes', 'Lakes_lost', 'Lakes_existing_overlap'].forEach(layerId => {
+    ['Lakes', 'Lakes_lost', 'Lakes_existing_overlap', 'parks', 'wetlands'].forEach(layerId => {
         if (map.getLayer(layerId)) {
             console.log(`✅ Applying ward filter to ${layerId}`);
             map.setFilter(layerId, wardFilter);
@@ -2786,14 +3245,14 @@ function filterSecondaryByPrimaryDrains() {
 
     // Update counter AFTER everything is done
     setTimeout(() => {
-        console.log('🔄 Updating counter...');
+        //console.log('🔄 Updating counter...');
         updateFilterCounter();
     }, 500);
 }
 
 //#endregion
 
-//#region Watershed Filter funcitons 
+//#region Watershed Filter funcitons
 
 function showStreamOrderByLevels(levels) {
     // levels can be a single number or an array: showStreamOrderByLevels(13) or showStreamOrderByLevels([12, 13, 14])
@@ -2819,7 +3278,6 @@ function showStreamOrderByLevels(levels) {
 
     // Sync the legend to show streamorder is now on
 
-
     console.log(`✅ Showing stream order levels: ${levelArray.join(', ')}`);
 }
 
@@ -2839,6 +3297,337 @@ function showAllStreamOrderLevels() {
     toggleGroup('streamorder', true);
 
     console.log('✅ Showing all stream order levels');
+}
+
+//#endregion
+
+//#region Typology Filters
+
+let typologyTypeFilterControl = null;
+let typologyPrimaryDrainFilterControl = null; // 🔥 NEW
+
+function initializeTypologyFilters() {
+    console.log('🎨 Initializing typology filters...');
+
+    const dropdownId = 'typology-filter-dropdown';
+    const sampleLayerId = 'typ_analysis';
+    const attributeName = 'typ';
+    const layerIds = ['typ_analysis', 'typ_analysis-glow'];
+
+    // Initialize filter state
+    const filterKey = dropdownId;
+    filterStates[filterKey] = {
+        selectedValues: new Set(),
+        allValues: [],
+        originalAllValues: [],
+        layerIds: layerIds,
+        attributeName: attributeName,
+        sampleLayerId: sampleLayerId
+    };
+
+    const state = filterStates[filterKey];
+
+    // Get unique typology values
+    function getTypologyValues() {
+        const layer = map.getLayer(sampleLayerId);
+        if (!layer) return {};
+
+        const features = map.querySourceFeatures(layer.source, {
+            sourceLayer: layer['source-layer']
+        });
+
+        const valueCounts = {};
+        const uniqueFeatures = new Map();
+
+        features.forEach(feature => {
+            const id = feature.id;
+            if (!uniqueFeatures.has(id)) {
+                uniqueFeatures.set(id, feature);
+            }
+        });
+
+        uniqueFeatures.forEach(feature => {
+            const value = feature.properties[attributeName];
+            if (value) {
+                valueCounts[value] = (valueCounts[value] || 0) + 1;
+            }
+        });
+
+        return valueCounts;
+    }
+
+    // Populate dropdown with labels
+    function populateTypologyDropdown() {
+        const dropdown = document.getElementById(dropdownId);
+        if (!dropdown) {
+            console.warn(`⚠️ Dropdown ${dropdownId} not found`);
+            return false;
+        }
+
+        // Get counts
+        const valueCounts = getTypologyValues();
+        const values = Object.keys(valueCounts).sort();
+
+        if (values.length === 0) {
+            console.warn('⚠️ No typology values found, will retry...');
+            return false;
+        }
+
+        // First time setup
+        if (state.originalAllValues.length === 0) {
+            state.originalAllValues = [...values];
+            state.allValues = [...values];
+            state.selectedValues = new Set(values);
+        }
+
+        // Clear existing items
+        const existingItems = dropdown.querySelectorAll('wa-dropdown-item, wa-divider');
+        existingItems.forEach(item => item.remove());
+
+        // Add "Select All" and "Clear" buttons
+        const selectAllBtn = document.createElement('wa-dropdown-item');
+        selectAllBtn.setAttribute('value', 'select-all');
+        selectAllBtn.className = 'filter-control-btn';
+        selectAllBtn.textContent = 'Select All';
+
+        const clearBtn = document.createElement('wa-dropdown-item');
+        clearBtn.setAttribute('value', 'clear-all');
+        clearBtn.className = 'filter-control-btn';
+        clearBtn.textContent = 'Clear';
+
+        dropdown.appendChild(selectAllBtn);
+        dropdown.appendChild(clearBtn);
+
+        // Add divider
+        const divider = document.createElement('wa-divider');
+        dropdown.appendChild(divider);
+
+        // Add checkbox items with labels
+        state.originalAllValues.forEach(value => {
+            const item = document.createElement('wa-dropdown-item');
+            item.setAttribute('type', 'checkbox');
+            item.setAttribute('value', value);
+            item.checked = state.selectedValues.has(value);
+
+            const count = valueCounts[value] || 0;
+            const label = getTypologyLabel(value);
+            const color = getTypologyColor(value);
+
+            // Format: "t1 - Road Adjacent with Footpath (25)"
+            item.textContent = `${value} - ${label} (${count})`;
+
+            // Add colored background behind checkbox
+            item.style.cssText = `
+                --checkbox-background: ${color};
+                position: relative;
+            `;
+
+            // Add a pseudo-element style for the checkbox background
+            const style = document.createElement('style');
+            style.textContent = `
+                wa-dropdown-item[value="${value}"]::part(base) {
+                    padding-left: 40px;
+                }
+                wa-dropdown-item[value="${value}"]::part(base)::before {
+                    content: '';
+                    position: absolute;
+                    left: 8px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    width: 20px;
+                    height: 20px;
+                    background-color: ${color};
+                    border-radius: 3px;
+                    z-index: -1;
+                }
+            `;
+            document.head.appendChild(style);
+
+            dropdown.appendChild(item);
+        });
+
+        return true;
+    }
+
+    // Apply filter
+    function applyTypologyFilter() {
+        if (state.selectedValues.size === 0 || state.selectedValues.size === state.originalAllValues.length) {
+            // All selected or none - clear filter
+            layerIds.forEach(layerId => {
+                if (map.getLayer(layerId)) {
+                    map.setFilter(layerId, null);
+                }
+            });
+        } else {
+            // Build filter
+            const valueArray = Array.from(state.selectedValues);
+            const filter =
+                valueArray.length === 1
+                    ? ['==', ['get', attributeName], valueArray[0]]
+                    : ['in', ['get', attributeName], ['literal', valueArray]];
+
+            layerIds.forEach(layerId => {
+                if (map.getLayer(layerId)) {
+                    map.setFilter(layerId, filter);
+                }
+            });
+        }
+    }
+
+    // Setup event listeners
+    function setupTypologyListeners() {
+        const dropdown = document.getElementById(dropdownId);
+        if (!dropdown) return;
+
+        dropdown.addEventListener('wa-select', event => {
+            event.preventDefault();
+
+            const item = event.detail.item;
+            const value = item.value;
+
+            if (item.type === 'checkbox') {
+                if (item.checked) {
+                    state.selectedValues.add(value);
+                } else {
+                    state.selectedValues.delete(value);
+                }
+
+                applyTypologyFilter();
+                resetTypologyPanel();
+
+                // 🔥 If exactly ONE typology is selected → update the central image
+                if (state.selectedValues.size === 1) {
+                    const typ = Array.from(state.selectedValues)[0];
+                    const imgPath = `typology_axos/${typ}-${typ}.png`;
+
+                    const imgEl = document.getElementById('typology-image');
+                    imgEl.src = imgPath;
+                    imgEl.style.display = 'block';
+                }
+            } else {
+                // Handle "Select All" or "Clear All"
+                if (value === 'select-all') {
+                    dropdown.querySelectorAll('wa-dropdown-item[type="checkbox"]').forEach(checkbox => {
+                        state.selectedValues.add(checkbox.value);
+                        checkbox.checked = true;
+                    });
+                    applyTypologyFilter();
+                } else if (value === 'clear-all') {
+                    state.selectedValues.clear();
+                    dropdown.querySelectorAll('wa-dropdown-item[type="checkbox"]').forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                    applyTypologyFilter();
+                }
+            }
+        });
+    }
+
+    // Initialize
+    const success = populateTypologyDropdown();
+    setupTypologyListeners();
+
+    // If no features found, wait for source data to load
+    if (!success) {
+        const layer = map.getLayer(sampleLayerId);
+        if (layer) {
+            const sourceId = layer.source;
+            const onSourceData = e => {
+                if (e.sourceId === sourceId && e.isSourceLoaded) {
+                    console.log(`Source ${sourceId} loaded, retrying typology dropdown...`);
+                    const retrySuccess = populateTypologyDropdown();
+                    if (retrySuccess) {
+                        map.off('sourcedata', onSourceData);
+                    }
+                }
+            };
+            map.on('sourcedata', onSourceData);
+        }
+    }
+
+    // Create control object
+    typologyTypeFilterControl = {
+        reset: () => {
+            state.selectedValues = new Set(state.originalAllValues);
+            state.allValues = [...state.originalAllValues];
+            populateTypologyDropdown();
+            applyTypologyFilter();
+            resetTypologyPanel();
+        },
+        applyFilter: applyTypologyFilter
+    };
+
+    filterControls[filterKey] = typologyTypeFilterControl;
+
+    // Populate typology legend
+    function populateTypologyLegend() {
+        const legendContainer = document.getElementById('typology-legend-items');
+        if (!legendContainer) return;
+
+        legendContainer.innerHTML = '';
+
+        // Get all typology values (12 values for two columns of 6 each)
+        const typologyValues = ['t1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 't9', 't10', 't11', 't12'];
+
+        typologyValues.forEach(value => {
+            const label = getTypologyLabel(value);
+            const color = getTypologyColor(value);
+
+            const legendItem = document.createElement('div');
+            legendItem.className = 'typology-legend-item';
+
+            const colorBox = document.createElement('div');
+            colorBox.className = 'typology-legend-color';
+            colorBox.style.backgroundColor = color;
+
+            const labelText = document.createElement('span');
+            labelText.className = 'typology-legend-label';
+            labelText.textContent = `${value} - ${label}`;
+
+            legendItem.appendChild(colorBox);
+            legendItem.appendChild(labelText);
+            legendContainer.appendChild(legendItem);
+        });
+    }
+
+    // Populate legend after filter initialization
+    populateTypologyLegend();
+
+    console.log('✅ Typology type filter initialized with labels!');
+
+    // ========================================
+    // 🔥 FILTER 2: Primary Drain ID Filter (for typology panel)
+    // ========================================
+    // COMMENTED OUT - Primary ID filter disabled
+    /*
+    typologyPrimaryDrainFilterControl = createLayerFilter({
+        dropdownId: 'typology-primary-drain-filter',
+        sampleLayerId: 'primary-drains',
+        attributeName: 'Drain num',
+        layerIds: ['primary-drains', 'primary-drains-interaction', 'Halo', 'typ_analysis'],
+        onFilterChange: (selectedValues, allValues) => {
+            // 🔥 Sync the primary drain filter state with the main filter
+            if (pridrainNumberFilterControl) {
+                // Update the main primary drain filter state WITHOUT triggering its events
+                filterStates['primary-number-filter-dropdown'].selectedValues = new Set(selectedValues);
+
+                // Update UI checkboxes in the main filter dropdown
+                const priDropdown = document.getElementById('primary-number-filter-dropdown');
+                if (priDropdown) {
+                    priDropdown.querySelectorAll('wa-dropdown-item[type="checkbox"]').forEach(item => {
+                        item.checked = selectedValues.has(item.value);
+                    });
+                }
+
+                // 🔥 Now call the existing filter function to cascade to secondary/lakes/wards
+                console.log('🔗 Calling filterSecondaryByPrimaryDrains from typology filter...');
+                filterSecondaryByPrimaryDrains();
+            }
+        }
+    });
+
+    console.log('✅ Typology primary drain filter initialized!');
+    */
 }
 
 //#endregion
@@ -2872,16 +3661,25 @@ function playBasinTimeline() {
 
         if (currentBasin > 5) {
             // Reached the end, stop
+            handleValleysDetail();
             stopBasinTimeline();
             return;
         }
 
         // Call the corresponding basin function
         switch (currentBasin) {
-            case 2: basin2(); break;
-            case 3: basin3(); break;
-            case 4: basin4(); break;
-            case 5: basin5(); break;
+            case 2:
+                basin2();
+                break;
+            case 3:
+                basin3();
+                break;
+            case 4:
+                basin4();
+                break;
+            case 5:
+                basin5();
+                break;
         }
     }, 4000); // 5 seconds per basin
 }
@@ -2908,16 +3706,88 @@ function stopBasinTimeline() {
     // Reset active button tracker
     activeBasinButton = null;
 
-    // 🔥 ONLY reset streamorder filter - don't call handleValleysDetail
-    // This prevents turning off layers when switching panels
+    // Reset streamorder filter to show all
     showAllStreamOrderLevels();
 
-    console.log('✅ Basin timeline stopped (streamorder reset only)');
+    console.log('✅ Basin timeline stopped');
 }
 //#endregion
 
+//#region lakes play
 
+function playLakesTimeline() {
+    if (isLakesPlaying) {
+        // Stop playing
+        stopLakesTimeline();
+        return;
+    }
 
+    // Start playing
+    isLakesPlaying = true;
+    const playButton = document.getElementById('lakes-play-button');
+    if (playButton) {
+        playButton.name = 'pause-circle'; // Change icon to pause
+        playButton.label = 'Pause timeline';
+    }
+
+    // Start with 1790
+    let currentLake = 1;
+    lakes1700();
+
+    // Set interval to move through lakes timeline
+    lakesPlayInterval = setInterval(() => {
+        currentLake++;
+
+        if (currentLake > 4) {
+            // Reached the end, stop
+            handlelakesDetail();
+            stopLakesTimeline();
+            return;
+        }
+
+        // Call the corresponding lakes function
+        switch (currentLake) {
+            case 2:
+                lakes1800();
+                break;
+            case 3:
+                lakes1900();
+                break;
+            case 4:
+                lakes2000();
+                break;
+        }
+    }, 4000); // 4 seconds per timeline point
+}
+
+function stopLakesTimeline() {
+    if (lakesPlayInterval) {
+        clearInterval(lakesPlayInterval);
+        lakesPlayInterval = null;
+    }
+
+    isLakesPlaying = false;
+    const playButton = document.getElementById('lakes-play-button');
+    if (playButton) {
+        playButton.name = 'play-circle';
+        playButton.label = 'Play timeline';
+        playButton.style.color = 'white';
+    }
+
+    // Remove active class from all lakes timeline buttons
+    document.querySelectorAll('#lakes_trace_container .timeline-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Hide all timeline descriptions
+    hideTimelineDescription();
+
+    // Reset active button tracker
+    activeButton = null;
+
+    console.log('✅ Lakes timeline stopped');
+}
+//#endregion
 
 //#region Download Functions
 
@@ -3151,38 +4021,44 @@ function downloadAsExcel() {
 
     // Lakes sheet
     if (data.lakes.length > 0) {
-        const wsLakes = XLSX.utils.json_to_sheet(data.lakes.map(lake => ({
-            'Type': lake.type,
-            'Name': lake.name,
-            'Category': lake.category,
-            'Area (acres)': lake.area_acres,
-            'Ward': lake.ward_name,
-            'Valley': lake.valley,
-            'Custodian': lake.custodian,
-            'Status': lake.status
-        })));
+        const wsLakes = XLSX.utils.json_to_sheet(
+            data.lakes.map(lake => ({
+                Type: lake.type,
+                Name: lake.name,
+                Category: lake.category,
+                'Area (acres)': lake.area_acres,
+                Ward: lake.ward_name,
+                Valley: lake.valley,
+                Custodian: lake.custodian,
+                Status: lake.status
+            }))
+        );
         XLSX.utils.book_append_sheet(wb, wsLakes, 'Lakes');
     }
 
     // Primary Drains sheet
     if (data.primaryDrains.length > 0) {
-        const wsPrimary = XLSX.utils.json_to_sheet(data.primaryDrains.map(drain => ({
-            'Drain ID': drain.drain_id,
-            'Length (m)': drain.length_m,
-            'Valley': drain.valley,
-            'Ward': drain.ward_name
-        })));
+        const wsPrimary = XLSX.utils.json_to_sheet(
+            data.primaryDrains.map(drain => ({
+                'Drain ID': drain.drain_id,
+                'Length (m)': drain.length_m,
+                Valley: drain.valley,
+                Ward: drain.ward_name
+            }))
+        );
         XLSX.utils.book_append_sheet(wb, wsPrimary, 'Primary Drains');
     }
 
     // Secondary Drains sheet
     if (data.secondaryDrains.length > 0) {
-        const wsSecondary = XLSX.utils.json_to_sheet(data.secondaryDrains.map(drain => ({
-            'Drain ID': drain.drain_id,
-            'Length (m)': drain.length_m,
-            'Valley': drain.valley,
-            'Ward': drain.ward_name
-        })));
+        const wsSecondary = XLSX.utils.json_to_sheet(
+            data.secondaryDrains.map(drain => ({
+                'Drain ID': drain.drain_id,
+                'Length (m)': drain.length_m,
+                Valley: drain.valley,
+                Ward: drain.ward_name
+            }))
+        );
         XLSX.utils.book_append_sheet(wb, wsSecondary, 'Secondary Drains');
     }
 
@@ -3211,43 +4087,37 @@ function downloadMapSnapshot() {
             console.log('✅ Canvas captured, generating image...');
 
             // Convert to blob for better performance with large images
-            canvas.toBlob((blob) => {
-                if (!blob) {
-                    throw new Error('Failed to create image');
-                }
+            canvas.toBlob(
+                blob => {
+                    if (!blob) {
+                        throw new Error('Failed to create image');
+                    }
 
-                // Create download URL
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
+                    // Create download URL
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
 
-                // Generate filename with timestamp
-                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-                link.download = `bangalore-watersheds-${timestamp}.png`;
-                link.href = url;
+                    // Generate filename with timestamp
+                    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                    link.download = `bangalore-watersheds-${timestamp}.png`;
+                    link.href = url;
 
-                // Trigger download
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                    // Trigger download
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
 
-                // Clean up
-                setTimeout(() => URL.revokeObjectURL(url), 100);
+                    // Clean up
+                    setTimeout(() => URL.revokeObjectURL(url), 100);
 
-                console.log('✅ Snapshot downloaded');
-
-                if (button) {
-                    button.loading = false;
-                }
-
-            }, 'image/png', 1.0);
-
+                    console.log('✅ Snapshot downloaded');
+                },
+                'image/png',
+                1.0
+            );
         } catch (error) {
             console.error('❌ Error:', error);
             alert('Failed to capture snapshot: ' + error.message);
-
-            if (button) {
-                button.loading = false;
-            }
         }
     });
 
@@ -3263,8 +4133,6 @@ function downloadMapSnapshot() {
 //#region layerData
 
 function addLayers() {
-
-
     // Add existing lakes layer
     map.addSource('lakes-existing-source', {
         type: 'vector',
@@ -3282,7 +4150,6 @@ function addLayers() {
         }
     });
 
-
     // Add Lakes_lost GeoJSON source and layer
     map.addSource('lakes-lost-source', {
         type: 'vector',
@@ -3296,7 +4163,7 @@ function addLayers() {
         source: 'lakes-lost-source',
         'source-layer': 'lakes_lost-6fymrh',
         paint: {
-            'fill-color': '#8e3838',  // Red for 1870/1897
+            'fill-color': '#8e3838', // Red for 1870/1897
             'fill-opacity': 0.7
         }
     });
@@ -3349,10 +4216,13 @@ function addLayers() {
             'line-color': [
                 'match',
                 ['get', 'year'], // Get the Year property from each feature
-                '1969', '#cb5151',  // Orange for 1969
-                '1870', '#ae2e2e',  // Red for 1870
-                '1897', '#ae2e2e',  // Red for 1897
-                '#999999'         // Default gray for other years
+                '1969',
+                '#cb5151', // Orange for 1969
+                '1870',
+                '#ae2e2e', // Red for 1870
+                '1897',
+                '#ae2e2e', // Red for 1897
+                '#999999' // Default gray for other years
             ], // Red color for lost lakes
             'line-opacity': 1,
             'line-width': [
@@ -3361,16 +4231,33 @@ function addLayers() {
                 ['zoom'],
                 // Define line-width at different zoom levels
                 // [zoom_level, line_width_in_pixels]
-                5, 1,   // At zoom 5, line-width is 1 pixel
-                10, 1,  // At zoom 10, line-width is 3 pixels
-                15, 3,  // At zoom 15, line-width is 6 pixels
-                20, 3  // At zoom 20, line-width is 10 pixels
+                5,
+                1, // At zoom 5, line-width is 1 pixel
+                10,
+                1, // At zoom 10, line-width is 3 pixels
+                15,
+                3, // At zoom 15, line-width is 6 pixels
+                20,
+                3 // At zoom 20, line-width is 10 pixels
             ],
             'line-dasharray': [2, 1]
         }
     });
 
     //for Lake Buttons
+
+    map.addLayer({
+        id: 'lakes_1700',
+        type: 'fill',
+        source: 'all-lakes-lost-source',
+        'source-layer': 'all_lost_lakes-3r51nl',
+        filter: ['in', ['get', 'year'], ['literal', ['1791']]],
+        paint: {
+            'fill-color': '#0085eb', // Red for 1870/1897
+            'fill-opacity': 0.5
+        }
+    });
+
     map.addLayer({
         id: 'lakes_existing_1800',
         type: 'fill',
@@ -3378,7 +4265,7 @@ function addLayers() {
         'source-layer': 'Lakes_existing_overlap-0n1e1w',
         filter: ['in', ['get', 'year'], ['literal', ['1870', '1897']]],
         paint: {
-            'fill-color': '#0085eb',  // Red for 1870/1897
+            'fill-color': '#0085eb', // Red for 1870/1897
             'fill-opacity': 0.5
         }
     });
@@ -3390,11 +4277,10 @@ function addLayers() {
         'source-layer': 'Lakes_existing_overlap-0n1e1w',
         filter: ['in', ['get', 'year'], '1969'],
         paint: {
-            'fill-color': '#0056eb',  // Red for 1870/1897
+            'fill-color': '#0056eb', // Red for 1870/1897
             'fill-opacity': 0.5
         }
     });
-
 
     map.addLayer({
         id: 'lakes_lost_1800',
@@ -3403,7 +4289,7 @@ function addLayers() {
         'source-layer': 'all_lost_lakes-3r51nl',
         filter: ['in', ['get', 'year'], ['literal', ['1854', '1870', '1897']]], // Only show 1870 and 1897
         paint: {
-            'fill-color': '#0085eb',  // Red for 1870/1897
+            'fill-color': '#0085eb', // Red for 1870/1897
             'fill-opacity': 0.5
         }
     });
@@ -3416,7 +4302,7 @@ function addLayers() {
         slot: 'top',
         filter: ['==', ['get', 'year'], '1969'], // Only show 1969
         paint: {
-            'fill-color': '#0056eb',  // Orange/red for 1969
+            'fill-color': '#0056eb', // Orange/red for 1969
             'fill-opacity': 0.5
         }
     });
@@ -3443,7 +4329,7 @@ function addLayers() {
         filter: [
             'all',
             ['in', 'year', '1870', '1897'], // Only 1870 & 1897
-            ['!=', 'Overlap', 1]            // Exclude overlap = 1
+            ['!=', 'Overlap', 1] // Exclude overlap = 1
         ],
         paint: {
             'fill-color': '#d54231',
@@ -3458,7 +4344,7 @@ function addLayers() {
         'source-layer': 'all_lost_lakes-3r51nl',
         filter: [
             'all',
-            ['!=', 'Overlap', 1]            // Exclude overlap = 1
+            ['!=', 'Overlap', 1] // Exclude overlap = 1
         ],
         paint: {
             'fill-color': '#d54231',
@@ -3484,57 +4370,113 @@ function addLayers() {
         }
     });*/
 
+    //subbasins
 
+    map.addSource('sub-basin-source', {
+        type: 'vector',
+        url: 'mapbox://mod-foundation.47rc6fbu'
+    });
 
+    map.addLayer({
+        id: 'sub-valleys',
+        type: 'fill',
+        source: 'sub-basin-source',
+        'source-layer': 'valley_subbasins-00mv95',
+        paint: {
+            'fill-color': 'rgba(255,255,255,0)',
+            'fill-outline-color': '#840606',
+            'fill-opacity': 0.5
+        }
+    });
 }
 
 function addTypLayers() {
-
     // Add typology GeoJSON source and layer
     map.addSource('typ_source', {
         type: 'vector',
-        url: 'mapbox://mod-foundation.5kzhy8uc'
+        url: 'mapbox://mod-foundation.8o8116ot'
     });
 
     //styling
+    // Add white drop shadow layer first (underneath)
+    map.addLayer({
+        id: 'typ_analysis-glow',
+        type: 'line',
+        source: 'typ_source',
+        'source-layer': 'typ_analysis-2cq5z2',
+        paint: {
+            'line-color': '#ffffff', // White drop shadow
+            'line-opacity': 0.8, // Semi-transparent
+            'line-width': 8, // Wider than main line
+            'line-blur': 4 // Blur for glow effect
+        }
+    });
+
+    // Add main line layer on top
     map.addLayer({
         id: 'typ_analysis',
         type: 'line',
         source: 'typ_source',
-        'source-layer': 'typ_analysis-6bvc7g',
+        'source-layer': 'typ_analysis-2cq5z2',
         paint: {
             'line-color': [
                 'match',
                 ['get', 'typ'], // Get the Year property from each feature
-                't1', '#FF0000',  // REd 
-                't2', '#ff7900',  // Orange 
+                't1',
+                '#FF0000', // REd
+                't2',
+                '#ff7900', // Orange
                 //'t3', '#3B8C1A',  // Orange for 1969
-                't4', '#b533b5',  // Purple
-                't5', '#4ed84e',  // green
-                //'t6', '#F1C40F',  // Orange for 1969
-                //'t7', '#7D3C98',  // Orange for 1969
-                //'t8', '#27AE60',  // Orange for 1969
-                //'t9', '#BA4A00',  // Orange for 1969
-                //'t10', '#A9CCE3',  // Orange for 1969
-                //'t11', '#2C3E50',  
-                't12', '#efc700',
+                't4',
+                '#db3ee9', // Purple
+                't5',
+                '#4ed84e', // green
+                't6',
+                '#F1C40F', // Orange for 1969
+                't7',
+                '#7D3C98', // Orange for 1969
+                't8',
+                '#27AE60', // Orange for 1969
+                't9',
+                '#BA4A00', // Orange for 1969
+                't10',
+                '#10611e', // Orange for 1969
+                't11',
+                '#2C3E50',
+                't12',
+                '#efc700',
                 '#999999'
             ],
             'line-opacity': 1,
-            'line-width': 4,
+            'line-width': 6
         }
     });
-
-
-
 }
 
 function addBoundaryLayers() {
-
     // Add Lakes_lost GeoJSON source and layer
     map.addSource('year-boundaries-source', {
         type: 'vector',
         url: 'mapbox://mod-foundation.21szwwtj'
+    });
+
+    map.addSource('1790-boundary-source', {
+        type: 'vector',
+        url: 'mapbox://mod-foundation.aume0lcw'
+    });
+
+    map.addLayer({
+        id: '1790-boundary',
+        type: 'line',
+        source: '1790-boundary-source',
+        'source-layer': '1790-5tli9z',
+        minzoom: 0,
+        maxzoom: 24,
+        paint: {
+            'line-color': '#000000', // Orange for 1969
+            'line-dasharray': [2, 1],
+            'line-width': 3
+        }
     });
 
     //1870 and 1897 Lakes
@@ -3545,9 +4487,9 @@ function addBoundaryLayers() {
         'source-layer': 'boundaries-3hk1x7',
         filter: ['in', ['get', 'Name'], ['literal', ['1870']]], // Only show 1870 and 1897
         paint: {
-            'line-color': '#000000',  // Orange for 1969
+            'line-color': '#000000', // Orange for 1969
             'line-dasharray': [2, 1],
-            'line-width': 2,
+            'line-width': 3
         }
     });
 
@@ -3558,33 +4500,32 @@ function addBoundaryLayers() {
         'source-layer': 'boundaries-3hk1x7',
         filter: ['in', ['get', 'Name'], ['literal', ['1968']]], // Only show 1870 and 1897
         paint: {
-            'line-color': '#000000',  // Orange for 1969
+            'line-color': '#000000', // Orange for 1969
             'line-dasharray': [2, 1],
-            'line-width': 2,
+            'line-width': 2
         }
     });
 
-    // Add bbmp wards
+    /* Add gba wards
     map.addSource('wards-boundary-source', {
         type: 'vector',
-        url: 'mapbox://mod-foundation.33pozkmp'
+        url: 'mod-foundation.5rtniquc'
     });
 
     //wards line
     map.addLayer({
-        id: 'bbmp-wards-line',
+        id: 'gba-wards',
         type: 'line',
         source: 'wards-boundary-source',
-        'source-layer': 'bbmp_wards_edited-d7kxzg',
+        'source-layer': 'GBA_Wards-b7csqh',
         paint: {
-            'line-color': '#000000',  // Orange for 1969
+            'line-color': '#000000', // Orange for 1969
             'line-width': 0.5,
-            'line-opacity': 0.3,
-        },
-
+            'line-opacity': 0.3
+        }
     });
 
-    /*wards fill
+   wards fill
     map.addLayer({
         id: 'bbmp-wards',
         type: 'fill',
@@ -3594,7 +4535,42 @@ function addBoundaryLayers() {
             'fill-color': '#ffffff',  // Red for 1870/1897
             'fill-opacity': 0
         } });*/
+}
 
+function addGreens() {
+    // Add parks layer
+    map.addSource('parks-source', {
+        type: 'vector',
+        url: 'mapbox://mod-foundation.53dfw0a4'
+    });
+
+    map.addLayer({
+        id: 'parks',
+        type: 'fill',
+        source: 'parks-source',
+        'source-layer': 'parks-0h64ty',
+        paint: {
+            'fill-color': '#2f6833',
+            'fill-opacity': 0.5
+        }
+    });
+
+    // Add wetlands layer
+    map.addSource('wetlands-source', {
+        type: 'vector',
+        url: 'mapbox://mod-foundation.cu0u4yom'
+    });
+
+    map.addLayer({
+        id: 'wetlands',
+        type: 'fill',
+        source: 'wetlands-source',
+        'source-layer': 'wetlands-1xglyr',
+        paint: {
+            'fill-color': '#2f6833',
+            'fill-opacity': 0.3
+        }
+    });
 }
 
 //#endregion
@@ -3624,16 +4600,16 @@ map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 // Add fullscreen control
 map.addControl(new mapboxgl.FullscreenControl(), 'bottom-right');
 
-
-
 // Add geolocate control
-map.addControl(new mapboxgl.GeolocateControl({
-    positionOptions: {
-        enableHighAccuracy: true
-    },
-    trackUserLocation: true
-}), 'bottom-right');
-
+map.addControl(
+    new mapboxgl.GeolocateControl({
+        positionOptions: {
+            enableHighAccuracy: true
+        },
+        trackUserLocation: true
+    }),
+    'bottom-right'
+);
 
 function addScreenshotButtonToMap() {
     // Create control container
@@ -3662,7 +4638,7 @@ function addScreenshotButtonToMap() {
     screenshotBtn.style.padding = '0';
 
     // Add click handler
-    screenshotBtn.addEventListener('click', (e) => {
+    screenshotBtn.addEventListener('click', e => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -3692,48 +4668,80 @@ function addScreenshotButtonToMap() {
     }
 }
 
-
 // Add scale control
-map.addControl(new mapboxgl.ScaleControl({
-    maxWidth: 80,
-    unit: 'metric'
-}), 'bottom-right');
-
-
+map.addControl(
+    new mapboxgl.ScaleControl({
+        maxWidth: 80,
+        unit: 'metric'
+    }),
+    'bottom-right'
+);
 
 //#endregion
 
 //#region interactive pop ups and selectors
 // Show selector for multiple features
 function showSelector(features, lngLat) {
-
     // Close any existing popup before opening a new one
     if (activePopup) {
         activePopup.remove();
         activePopup = null;
     }
 
-    const items = features.map((f, i) => {
-        window[`selectFeature${i}`] = () => {
-            showPopup(f, lngLat);
-            highlightFeature(f);
-        };
-        return `<div class="feature-option" style="border-left:6px solid ${getColor(f.layer.id)}" 
+    const items = features
+        .map((f, i) => {
+            window[`selectFeature${i}`] = () => {
+                showPopup(f, lngLat);
+                highlightFeature(f);
+            };
+
+            // Determine label based on feature type
+            const isTank = [
+                'Lakes',
+                'Lakes_lost',
+                'tanks_existing',
+                'lakes_lost_1900',
+                'lakes_existing_1900',
+                'lakes_1700',
+                'lakes_lost_1800',
+                'lakes_existing_1800',
+                'Lakes_existing_overlap-interaction'
+            ].includes(f.layer.id);
+
+            const isDrain =
+                f.layer.id === 'primary-drains-interaction' || f.layer.id === 'secondary-drains-interaction';
+            const isWard = f.layer.id === 'gba-wards';
+
+            let label;
+            if (isTank) {
+                label = f.properties.name || f.properties.NAME || 'Unnamed';
+            } else if (isDrain) {
+                label = f.properties['Drain num'] || 'Unnamed Drain';
+            } else if (isWard) {
+                label = f.properties.ward_name || 'Unnamed Ward';
+            } else {
+                label = f.properties.name || f.properties.NAME || f.properties.Name || 'Unnamed';
+            }
+
+            return `<div class="feature-option" style="border-left:6px solid ${getColor(f.layer.id)}"
                             onclick="selectFeature${i}()">
                             <strong style="color:${getColor(f.layer.id)}">${getType(f.layer.id)}</strong><br>
-                            ${f.properties.name || f.properties.NAME || 'Unnamed'}
+                            ${label}
                         </div>`;
-    }).join('');
+        })
+        .join('');
 
     // Create new popup and assign it to the global variable
-    activePopup = new mapboxgl.Popup()
+    activePopup = new mapboxgl.Popup({ closeButton: true })
         .setLngLat(lngLat)
-        .setHTML(`
+        .setHTML(
+            `
                     <div class="feature-option-container">
                         <p class="feature-option-heading">Select feature:</p>
                         ${items}
                     </div>
-                `)
+                `
+        )
         .addTo(map)
         .on('close', () => {
             activePopup = null;
@@ -3748,14 +4756,17 @@ function showPopup(feature, lngLat) {
     }
 
     const p = feature.properties;
-    const isTank = ['Lakes', 'Lakes_lost',
+    const isTank = [
+        'Lakes',
+        'Lakes_lost',
         'tanks_existing',
-        'lakes_lost_1900', 'lakes_existing_1900',
-        'lakes_lost_1800', 'lakes_existing_1800',
+        'lakes_lost_1900',
+        'lakes_existing_1900',
+        'lakes_1700',
+        'lakes_lost_1800',
+        'lakes_existing_1800',
         'Lakes_existing_overlap-interaction'
     ].includes(feature.layer.id);
-
-
 
     let color = getColor(feature.layer.id);
     const type = getType(feature.layer.id);
@@ -3772,26 +4783,30 @@ function showPopup(feature, lngLat) {
             p.ward_name && `<strong>Ward:</strong> ${p.ward_name}`,
             p.ward_name_ka && `<strong>Ward:</strong> ${p.ward_name_ka}`,
             p.Status && `<strong>Status:</strong> ${p.Status}`
-        ].filter(Boolean).join('<br>');
-    }
-    /*else if ('bbmp-wards'){
-            contentHtml = [
-            p.ward_name && `<strong>Name:</strong> ${p.ward_name}`,
-        ].filter(Boolean).join('<br>');
-    }*/
-    else if ('primary-drain-interaction' || 'secondary-drain-interaction') {
+        ]
+            .filter(Boolean)
+            .join('<br>');
+    } else if (
+        feature.layer.id === 'primary-drains-interaction' ||
+        feature.layer.id === 'secondary-drains-interaction'
+    ) {
         contentHtml = [
             p['Drain num'] && `<strong>Drain ID:</strong> ${p['Drain num']}`,
-            p.length_m && `<strong>Length:</strong> ${p.length_m}`,
-        ].filter(Boolean).join('<br>');
+            p.length_m && `<strong>Length:</strong> ${p.length_m}`
+        ]
+            .filter(Boolean)
+            .join('<br>');
+    } else if (feature.layer.id === 'gba-wards') {
+        contentHtml = [p.ward_name && `<strong>Name:</strong> ${p.ward_name}`].filter(Boolean).join('<br>');
+        console.log('filledward data');
+    } else if (feature.layer.id === 'parks') {
+        contentHtml = [p.Name && `<strong>Name:</strong> ${p.Name}`].filter(Boolean).join('<br>');
+        console.log('filledward data');
+    } else {
+        contentHtml = Object.entries(p)
+            .map(([k, v]) => `<strong>${k}:</strong> ${v}`)
+            .join('<br>');
     }
-
-
-    else {
-        contentHtml = Object.entries(p).map(([k, v]) => `<strong>${k}:</strong> ${v}`).join('<br>');
-    }
-
-
 
     const html = `<div class="feature-detail-container" style="border-left:4px solid ${color};">
                 <strong id="heading" style="color:${color}">${type}</strong><br>
@@ -3808,7 +4823,7 @@ function showPopup(feature, lngLat) {
     window.typologyPopupsActive = false;
 
     // Create new popup and assign it to the global variable
-    activePopup = new mapboxgl.Popup()
+    activePopup = new mapboxgl.Popup({ closeButton: true })
         .setLngLat(lngLat)
         .setHTML(html || '<em>No data available</em>')
         .addTo(map)
@@ -3819,7 +4834,6 @@ function showPopup(feature, lngLat) {
 
     highlightFeature(feature);
 }
-
 function createLineCallout(id, coordinates, title, subtitle) {
     // Remove existing callout with same id (if any)
     if (activeCallouts[id]) {
@@ -3849,16 +4863,13 @@ function createLineCallout(id, coordinates, title, subtitle) {
     activeCallouts[id] = marker;
 }
 
-
 //#endregion
 
 //#region paneldetails
 
-
-
 function panelHandle(keepGroups) {
-    console.log("\n🔧 === panelHandle CALLED ===");
-    console.log("Input keepGroups:", keepGroups);
+    console.log('\n🔧 === panelHandle CALLED ===');
+    console.log('Input keepGroups:', keepGroups);
 
     const keepVisible = new Set();
 
@@ -3866,13 +4877,13 @@ function panelHandle(keepGroups) {
     const groupKeys = Array.isArray(keepGroups?.groups)
         ? keepGroups.groups
         : Array.isArray(keepGroups)
-            ? keepGroups
-            : [];
+        ? keepGroups
+        : [];
 
-    console.log("Processed groupKeys:", groupKeys);
+    console.log('Processed groupKeys:', groupKeys);
 
     // ✅ Turn ON all layers in groups to keep
-    console.log("\n✅ TURNING ON these groups:");
+    console.log('\n✅ TURNING ON these groups:');
     groupKeys.forEach(groupKey => {
         const group = layerConfig[groupKey];
         if (!group) {
@@ -3900,7 +4911,7 @@ function panelHandle(keepGroups) {
     });
 
     // 🚫 Turn OFF all other groups not in keepVisible
-    console.log("\n🚫 TURNING OFF these groups:");
+    console.log('\n🚫 TURNING OFF these groups:');
     Object.keys(layerConfig).forEach(groupKey => {
         if (keepVisible.has(groupKey)) return;
 
@@ -3910,10 +4921,7 @@ function panelHandle(keepGroups) {
         console.log(`\n  ${groupKey} (${group.label}):`);
 
         group.layers.forEach(layerId => {
-            if (
-                map.getLayer(layerId) &&
-                !['background', 'satellite'].includes(layerId)
-            ) {
+            if (map.getLayer(layerId) && !['background', 'satellite'].includes(layerId)) {
                 const visibility = map.getLayoutProperty(layerId, 'visibility');
                 if (visibility !== 'none') {
                     console.log(`    🔴 Turning OFF: ${layerId} (was ${visibility || 'visible'})`);
@@ -3926,20 +4934,33 @@ function panelHandle(keepGroups) {
         });
     });
 
-    console.log("✅ === panelHandle COMPLETE ===\n");
+    console.log('✅ === panelHandle COMPLETE ===\n');
 }
 
+// Helper function to clear all pending panel timeouts
+function clearAllPanelTimeouts() {
+    // Clear valleys category timeout
+    if (valleysCategoryTimeout) {
+        clearTimeout(valleysCategoryTimeout);
+        valleysCategoryTimeout = null;
+    }
+
+    // Clear all DEM timeouts
+    demTimeouts.forEach(timeout => clearTimeout(timeout));
+    demTimeouts = [];
+}
 
 function handleDEMDetail() {
-    console.log("🏔 Handling DEM Detail");
+    console.log('🏔 Handling DEM Detail');
+
+    // Clear any pending timeouts from other panels
+    clearAllPanelTimeouts();
 
     // Fly to DEM view
-    smoothFlyTo(dem3DView);
+    smoothFlyTo(dem3DViewBounds);
 
     // Define groups/layers to stay visible or turn on
-    const keepGroups = (
-        { groups: ['dem', 'hillshade', 'ridge', ...alwaysVisible] }
-    );
+    const keepGroups = { groups: ['dem', 'hillshade', 'ridge', ...alwaysVisible] };
 
     panelHandle(keepGroups.groups);
 
@@ -3949,33 +4970,42 @@ function handleDEMDetail() {
     setOpa('hillshade', 1);
 
     // 🗺️ Sequential activation of DEM contextual layers
-    setTimeout(() => {
-        toggleGroup('valleys', true);
-        syncLegendToMapGroup('valleys');
-        createLineCallout('ridge', [77.58519, 12.97963], 'RIDGE LINE', 'Highest elevation area');
-        createLineCallout('highestpoint', [77.582468, 13.012390], 'HIGHEST POINT', 'North kempegowda Tower<br> 952m');
-    }, 1000);
+    demTimeouts.push(
+        setTimeout(() => {
+            toggleGroup('valleys', true);
+            syncLegendToMapGroup('valleys');
+            createLineCallout('ridge', [77.5835, 12.93], 'RIDGE LINE', 'Highest elevation area');
+            createLineCallout(
+                'highestpoint',
+                [77.582468, 13.01239],
+                'HIGHEST POINT',
+                'North kempegowda Tower<br> 952m'
+            );
+        }, 1000)
+    );
 
-    setTimeout(() => {
-        toggleGroup('streamorder', true);
-        syncLegendToMapGroup('streamorder');
-    }, 3000);
-
+    demTimeouts.push(
+        setTimeout(() => {
+            toggleGroup('streamorder', true);
+            syncLegendToMapGroup('streamorder');
+        }, 3000)
+    );
 }
 
 function handleValleysDetail() {
+    // Clear any pending timeouts from other panels
+    clearAllPanelTimeouts();
+
     removeAllCallouts();
     // 1️⃣ Fly to the valley view
-    smoothFlyTo(valleyView);
+    smoothFlyTo(valleyViewBounds);
 
     // 2️⃣ Make DEM fully visible
     setOpa('dem', 0.5);
     setOpa('hillshade', 0);
 
     // 3️⃣ Define groups that must stay visible
-    const keepGroups = (
-        { groups: ['dem', 'hillshade', 'valleys', 'valleylabels', 'streamorder', ...alwaysVisible] }
-    );
+    const keepGroups = { groups: ['dem', 'hillshade', 'valleys', 'valleylabels', 'streamorder', ...alwaysVisible] };
 
     panelHandle(keepGroups.groups);
 
@@ -3986,7 +5016,7 @@ function handleValleysDetail() {
         map.moveLayer('valleys');
     }
     // 7️⃣ (Optional) Turn on "valleys category" after short delay
-    setTimeout(() => {
+    valleysCategoryTimeout = setTimeout(() => {
         toggleGroup('valleyscategory', true, 0.7);
         syncLegendToMapGroup('valleyscategory');
     }, 1000);
@@ -3997,18 +5027,24 @@ const TOTAL_EXISTING_LAKES = 203;
 const TOTAL_LOST_LAKES = 108;
 
 function handlelakesDetail() {
-    console.log("\n🏔 === HANDLING LAKES DETAIL - START ===");
-    console.log("Timestamp:", new Date().toISOString());
+    console.log('\n🏔 === HANDLING LAKES DETAIL - START ===');
+    console.log('Timestamp:', new Date().toISOString());
+
+    // Clear any pending timeouts from other panels
+    clearAllPanelTimeouts();
+
+    // Hide timeline description
+    hideTimelineDescription();
 
     // 1️⃣ Fly to the valley view
-    console.log("📍 Flying to default view:", defaultView);
-    smoothFlyTo(defaultView);
+    console.log('📍 Flying to default view:', defaultView);
+    smoothFlyTo(defaultViewBounds);
 
     // 2️⃣ Set DEM to 40% opacity
-    console.log("🎨 Setting DEM opacity to 0.4");
+    console.log('🎨 Setting DEM opacity to 0.4');
     setOpa('dem', 0.4);
 
-    console.log("🔇 Turning off hillshade");
+    console.log('🔇 Turning off hillshade');
     toggleLayerOff('hillshade');
 
     // Define groups/layers to stay visible or turn on
@@ -4016,84 +5052,85 @@ function handlelakesDetail() {
         groups: ['dem', 'valleys', 'tanks', 'losttanks', 'wards', ...alwaysVisible]
     };
 
-    console.log("📋 Groups to keep visible:", keepGroups.groups);
-    console.log("📋 Expanded layer IDs for these groups:");
+    //console.log('📋 Groups to keep visible:', keepGroups.groups);
+    //console.log('📋 Expanded layer IDs for these groups:');
     keepGroups.groups.forEach(groupKey => {
         const layers = layerConfig[groupKey]?.layers || [];
-        console.log(`  ${groupKey}:`, layers);
+        //console.log(`  ${groupKey}:`, layers);
     });
 
-    console.log("\n🔧 Calling panelHandle with keepGroups...");
+    //console.log('\n🔧 Calling panelHandle with keepGroups...');
     panelHandle(keepGroups.groups);
 
-    console.log("\n🎨 Setting additional opacities:");
-    console.log("  - tanks: 0.9");
+    //console.log('\n🎨 Setting additional opacities:');
+    //console.log('  - tanks: 0.9');
     setOpa('tanks', 0.9);
-    console.log("  - wards: 0.3");
+    //console.log('  - wards: 0.3');
     setOpa('wards', 0.3);
 
     // Log current layer visibility states AFTER panelHandle
-    console.log("\n📊 === LAYER VISIBILITY STATES AFTER panelHandle ===");
+    //console.log('\n📊 === LAYER VISIBILITY STATES AFTER panelHandle ===');
     Object.keys(layerConfig).forEach(groupKey => {
         const group = layerConfig[groupKey];
-        console.log(`\n${groupKey} (${group.label}):`);
+        //console.log(`\n${groupKey} (${group.label}):`);
         group.layers.forEach(layerId => {
             if (map.getLayer(layerId)) {
                 const visibility = map.getLayoutProperty(layerId, 'visibility');
                 const opacityProp = getOpacityProperty(layerId);
                 const opacity = opacityProp ? map.getPaintProperty(layerId, opacityProp) : 'N/A';
-                console.log(`  ${layerId}:`, {
-                    visibility: visibility || 'visible (default)',
-                    opacity: opacity
-                });
+                //console.log(`  ${layerId}:`, {
+                //    visibility: visibility || 'visible (default)',
+                //    opacity: opacity
+                //});
             } else {
-                console.log(`  ${layerId}: ❌ LAYER NOT FOUND`);
+                //console.log(`  ${layerId}: ❌ LAYER NOT FOUND`);
             }
         });
     });
 
     // ✅ Use hardcoded totals immediately (no waiting for map)
-    console.log("\n📊 Updating lakes counter with totals:", {
-        existing: TOTAL_EXISTING_LAKES,
-        lost: TOTAL_LOST_LAKES
-    });
+    //console.log('\n📊 Updating lakes counter with totals:', {
+    //    existing: TOTAL_EXISTING_LAKES,
+    //    lost: TOTAL_LOST_LAKES
+    //});
     updateLakesCounter(TOTAL_EXISTING_LAKES, TOTAL_LOST_LAKES, true);
 
     // ✅ Reset ALL lake filters
-    console.log("\n🔄 Resetting all filters...");
+    //console.log('\n🔄 Resetting all filters...');
     resetAllFilters();
 
-    console.log("✅ === HANDLING LAKES DETAIL - COMPLETE ===\n");
+    console.log('✅ === HANDLING LAKES DETAIL - COMPLETE ===\n');
 }
 
 function handlePrimaryDetail() {
-    console.log("🏔 Handling Primary Detail");
+    console.log('🏔 Handling Primary Detail');
+
+    // Clear any pending timeouts from other panels
+    clearAllPanelTimeouts();
 
     // 1️⃣ Fly to the valley view
-    smoothFlyTo(defaultView);
-
+    smoothFlyTo(defaultViewBounds);
 
     // 2️⃣ Make DEM fully visible
     setOpa('dem', 0.4);
     toggleLayerOff('hillshade');
 
     // Define groups/layers to stay visible or turn on
-    const keepGroups = (
-        { groups: ['dem', 'valleys', 'tanks', 'primarydrains', 'wards', 'losttanks', ...alwaysVisible] }
-    );
+    const keepGroups = { groups: ['dem', 'valleys', 'tanks', 'primarydrains', 'wards', 'losttanks', ...alwaysVisible] };
 
     setOpa('wards', 0.4);
 
     panelHandle(keepGroups.groups);
-
 }
 
 function handleSecondaryDetail() {
-    console.log("🏔 Handling Secondary Detail");
+    console.log('🏔 Handling Secondary Detail');
+
+    // Clear any pending timeouts from other panels
+    clearAllPanelTimeouts();
 
     // 1️⃣ Fly to the valley view
-    smoothFlyTo(defaultView);
-
+    smoothFlyTo(defaultViewBounds);
 
     // 2️⃣ Make DEM fully visible
     setOpa('dem', 0.4);
@@ -4101,36 +5138,61 @@ function handleSecondaryDetail() {
     toggleLayerOff('hillshade');
 
     // Define groups/layers to stay visible or turn on
-    const keepGroups = (
-        { groups: ['dem', 'valleys', 'tanks', 'primarydrains', 'secondarydrains', 'wards', 'losttanks', 'valleylabels', ...alwaysVisible] }
-    );
-
+    const keepGroups = {
+        groups: [
+            'dem',
+            'valleys',
+            'tanks',
+            'primarydrains',
+            'secondarydrains',
+            'subvalleys',
+            'wards',
+            'losttanks',
+            'valleylabels',
+            ...alwaysVisible
+        ]
+    };
+    setOpa('greens', 0.4);
     panelHandle(keepGroups.groups);
-
 }
 
 function handleTypologyDetail() {
-    console.log("🏔 Handling Typology Detail");
+    console.log('🏔 Handling Typology Detail');
+
+    // Clear any pending timeouts from other panels
+    clearAllPanelTimeouts();
 
     // Mark typology as active
     window.typologyPanelActive = true;
     window.typologyPopupsActive = false;
 
-    // 1️⃣ Fly to the default view
-    smoothFlyTo(defaultView);
+    // 1️⃣ Zoom to typology analysis layer extents
+    zoomToLayerBounds('typ_analysis', { padding: 50, duration: 2000, maxZoom: 25 });
 
     // 2️⃣ Set DEM to 40% opacity
     setOpa('dem', 0.4);
+    setOpa('roads', 0.4);
     toggleLayerOff('hillshade');
 
     // Define groups/layers to stay visible or turn on
-    const keepGroups = (
-        { groups: ['dem', 'valleys', 'tanks', 'primarydrains', 'secondarydrains', 'roads', 'placelabels', 'typologyanalysis', ...alwaysVisible] }
-    );
-
+    const keepGroups = {
+        groups: [
+            'dem',
+            'valleys',
+            'tanks',
+            'losttanks',
+            'primarydrains',
+            'secondarydrains',
+            'roads',
+            'placelabels',
+            'typologyanalysis',
+            'wards',
+            'greens',
+            ...alwaysVisible
+        ]
+    };
+    setOpa('greens', 0.4);
     panelHandle(keepGroups.groups);
-
-    setOpa('roads', 0.5);
 
     // 4️⃣ Make sure the detail is open so content shows
     const detail = document.getElementById('typology-detail');
@@ -4140,12 +5202,38 @@ function handleTypologyDetail() {
 }
 
 function handlefilterDetail() {
-    console.log("🏔 Handling Filter Detail");
+    console.log('🏔 Handling Filter Detail');
 
-    handleSecondaryDetail();
+    // Clear any pending timeouts from other panels
+    clearAllPanelTimeouts();
+
+    // 2️⃣ Make DEM fully visible
+    setOpa('dem', 0.4);
+    setOpa('wards', 0.4);
+
+    // Define groups/layers to stay visible or turn on
+    const keepGroups = {
+        groups: [
+            'dem',
+            'valleys',
+            'tanks',
+            'primarydrains',
+            'secondarydrains',
+            'subvalleys',
+            'wards',
+            'losttanks',
+            'valleylabels',
+            'greens',
+            ...alwaysVisible
+        ]
+    };
+
+    setOpa('greens', 0.4);
+
+    panelHandle(keepGroups.groups);
 
     // Fly to the valley view
-    smoothFlyTo(defaultView);
+    smoothFlyTo(defaultViewBounds);
 
     // Make DEM fully visible
     setOpa('roads', 0.2);
@@ -4157,7 +5245,7 @@ function handlefilterDetail() {
 }
 
 function resetMap() {
-    console.log("🏔 Reset Map");
+    console.log('🏔 Reset Map');
 
     //remove callouts
     removeAllCallouts();
@@ -4168,69 +5256,186 @@ function resetMap() {
     clearTypologyMarkers();
 
     //reset filters
-    resetAllFilters;
-    
+    resetAllFilters();
+
+    // Close typology panel and open default panel (e.g., primary-detail)
+    const typologyDetail = document.getElementById('typology-detail');
+    if (typologyDetail && typologyDetail.open) {
+        typologyDetail.open = false;
+    }
+
+    // Open the default panel (primary drains)
+    const primaryDetail = document.getElementById('primary-detail');
+    if (primaryDetail && !primaryDetail.open) {
+        primaryDetail.open = true;
+    }
+
     // 1️⃣ Fly to the default view
-    smoothFlyTo(defaultView);
+    smoothFlyTo(defaultViewBounds);
 
     // 2️⃣ Make DEM fully visible
     setOpa('dem', 0.4);
     toggleLayerOff('hillshade');
 
     // Define groups/layers to stay visible or turn on
-    const keepGroups = (
-        { groups: ['dem', 'valleys', 'valleylabels', 'losttanks', 'wards', 'tanks', 'primarydrains', 'secondarydrains', 'roads', 'placelabels', ...alwaysVisible] }
-    );
+    const keepGroups = {
+        groups: [
+            'dem',
+            'valleys',
+            'valleylabels',
+            'losttanks',
+            'wards',
+            'tanks',
+            'primarydrains',
+            'secondarydrains',
+            'roads',
+            'placelabels',
+            'greens',
+            ...alwaysVisible
+        ]
+    };
 
     panelHandle(keepGroups.groups);
 
     setOpa('roads', 0.5);
     setOpa('wards', 0.5);
+    setOpa('greens', 0.4);
 }
-
-
-
 
 //#endregion
 
 //#region lakesbuttons
 
+// Helper function to show timeline description
+function showTimelineDescription(year) {
+    // Hide all descriptions first
+    document.querySelectorAll('.timeline-description').forEach(desc => {
+        desc.style.display = 'none';
+    });
+
+    // Show the specific description for this year
+    const descDiv = document.getElementById('desc_' + year);
+    if (descDiv) {
+        descDiv.style.display = 'block';
+    }
+}
+
+// Helper function to hide all timeline descriptions
+function hideTimelineDescription() {
+    document.querySelectorAll('.timeline-description').forEach(desc => {
+        desc.style.display = 'none';
+    });
+}
+
 // 1800s lakes view
-function lakes1800() {
+function lakes1700() {
+    console.log('🏛️ lakes1700 function called');
+    showTimelineDescription('1790');
+
+    // Update active state
+    const lakes1700Btn = document.getElementById('lakes_trace_1700');
+    document.querySelectorAll('#lakes_trace_container .timeline-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    if (lakes1700Btn) {
+        lakes1700Btn.classList.add('active');
+    }
 
     // Define groups/layers to stay visible or turn on
-    const keepGroups = (
-        { groups: ['dem', 'tanks1800'] }
-    );
+    const keepGroups = { groups: ['dem', 'tanks1700'] };
+    panelHandle(keepGroups.groups);
+
+    setOpa('tanks1700', 0.6);
+
+    // Check if layer exists
+    const layer = map.getLayer('lakes_1700');
+    if (layer) {
+        console.log('✅ lakes_1700 layer exists');
+
+        const View_1700 = {
+            center: [77.578, 12.965],
+            zoom: 14.46,
+            pitch: 0,
+            bearing: 0
+        };
+        smoothFlyTo(View_1700);
+
+        // Wait for layers to load before counting
+        setTimeout(() => {
+            const existingCount = countFeaturesInLayer('lakes_1700');
+            console.log('Count result:', existingCount);
+            updateLakesCounter(existingCount, null, false);
+        }, 500);
+    }
+}
+
+function lakes1800() {
+    showTimelineDescription('1870');
+
+    // Update active state
+    const lakes1800Btn = document.getElementById('lakes_trace_1800');
+    document.querySelectorAll('#lakes_trace_container .timeline-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    if (lakes1800Btn) {
+        lakes1800Btn.classList.add('active');
+    }
+
+    // Define groups/layers to stay visible or turn on
+    const keepGroups = { groups: ['dem', 'tanks1800'] };
     panelHandle(keepGroups.groups);
 
     setOpa('tanks1800', 0.6);
 
+    const View_1800 = {
+        center: [77.61, 12.98],
+        zoom: 12.15,
+        pitch: 0,
+        bearing: 0
+    };
+
+    smoothFlyTo(View_1800);
+
     // Wait for layers to load before counting
     setTimeout(() => {
-        const existingCount = countFeaturesInLayer('lakes_existing_1800') +
-            countFeaturesInLayer('lakes_lost_1800');
+        const existingCount = countFeaturesInLayer('lakes_existing_1800') + countFeaturesInLayer('lakes_lost_1800');
         updateLakesCounter(existingCount, null, false);
     }, 500);
 }
 
 // 1900s lakes view
 function lakes1900() {
+    showTimelineDescription('1969');
     //console.log("📅 Showing 1900s lakes");
 
+    // Update active state
+    const lakes1900Btn = document.getElementById('lakes_trace_1900');
+    document.querySelectorAll('#lakes_trace_container .timeline-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    if (lakes1900Btn) {
+        lakes1900Btn.classList.add('active');
+    }
+
     // Define groups/layers to stay visible or turn on
-    const keepGroups = (
-        { groups: ['dem', 'tanks1900'] }
-    );
+    const keepGroups = { groups: ['dem', 'tanks1900'] };
     panelHandle(keepGroups.groups);
 
     setOpa('tanks1900', 0.8);
 
+    const View_1900 = {
+        center: [77.594, 12.988],
+        zoom: 11.8,
+
+        pitch: 0,
+        bearing: 0
+    };
+
+    smoothFlyTo(View_1900);
+
     // Wait for layers to load before counting
     setTimeout(() => {
-
-        const existingCount = countFeaturesInLayer('lakes_existing_1900') +
-            countFeaturesInLayer('lakes_lost_1900');
+        const existingCount = countFeaturesInLayer('lakes_existing_1900') + countFeaturesInLayer('lakes_lost_1900');
         const lostCount = countFeaturesInLayer('Lakes_lost_1800_1900');
         //console.log(lostCount);
         updateLakesCounter(existingCount, lostCount, true);
@@ -4239,13 +5444,22 @@ function lakes1900() {
 
 // 2000s lakes view
 function lakes2000() {
+    showTimelineDescription('Present');
     //console.log("📅 Showing 2000s lakes");
 
+    // Update active state
+    const lakes2000Btn = document.getElementById('lakes_trace_2000');
+    document.querySelectorAll('#lakes_trace_container .timeline-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    if (lakes2000Btn) {
+        lakes2000Btn.classList.add('active');
+    }
+
     // Define groups/layers to stay visible or turn on
-    const keepGroups = (
-        { groups: ['dem', 'valleys', 'existingtanks', ...alwaysVisible] }
-    );
+    const keepGroups = { groups: ['dem', 'valleys', 'existingtanks', ...alwaysVisible] };
     panelHandle(keepGroups.groups);
+    smoothFlyTo(defaultViewBounds);
 
     // Wait for layers to load before counting
     setTimeout(() => {
@@ -4264,7 +5478,7 @@ function lakes2000() {
 let activeBasinButton = null;
 
 function basin1() {
-    console.log("📊 === BASIN 1 FUNCTION CALLED ===");
+    //console.log('📊 === BASIN 1 FUNCTION CALLED ===');
     removeAllCallouts();
 
     const basin1Btn = document.getElementById('basin_1');
@@ -4299,11 +5513,11 @@ function basin1() {
     console.log('Streamorder layer exists:', !!streamorderLayer);
 
     const keepGroups = {
-        groups: ['bbmp', 'streamorder', 'allbasins', 'basinbg']
+        groups: ['gba', 'streamorder', 'allbasins', 'basinbg']
     };
 
     setOpa('basinbg', 0.6);
-    smoothFlyTo(valleyView);
+    smoothFlyTo(valleyViewBounds);
 
     panelHandle(keepGroups.groups);
 
@@ -4311,7 +5525,7 @@ function basin1() {
 
     syncLegendToMapGroup('streamorder');
 
-    console.log("✅ Basin 1 complete");
+    console.log('✅ Basin 1 complete');
 }
 
 function basin2() {
@@ -4342,12 +5556,11 @@ function basin2() {
     }
 
     const keepGroups = {
-        groups: ['bbmp', 'streamorder', 'allbasins', 'basinbg', 'valleyscategory']
+        groups: ['gba', 'streamorder', 'allbasins', 'basinbg', 'valleyscategory']
     };
 
     setOpa('basinbg', 0.6);
     setOpa('valleyscategory', 0.3);
-
 
     const basin2View = {
         center: [77.616, 12.93],
@@ -4366,7 +5579,7 @@ function basin2() {
     syncLegendToMapGroup('streamorder');
     toggleLayer('valleys-label');
 
-    console.log("✅ Basin 2 complete");
+    console.log('✅ Basin 2 complete');
 }
 
 function basin3() {
@@ -4397,7 +5610,7 @@ function basin3() {
     }
 
     const keepGroups = {
-        groups: ['bbmp', 'streamorder', 'allbasins', 'basinbg', 'valleyscategory']
+        groups: ['gba', 'streamorder', 'allbasins', 'basinbg', 'valleyscategory']
     };
 
     setOpa('basinbg', 0.6);
@@ -4419,11 +5632,10 @@ function basin3() {
     syncLegendToMapGroup('streamorder');
     toggleLayer('river-label');
 
-    console.log("✅ Basin 3 complete");
+    console.log('✅ Basin 3 complete');
 }
 
 function basin4() {
-
     const basin4Btn = document.getElementById('basin_4');
     removeAllCallouts();
 
@@ -4451,7 +5663,7 @@ function basin4() {
     }
 
     const keepGroups = {
-        groups: ['bbmp', 'streamorder', 'allbasins', 'basinbg', 'valleyscategory']
+        groups: ['gba', 'streamorder', 'allbasins', 'basinbg', 'valleyscategory']
     };
 
     setOpa('basinbg', 0.6);
@@ -4472,9 +5684,14 @@ function basin4() {
     syncLegendToMapGroup('streamorder');
     toggleLayer('largerriver-label');
 
-    createLineCallout('river_marker_1', [79.794748, 11.774276], 'Thazhangudha, Tamil Nadu', 'Confluence point of Thenna Pennai');
+    createLineCallout(
+        'river_marker_1',
+        [79.794748, 11.774276],
+        'Thazhangudha, Tamil Nadu',
+        'Confluence point of Thenna Pennai'
+    );
 
-    console.log("✅ Basin 4 complete");
+    console.log('✅ Basin 4 complete');
 }
 
 function basin5() {
@@ -4504,7 +5721,7 @@ function basin5() {
     }
 
     const keepGroups = {
-        groups: ['bbmp', 'streamorder', 'allbasins', 'basinbg', 'valleyscategory']
+        groups: ['gba', 'streamorder', 'allbasins', 'basinbg', 'valleyscategory']
     };
 
     setOpa('basinbg', 0.6);
@@ -4523,15 +5740,23 @@ function basin5() {
     showStreamOrderByLevels([13, 12, 9, 7, 6, 4]);
 
     syncLegendToMapGroup('streamorder');
-    createLineCallout('river_marker_1', [79.794748, 11.774276], 'Thazhangudha, Tamil Nadu', 'Confluence point of Thenna Pennai');
-    createLineCallout('river_marker_2', [79.828159, 11.364984], 'Kodiyampalayam, Tamil Nadu', 'Confluence point of Kaveri-Kollidam River');
+    createLineCallout(
+        'river_marker_1',
+        [79.794748, 11.774276],
+        'Thazhangudha, Tamil Nadu',
+        'Confluence point of Thenna Pennai'
+    );
+    createLineCallout(
+        'river_marker_2',
+        [79.828159, 11.364984],
+        'Kodiyampalayam, Tamil Nadu',
+        'Confluence point of Kaveri-Kollidam River'
+    );
 
-    console.log("✅ Basin 5 complete");
+    console.log('✅ Basin 5 complete');
 }
 
 //#endregion
-
-
 
 //#endregion
 
@@ -4561,7 +5786,7 @@ function highlightBasin(basinName, buttonId) {
         document.querySelectorAll('#panel sl-button').forEach(btn => btn.classList.remove('active'));
 
         // Reset info panel
-        infoDiv.innerHTML = "<p>Select a basin to view its details.</p>";
+        infoDiv.innerHTML = '<p>Select a basin to view its details.</p>';
 
         return;
     }
@@ -4630,24 +5855,22 @@ function highlightBasin(basinName, buttonId) {
     `;
 }
 
-
-
-
 //#endregion
-
 
 //#endregion
 
 //#region main
 
-
 map.on('load', () => {
+    smoothFlyTo(defaultViewBounds);
+    setOpa('wards', 0.5);
     console.log('✅ Map loaded!');
 
     //add layers not in the style
     addLayers();
     addTypLayers();
     addBoundaryLayers();
+    addGreens();
     console.log('✅ Layers added!');
 
     storeOriginalLayerProperties();
@@ -4676,6 +5899,13 @@ map.on('load', () => {
     if (map.getLayer('streamorder')) {
         map.setLayerZoomRange('streamorder', 0, 24);
     }
+
+    if (map.getLayer('1790-boundary')) {
+        map.setLayerZoomRange('1790-boundary', 0, 24);
+    }
+    if (map.getLayer('typ_analysis')) {
+        map.setLayerZoomRange('typ_analysis', 0, 24);
+    }
     console.log('✅ Zoom range set!');
 
     if (map.getLayer('road-secondary-tertiary')) {
@@ -4689,23 +5919,6 @@ map.on('load', () => {
     setupInteraction();
     console.log('✅ setupInteraction completed!');
 
-    // 🔥 ADD THIS: Initialize ALL filters and setup reset button
-    setTimeout(() => {
-        initializeLakeFilters();
-        initializeDrainFilters();
-
-        // Single combined reset button handler
-        const resetAllFiltersBtn = document.getElementById('reset-all-filters');
-        if (resetAllFiltersBtn) {
-            resetAllFiltersBtn.addEventListener('click', () => {
-                console.log('Reset all filters clicked!');
-                resetAllFilters();
-            });
-        } else {
-            console.warn('⚠️ Reset button not found!');
-        }
-    }, 1000);
-
     // Add this debug temporarily
     map.once('idle', () => {
         const lostLayer = map.getLayer('Lakes_lost');
@@ -4718,370 +5931,456 @@ map.on('load', () => {
     setTimeout(() => {
         initializeLakeFilters();
         initializeDrainFilters();
+        initializeTypologyFilters();
+        lostTankIdentifierFilterControl = initializeLostTankIdentifierFilters();
 
-        // Reset button handler (existing)
-        const resetAllFiltersBtn = document.getElementById('reset-all-filters');
-        if (resetAllFiltersBtn) {
-            resetAllFiltersBtn.addEventListener('click', () => {
-                console.log('Reset all filters clicked!');
+        // 🔥 Handle ALL reset buttons with class 'reset_button'
+        const filterresetButton = document.getElementById('filterandfind_reset');
+
+        if (filterresetButton) {
+            filterresetButton.addEventListener('click', () => {
                 resetAllFilters();
             });
         }
 
-        // 🔥 NEW: Download button handlers
-        const downloadCsvBtn = document.getElementById('download-csv');
-        if (downloadCsvBtn) {
-            downloadCsvBtn.addEventListener('click', downloadAsCSV);
+        // Typology reset button
+        const typologyResetButton = document.getElementById('typology_reset');
+        if (typologyResetButton) {
+            typologyResetButton.addEventListener('click', () => {
+                console.log('🔄 Typology reset clicked');
+                if (typologyTypeFilterControl) {
+                    typologyTypeFilterControl.reset();
+                }
+            });
         }
 
+        // Download button handlers
+        const downloadCsvBtn = document.getElementById('download-csv');
+        if (downloadCsvBtn) {
+            downloadCsvBtn.addEventListener('click', e => {
+                e.preventDefault(); // Prevent page refresh
+                downloadAsCSV();
+            });
+        }
     }, 1000);
 
     watershedListener();
 
     addScreenshotButtonToMap();
-
 });
 
 //#endregion
 
 //#region eventListeners
 
-    //#region Valley Buttons
+//#region Valley Buttons
 
+// Add event listener for valley view toggle
+const valleyToggle = document.getElementById('valley-view-toggle');
+if (valleyToggle) {
+    valleyToggle.addEventListener('change', e => {
+        const isRegional = e.target.checked;
+        toggleValleyView(isRegional);
+    });
+}
 
-    // Add event listener for valley view toggle
-    const valleyToggle = document.getElementById('valley-view-toggle');
-    if (valleyToggle) {
-        valleyToggle.addEventListener('change', (e) => {
-            const isRegional = e.target.checked;
-            toggleValleyView(isRegional);
-        });
-    }
+document.getElementById('p_basin').addEventListener('click', () => highlightBasin('Ponnaiyar Basin', 'p_basin'));
+document.getElementById('c_basin').addEventListener('click', () => highlightBasin('Cauvery Basin', 'c_basin'));
+//document.getElementById('a_valley').addEventListener('click', () => highlightValleyByName('Arkavathi Valley', 'a_valley'));
+//document.getElementById('v_valley').addEventListener('click', () => highlightValleyByName('Vrishabhavati Valley', 'v_valley'));
+//document.getElementById('s_valley').addEventListener('click', () => highlightValleyByName('Suvarnamukhi Valley', 's_valley'));
+//#endregion
 
+//#region Lakes timeline buttons
+// Replace your Lakes timeline buttons event listeners section with this:
+// Replace your Lakes timeline buttons event listeners section with this:
+let activeButton = null;
 
-    document.getElementById('p_basin').addEventListener('click', () => highlightBasin('Ponnaiyar Basin', 'p_basin'));
-    document.getElementById('c_basin').addEventListener('click', () => highlightBasin('Cauvery Basin', 'c_basin'));
-    //document.getElementById('a_valley').addEventListener('click', () => highlightValleyByName('Arkavathi Valley', 'a_valley'));
-    //document.getElementById('v_valley').addEventListener('click', () => highlightValleyByName('Vrishabhavati Valley', 'v_valley'));
-    //document.getElementById('s_valley').addEventListener('click', () => highlightValleyByName('Suvarnamukhi Valley', 's_valley'));
-    //#endregion
+const lakes1700Btn = document.getElementById('lakes_trace_1700');
+const lakes1800Btn = document.getElementById('lakes_trace_1800');
+const lakes1900Btn = document.getElementById('lakes_trace_1900');
+const lakes2000Btn = document.getElementById('lakes_trace_2000');
+const lakesTraceContainer = document.getElementById('lakes_trace_container');
 
-    //#region Lakes timeline buttons
-    // Replace your Lakes timeline buttons event listeners section with this:
-    // Replace your Lakes timeline buttons event listeners section with this:
-    let activeButton = null;
+// Helper function to clear all active states
+function clearActiveButtons() {
+    if (lakes1700Btn) lakes1700Btn.classList.remove('active');
+    if (lakes1800Btn) lakes1800Btn.classList.remove('active');
+    if (lakes1900Btn) lakes1900Btn.classList.remove('active');
+    if (lakes2000Btn) lakes2000Btn.classList.remove('active');
+    activeButton = null;
+}
 
-    const lakes1800Btn = document.getElementById('lakes_trace_1800');
-    const lakes1900Btn = document.getElementById('lakes_trace_1900');
-    const lakes2000Btn = document.getElementById('lakes_trace_2000');
-    const lakesTraceContainer = document.getElementById('lakes_trace_container');
-
-    // Helper function to clear all active states
-    function clearActiveButtons() {
-        if (lakes1800Btn) lakes1800Btn.classList.remove('active');
-        if (lakes1900Btn) lakes1900Btn.classList.remove('active');
-        if (lakes2000Btn) lakes2000Btn.classList.remove('active');
-        activeButton = null;
-    }
-
-    // 1800s button handler
-    if (lakes1800Btn) {
-        lakes1800Btn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent click from bubbling
-            if (activeButton === 'lakes1800') {
-                clearActiveButtons();
-                handlelakesDetail();
-            } else {
-                clearActiveButtons();
-                lakes1800Btn.classList.add('active');
-                activeButton = 'lakes1800';
-                lakes1800();
-            }
-        });
-    }
-
-    // 1900s button handler
-    if (lakes1900Btn) {
-        lakes1900Btn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent click from bubbling
-            if (activeButton === 'lakes1900') {
-                clearActiveButtons();
-                handlelakesDetail();
-            } else {
-                clearActiveButtons();
-                lakes1900Btn.classList.add('active');
-                activeButton = 'lakes1900';
-                lakes1900();
-            }
-        });
-    }
-
-    // 2000s button handler
-    if (lakes2000Btn) {
-        lakes2000Btn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent click from bubbling
-            if (activeButton === 'lakes2000') {
-                clearActiveButtons();
-                handlelakesDetail();
-            } else {
-                clearActiveButtons();
-                lakes2000Btn.classList.add('active');
-                activeButton = 'lakes2000';
-                lakes2000();
-            }
-        });
-    }
-
-    // Click outside timeline to reset
-    document.addEventListener('click', (e) => {
-        // Check if lakes-detail panel is open
-        const lakesDetail = document.getElementById('lakes-detail');
-        if (!lakesDetail || !lakesDetail.open) {
-            return; // Don't reset if panel is closed
-        }
-
-        // Check if click is outside the timeline container
-        if (lakesTraceContainer && !lakesTraceContainer.contains(e.target)) {
-            // Only reset if there's an active button
-            if (activeButton) {
-                clearActiveButtons();
-                handlelakesDetail();
-            }
+// 1700s button handler
+if (lakes1700Btn) {
+    lakes1700Btn.addEventListener('click', e => {
+        e.stopPropagation(); // Prevent click from bubbling
+        if (activeButton === 'lakes1700') {
+            clearActiveButtons();
+            handlelakesDetail();
+        } else {
+            clearActiveButtons();
+            lakes1700Btn.classList.add('active');
+            activeButton = 'lakes1700';
+            lakes1700();
         }
     });
-    //#endregion
+}
 
-    //#region Panel Listener
+// 1800s button handler
+if (lakes1800Btn) {
+    lakes1800Btn.addEventListener('click', e => {
+        e.stopPropagation(); // Prevent click from bubbling
+        if (activeButton === 'lakes1800') {
+            clearActiveButtons();
+            handlelakesDetail();
+        } else {
+            clearActiveButtons();
+            lakes1800Btn.classList.add('active');
+            activeButton = 'lakes1800';
+            lakes1800();
+        }
+    });
+}
 
-    // Store reference to other panel details
-    const allPanelDetails = document.querySelectorAll('#panel sl-details');
-    const typologyDetail = document.getElementById('typology-detail');
-    const resetButton = document.getElementById('reset');
+// 1900s button handlerk
+if (lakes1900Btn) {
+    lakes1900Btn.addEventListener('click', e => {
+        e.stopPropagation(); // Prevent click from bubbling
+        if (activeButton === 'lakes1900') {
+            clearActiveButtons();
+            handlelakesDetail();
+        } else {
+            clearActiveButtons();
+            lakes1900Btn.classList.add('active');
+            activeButton = 'lakes1900';
+            lakes1900();
+        }
+    });
+}
 
-    // Track visibility state of all panels
-    const panelVisibilityState = {};
+// 2000s button handler
+if (lakes2000Btn) {
+    lakes2000Btn.addEventListener('click', e => {
+        e.stopPropagation(); // Prevent click from bubbling
+        if (activeButton === 'lakes2000') {
+            clearActiveButtons();
+            handlelakesDetail();
+        } else {
+            clearActiveButtons();
+            lakes2000Btn.classList.add('active');
+            activeButton = 'lakes2000';
+            lakes2000();
+        }
+    });
+}
 
-    // Update the panel listener to handle typology fullscreen
-    document.querySelectorAll('#panel sl-details').forEach(detail => {
-        detail.addEventListener('sl-show', () => {
-            const selectedId = detail.id;
+// Click outside timeline to reset
+//#endregion
 
-            // Close all other details
-            document.querySelectorAll('#panel sl-details').forEach(d => {
-                if (d !== detail) d.open = false;
-            });
+//#region Panel Listener
 
-            removeAllCallouts();
+// Store reference to other panel details
+const allPanelDetails = document.querySelectorAll('#panel sl-details');
+const typologyDetail = document.getElementById('typology-detail');
+const resetButton = document.getElementById('reset');
 
-            // 🔥 NEW: Stop basin timeline without resetting view
-            if (isBasinPlaying) {
-                if (basinPlayInterval) {
-                    clearInterval(basinPlayInterval);
-                    basinPlayInterval = null;
-                }
-                isBasinPlaying = false;
-                const playButton = document.getElementById('basin-play-button');
-                if (playButton) {
-                    playButton.name = 'play-circle';
-                    playButton.label = 'Play timeline';
-                }
-            }
+// Track visibility state of all panels
+const panelVisibilityState = {};
 
-            // Remove active class from basin buttons
-            document.querySelectorAll('#basin_container .timeline-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            activeBasinButton = null;
+// Update the panel listener to handle typology fullscreen
+document.querySelectorAll('#panel sl-details').forEach(detail => {
+    detail.addEventListener('sl-show', () => {
+        const selectedId = detail.id;
 
-            // If typology panel is opened
-            if (selectedId === 'typology-detail') {
-                // Hide all other panels
-                allPanelDetails.forEach(d => {
-                    if (d !== typologyDetail) {
-                        d.style.display = 'none';
-                    }
-                });
-                // Keep reset button visible
-                if (resetButton) {
-                    resetButton.style.display = 'block';
-                }
-                handleTypologyDetail();
-                return;
-            }
+        // Close all other details
+        document.querySelectorAll('#panel sl-details').forEach(d => {
+            if (d !== detail) d.open = false;
+        });
 
-            // For all other panels, make sure they're visible
+        removeAllCallouts();
+
+        // Stop timelines when switching panels
+        if (isBasinPlaying) {
+            stopBasinTimeline();
+        }
+        if (isLakesPlaying) {
+            stopLakesTimeline();
+        }
+
+        // If typology panel is opened
+        if (selectedId === 'typology-detail') {
+            // Hide all other panels
             allPanelDetails.forEach(d => {
-                d.style.display = 'block';
+                if (d !== typologyDetail) {
+                    d.style.display = 'none';
+                }
             });
+            // Keep reset button visible
             if (resetButton) {
                 resetButton.style.display = 'block';
             }
+            handleTypologyDetail();
+            return;
+        }
 
-            // === Custom setups for other panels ===
-            if (selectedId === 'dem-detail') {
-                handleDEMDetail();
-                return;
-            }
+        // For all other panels, make sure they're visible
+        allPanelDetails.forEach(d => {
+            d.style.display = 'block';
+        });
+        if (resetButton) {
+            resetButton.style.display = 'block';
+        }
 
-            if (selectedId === 'valleys-detail') {
-                handleValleysDetail();
-                return;
-            }
+        // === Custom setups for other panels ===
+        if (selectedId === 'dem-detail') {
+            handleDEMDetail();
+            return;
+        }
 
-            if (selectedId === 'lakes-detail') {
-                handlelakesDetail();
-                return;
-            }
+        if (selectedId === 'valleys-detail') {
+            handleValleysDetail();
+            return;
+        }
 
-            if (selectedId === 'drains-detail') {
-                handlePrimaryDetail();
-                return;
-            }
+        if (selectedId === 'lakes-detail') {
+            handlelakesDetail();
+            return;
+        }
 
-            if (selectedId === 'secondary-drains-detail') {
-                handleSecondaryDetail()
-                return;
-            }
+        if (selectedId === 'drains-detail') {
+            handlePrimaryDetail();
+            return;
+        }
 
-            if (selectedId === 'filterandfind-detail') {
-                handlefilterDetail()
-                return;
+        if (selectedId === 'secondary-drains-detail') {
+            handleSecondaryDetail();
+            return;
+        }
+
+        if (selectedId === 'filterandfind-detail') {
+            handlefilterDetail();
+            return;
+        }
+    });
+});
+
+// Listen for typology panel close
+if (typologyDetail) {
+    typologyDetail.addEventListener('sl-hide', () => {
+        // Show all other panels again
+        allPanelDetails.forEach(d => {
+            if (d !== typologyDetail) {
+                d.style.display = 'block';
             }
         });
+        // Clear typology data
+        window.typologyPanelActive = false;
+        window.typologyPopupsActive = false;
+        clearTypologyMarkers();
     });
+}
 
-    // Listen for typology panel close
-    if (typologyDetail) {
-        typologyDetail.addEventListener('sl-hide', () => {
-            // Show all other panels again
-            allPanelDetails.forEach(d => {
-                if (d !== typologyDetail) {
-                    d.style.display = 'block';
-                }
-            });
-            // Clear typology data
-            window.typologyPanelActive = false;
-            window.typologyPopupsActive = false;
-            clearTypologyMarkers();
+// 🔥 NEW: Listen for valleys panel HIDE to reset basin state
+const valleysDetail = document.getElementById('valleys-detail');
+if (valleysDetail) {
+    valleysDetail.addEventListener('sl-hide', () => {
+        // Only reset if basin timeline was playing
+        stopBasinTimeline();
+    });
+}
+
+const resetMapbutton = document.getElementById('panel_reset');
+resetMapbutton.addEventListener('click', () => {
+    resetMap();
+});
+
+//#endregion
+
+//#region Watershed Listener
+
+function watershedListener() {
+    const basin1Btn = document.getElementById('basin_1');
+    const basin2Btn = document.getElementById('basin_2');
+    const basin3Btn = document.getElementById('basin_3');
+    const basin4Btn = document.getElementById('basin_4');
+    const basin5Btn = document.getElementById('basin_5');
+
+    if (basin1Btn) {
+        basin1Btn.addEventListener('click', e => {
+            e.stopPropagation();
+            basin1();
         });
     }
+    if (basin2Btn) {
+        basin2Btn.addEventListener('click', e => {
+            e.stopPropagation();
+            basin2();
+        });
+    }
+    if (basin3Btn) {
+        basin3Btn.addEventListener('click', e => {
+            e.stopPropagation();
+            basin3();
+        });
+    }
+    if (basin4Btn) {
+        basin4Btn.addEventListener('click', e => {
+            e.stopPropagation();
+            basin4();
+        });
+    }
+    if (basin5Btn) {
+        basin5Btn.addEventListener('click', e => {
+            e.stopPropagation();
+            basin5();
+        });
+    } else {
+        console.warn('⚠️ Basin 1 button NOT found');
+    }
+}
 
-    // 🔥 NEW: Listen for valleys panel HIDE to reset basin state
+document.addEventListener('click', e => {
+    // Check if valleys-detail panel is open
     const valleysDetail = document.getElementById('valleys-detail');
-    if (valleysDetail) {
-        valleysDetail.addEventListener('sl-hide', () => {
-            // Only reset if basin timeline was playing
-            stopBasinTimeline();
-        });
+    if (!valleysDetail || !valleysDetail.open) {
+        return; // Don't reset if panel is closed
     }
 
-    const resetMapbutton = document.getElementById('reset');
-    resetMapbutton.addEventListener('click', () => {
-        resetMap();
-    });
+    const basinContainer = document.getElementById('basin_container');
 
-    //#endregion
-
-    //#region Watershed Listener
-
-        function watershedListener() {
-            const basin1Btn = document.getElementById('basin_1');
-            const basin2Btn = document.getElementById('basin_2');
-            const basin3Btn = document.getElementById('basin_3');
-            const basin4Btn = document.getElementById('basin_4');
-            const basin5Btn = document.getElementById('basin_5');
-
-            if (basin1Btn) {
-                basin1Btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    basin1();
-                });
-            }
-            if (basin2Btn) {
-                basin2Btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    basin2();
-                });
-            }
-            if (basin3Btn) {
-                basin3Btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    basin3();
-                });
-            }
-            if (basin4Btn) {
-                basin4Btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    basin4();
-                });
-            }
-            if (basin5Btn) {
-                basin5Btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    basin5();
-                });
-            }
-
-
-
-
-
-            else {
-                console.warn('⚠️ Basin 1 button NOT found');
-            }
-        }
-
-
-        document.addEventListener('click', (e) => {
-            // Check if valleys-detail panel is open
-            const valleysDetail = document.getElementById('valleys-detail');
-            if (!valleysDetail || !valleysDetail.open) {
-                return; // Don't reset if panel is closed
-            }
-
-            const basinContainer = document.getElementById('basin_container');
-
-            // Check if click is outside the basin container
-            if (basinContainer && !basinContainer.contains(e.target)) {
-                // Only reset if there's an active button
-                if (activeBasinButton) {
-                    // Remove active class from all basin buttons
-                    document.querySelectorAll('#basin_container .timeline-button').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-
-                    // Reset active button tracker
-                    activeBasinButton = null;
-
-                    // Reset streamorder filter to show all
-                    showAllStreamOrderLevels();
-
-                    // Call handleValleysDetail to reset
-                    handleValleysDetail();
-
-                    console.log('✅ Basin timeline reset by clicking outside');
-                }
-            }
-        });
-
-        // Basin timeline play button
-        const basinPlayButton = document.getElementById('basin-play-button');
-        if (basinPlayButton) {
-            basinPlayButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                playBasinTimeline();
+    // Check if click is outside the basin container
+    if (basinContainer && !basinContainer.contains(e.target)) {
+        // Only reset if there's an active button
+        if (activeBasinButton) {
+            // Remove active class from all basin buttons
+            document.querySelectorAll('#basin_container .timeline-button').forEach(btn => {
+                btn.classList.remove('active');
             });
+
+            // Reset active button tracker
+            activeBasinButton = null;
+
+            // Reset streamorder filter to show all
+            showAllStreamOrderLevels();
+
+            // Call handleValleysDetail to reset
+            handleValleysDetail();
+
+            console.log('✅ Basin timeline reset by clicking outside');
         }
-
-    //#endregion
-
-    // Filter secondary by primary button
-    const filterSecByPriBtn = document.getElementById('filter-secondary-by-primary');
-    if (filterSecByPriBtn) {
-        filterSecByPriBtn.addEventListener('click', () => {
-            console.log('Filter Secondary by Primary clicked!');
-            filterSecondaryByPrimaryDrains();
-        });
     }
+});
+
+// Basin timeline play button
+const basinPlayButton = document.getElementById('basin-play-button');
+if (basinPlayButton) {
+    basinPlayButton.addEventListener('click', e => {
+        e.stopPropagation();
+        playBasinTimeline();
+    });
+}
+
+// Lakes timeline play button
+const lakesPlayButton = document.getElementById('lakes-play-button');
+if (lakesPlayButton) {
+    lakesPlayButton.addEventListener('click', e => {
+        e.stopPropagation();
+        playLakesTimeline();
+    });
+}
+
+//#endregion
+
+// Filter secondary by primary button
+const filterSecByPriBtn = document.getElementById('filter-secondary-by-primary');
+if (filterSecByPriBtn) {
+    filterSecByPriBtn.addEventListener('click', () => {
+        console.log('Filter Secondary by Primary clicked!');
+        filterSecondaryByPrimaryDrains();
+    });
+}
+
+const typologyresetBtn = document.querySelector('.typology-reset');
+
+if (typologyresetBtn) {
+    typologyresetBtn.addEventListener('click', () => {
+        resetAllFilters();
+        resetTypologyPanel();
+    });
+}
+
+//#region Download Table
+async function populateDownloadTable() {
+    const tableBody = document.getElementById('download-table-body');
+    if (!tableBody) return;
+
+    try {
+        // Fetch the Excel file
+        const response = await fetch('downloadcentre.xlsx');
+        const arrayBuffer = await response.arrayBuffer();
+
+        // Parse the Excel file
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+
+        // Get the first sheet
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+
+        // Convert to JSON
+        const data = XLSX.utils.sheet_to_json(worksheet);
+
+        console.log('📊 Download Centre Data:', data);
+
+        tableBody.innerHTML = '';
+
+        // Populate table with data from Excel
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+
+            // Layer Name
+            const nameCell = document.createElement('td');
+            nameCell.textContent = row.Layer || row.layer || row.Name || row.name || '';
+            tr.appendChild(nameCell);
+
+            // Source
+            const sourceCell = document.createElement('td');
+            sourceCell.textContent = row.Source || row.source || '';
+            tr.appendChild(sourceCell);
+
+            // Download Link
+            const linkCell = document.createElement('td');
+            const downloadLink = document.createElement('a');
+            const url = row.Link || row.link || row.URL || row.url || row['Download Link'] || row['download link'] || '';
+            const layerName = nameCell.textContent;
+            const sourceName = sourceCell.textContent;
+
+            // Create filename: layername_source.geojson
+            const fileName = `${layerName.replace(/\s+/g, '_')}_${sourceName.replace(/\s+/g, '_')}.geojson`;
+
+            downloadLink.href = url;
+            downloadLink.download = fileName;
+            downloadLink.className = 'download-icon';
+            downloadLink.innerHTML = '⬇';
+            downloadLink.title = `Download ${layerName}`;
+            linkCell.appendChild(downloadLink);
+            tr.appendChild(linkCell);
+
+            tableBody.appendChild(tr);
+        });
+
+        console.log('✅ Download table populated successfully');
+
+    } catch (error) {
+        console.error('❌ Error loading download centre data:', error);
+        tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: red;">Error loading download data</td></tr>';
+    }
+}
+
+// Populate download table on load
+map.on('load', () => {
+    populateDownloadTable();
+});
+//#endregion
 
 //#endregion
