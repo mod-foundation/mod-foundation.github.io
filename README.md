@@ -48,8 +48,11 @@ In July 2025, Mod Foundation in collaboration with Oorvani Foundation won a gran
 ## Built With
 The development of the interactive map was done on Visual Studio Code with Claude Integration. Source code hosted on Github and served via Github Pages
 
-Basemap - Mapbox Studio style
-mapbox://styles/mod-foundation/cmimsj4eh00q401qw4s9b2ogt
+Basemap - Mapbox Studio
+
+Style: mapbox://styles/mod-foundation/cmimsj4eh00q401qw4s9b2ogt
+
+Preview: https://api.mapbox.com/styles/v1/mod-foundation/cmimsj4eh00q401qw4s9b2ogt.html?title=view&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34
 
 JS
 Mapbox GL JS for client side map rendering and interactivity
