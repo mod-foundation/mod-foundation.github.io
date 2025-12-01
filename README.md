@@ -10,6 +10,10 @@ Interactive Map: https://buildingaresilientbengaluru.com/ecology-map/
 
 Homepage: https://buildingaresilientbengaluru.com/
 
+<div align="center">
+  <img src="images/meta.png" alt="Building a Resilient Bengaluru" width="800">
+</div>
+
 ## Table of Contents
 
 - [The Campaign](#the-campaign)
