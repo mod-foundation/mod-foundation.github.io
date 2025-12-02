@@ -39,17 +39,17 @@ Most of the data has been created and analysed by MOD Foundation. Some datasets 
 
 | Layer | Source | Description | Link | Resource |
 |-------|--------|-------------|------|----------|
-| **DEM** | USGS Earth Explorer | Digital Elevation Model (DEM) 30m resolution downloaded from Earth Explorer | [TIF](/datasets/DEM.tif) | [USGS Earth Explorer](https://earthexplorer.usgs.gov/) |
-| **Roads** | Mapbox | Click on "Copy this style into your account" | [Style Link](https://api.mapbox.com/styles/v1/modfoundation/cmimsj4eh00q401qw4s9b2ogt.htmltitle=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34) |
-| **Place Labels** | Mapbox | Click on "Copy this style into your account" | [Style Link](https://api.mapbox.com/styles/v1/modfoundation/cmimsj4eh00q401qw4s9b2ogt.htmltitle=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34) |
-| **Basemap** | Mapbox | Click on "Copy this style into your account" | [Style Link](https://api.mapbox.com/styles/v1/modfoundation/cmimsj4eh00q401qw4s9b2ogt.htmltitle=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34) |
+| **DEM** | USGS Earth Explorer | Digital Elevation el (DEM) 30m resolution downloaded from Earth Explorer | [TIF](/datasets/DEM.tif) | [USGS Earth Explorer](https://earthexplorer.usgs.gov/) |
+| **Roads** | Mapbox | Click on "Copy this style into your account" | [Style Link](https://api.mapbox.com/styles/v1/foundation/cmimsj4eh00q401qw4s9b2ogt.htmltitle=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34) |
+| **Place Labels** | Mapbox | Click on "Copy this style into your account" | [Style Link](https://api.mapbox.com/styles/v1/foundation/cmimsj4eh00q401qw4s9b2ogt.htmltitle=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34) |
+| **Basemap** | Mapbox | Click on "Copy this style into your account" | [Style Link](https://api.mapbox.com/styles/v1/foundation/cmimsj4eh00q401qw4s9b2ogt.htmltitle=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34) |
 
 ### <span style="color: #68c2fb;">Typologies</span>
 
 | Layer | Source | Description | Link |
 |-------|--------|-------------|------|
 | **Typology Guidebook** | Building a Resilient Bengaluru | Comprehensive guidebook on drain typologies | [Typology Guidebook](https://buildingaresilientbengaluru.com/) |
-| **Typology Analysis for C100** | MOD Foundation | Access the Streetview and Satellite imager screenshots [here](/files) | [Geojson](/datasets/typology_analysis.geojson) |
+| **Typology Analysis for C100** | Mod Foundation | Access the Streetview and Satellite imager screenshots [here](/files) | [Geojson](/datasets/typology_analysis.geojson) |
 
 ---
 
