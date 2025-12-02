@@ -48,6 +48,9 @@
         <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 
         <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+        <!-- toGeoJSON for KML conversion -->
+        <script src="https://cdn.jsdelivr.net/npm/@mapbox/togeojson@0.16.2/togeojson.min.js"></script>
     </head>
     <body>
         <div id="legend-container">
@@ -289,12 +292,22 @@
             <sl-details id="secondary-drains-detail" summary="Secondary Drains">
                 <p>
                     The secondary drains carry runoff, from road-side drains and tertiary networks, to the primary drains.  </p>
-                <img src="images/secondarydrain.jpeg" alt="MOD Foundation" class="image-100" />     
-                    
-                    
+                <img src="images/secondarydrain.jpeg" alt="MOD Foundation" class="image-100" />
+
+
                 <p>
                     The image above shows a typical condition of secondary drains connecting to primary drains. These drains link tanks and eventually flow into rivers, forming the city's cascading stormwater system.
                 </p>
+            </sl-details>
+
+            <sl-details id="flood-hotspots-detail" summary="Flood Hotspots">
+                 <h4 style ="color: white; border-bottom: 1px solid #ff0000">Notice how flood-prone zones overlap with lost lakes and constricted drains!
+                </h4><p>
+                   
+Encroachments have narrowed drains over the years, while tanks and marshes have been built over completely. This has blocked the city's natural drainage pathways.
+<br><br>Now, these vulnerable low-lying areas experience severe waterlogging and flooding during heavy rains. The map shows flood-prone locations as recorded by KSRAC in 2023.
+                </p>
+                <p id="subtitle">Source: Open City</p>
             </sl-details>
 
             <sl-details id="filterandfind-detail" summary="Filter & Find">
@@ -487,6 +500,32 @@
                      
                 </div>
                 <p id="subtitle" >Scroll down to visit the typology library</p>
+            </sl-details>
+
+            <sl-details id="upload-detail" summary="Upload Custom Layer">
+                <p>Upload your own GeoJSON or KML file to overlay on the map.</p>
+                <div id="upload-dropzone" class="upload-dropzone">
+                    <div class="upload-icon">
+                        <sl-icon name="cloud-upload" style="font-size: 48px;"></sl-icon>
+                    </div>
+                    <p class="upload-text">Drag & drop your GeoJSON or KML file here</p>
+                    <p class="upload-subtext">or click to browse</p>
+                    <input type="file" id="geojson-file-input" accept=".json,.geojson,.kml" style="display: none;" />
+                </div>
+                <div id="upload-info" style="display: none; margin-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span id="upload-filename" style="font-size: 12px; color: white;"></span>
+                        <sl-button id="remove-upload" variant="danger" size="small" outline>Remove</sl-button>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <label style="font-size: 12px; color: white; margin-bottom: 5px; display: block;">Layer Color:</label>
+                        <input type="color" id="upload-layer-color" value="#FF5733" style="width: 100%; height: 40px; border: none; cursor: pointer;" />
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <label style="font-size: 12px; color: white; margin-bottom: 5px; display: block;">Opacity:</label>
+                        <sl-range id="upload-layer-opacity" min="0" max="100" value="80" step="5"></sl-range>
+                    </div>
+                </div>
             </sl-details>
 
             <sl-details id="download-detail" summary="Download Center">
