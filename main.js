@@ -132,6 +132,11 @@ const layerConfig = {
     greens: {
         label: 'Greens',
         layers: ['parks', 'wetlands']
+    },
+
+    floodhotspots: {
+        label: 'Flood Hotspots',
+        layers: ['flood-hotspots']
     }
 };
 
@@ -227,7 +232,8 @@ const hideLayers = resolveLayers({
         'tanks1800',
         'tanks1900',
         'typologyanalysis',
-        'existingtanks'
+        'existingtanks',
+        'floodhotspots'
     ]
 });
 
@@ -245,7 +251,8 @@ const interactiveLayers = [
     'lakes_lost_1900',
     'lakes_1700',
     'gba-wards',
-    'parks'
+    'parks',
+    'flood-hotspots'
 ];
 
 let currentHighlight = null;
@@ -325,12 +332,17 @@ function generateLegend() {
         {
             label: 'Drains',
             isGroup: true,
-            children: ['primarydrains', 'secondarydrains']
+            children: ['primarydrains', 'secondarydrains', 'floodhotspots']
         },
         {
             label: 'Tanks',
             isGroup: true,
             children: ['tanks', 'losttanks']
+        },
+        {
+            label: 'Flood Hotspots',
+            isGroup: true,
+            children: ['floodhotspots']
         },
         {
             label: 'Valleys',
@@ -653,6 +665,8 @@ function getType(id) {
     if (id === 'typ_analysis') return 'Typology';
     if (id === 'gba-wards') return 'Ward';
     if (id === 'parks') return 'Park';
+    if (id === 'flood-hotspots') return 'Flood Hotspot';
+    if (id.includes('uploaded-layer')) return 'Uploaded Layer';
     return 'Feature';
 }
 
@@ -672,6 +686,12 @@ function getColor(id) {
     if (id === 'tanks_existing') return '#4e4cf0';
     if (id === 'typ_analysis') return '#FF69B4';
     if (id === 'parks') return '#296b2f';
+    if (id === 'flood-hotspots') return '#ff0000';
+    // Get color from uploaded layer if it exists
+    if (id.includes('uploaded-layer')) {
+        const colorInput = document.getElementById('upload-layer-color');
+        return colorInput ? colorInput.value : '#FF5733';
+    }
     return '#999';
 }
 
@@ -4388,6 +4408,28 @@ function addLayers() {
             'fill-opacity': 0.5
         }
     });
+
+    //floodprone
+
+    map.addSource('flood-hotspots-source', {
+        type: 'vector',
+        url: 'mapbox://mod-foundation.c5rqg4ml'
+    });
+
+    map.addLayer({
+        id: 'flood-hotspots',
+        type: 'circle',
+        source: 'flood-hotspots-source',
+        'source-layer': 'flooding_vulnerable_locations-1vvgs0',
+        paint: {
+            'circle-radius': 6, // Size of the point
+            'circle-color': 'rgba(250, 0, 0, 0.5)', // Fill color
+            'circle-opacity': 1, // Fill opacity
+            'circle-stroke-width': 1, // Outline width
+            'circle-stroke-color': 'rgba(255, 255, 255, 1)', // Outline color
+            'circle-stroke-opacity': 1 // Outline opacity
+        }
+    });
 }
 
 function addTypLayers() {
@@ -4720,7 +4762,12 @@ function showSelector(features, lngLat) {
             } else if (isWard) {
                 label = f.properties.ward_name || 'Unnamed Ward';
             } else {
-                label = f.properties.name || f.properties.NAME || f.properties.Name || 'Unnamed';
+                label =
+                    f.properties.name ||
+                    f.properties.LocationName ||
+                    f.properties.NAME ||
+                    f.properties.Name ||
+                    'Unnamed';
             }
 
             return `<div class="feature-option" style="border-left:6px solid ${getColor(f.layer.id)}"
@@ -4802,6 +4849,12 @@ function showPopup(feature, lngLat) {
     } else if (feature.layer.id === 'parks') {
         contentHtml = [p.Name && `<strong>Name:</strong> ${p.Name}`].filter(Boolean).join('<br>');
         console.log('filledward data');
+    } else if (feature.layer.id.includes('uploaded-layer')) {
+        // Handle uploaded layer - display all properties
+        contentHtml = Object.entries(p)
+            .filter(([k, v]) => v !== null && v !== undefined && !k.startsWith('_'))
+            .map(([k, v]) => `<strong>${k}:</strong> ${v}`)
+            .join('<br>');
     } else {
         contentHtml = Object.entries(p)
             .map(([k, v]) => `<strong>${k}:</strong> ${v}`)
@@ -5149,6 +5202,41 @@ function handleSecondaryDetail() {
             'wards',
             'losttanks',
             'valleylabels',
+            ...alwaysVisible
+        ]
+    };
+    setOpa('greens', 0.4);
+    panelHandle(keepGroups.groups);
+}
+
+function handleFloodHotspotsDetail() {
+    console.log('💧 Handling Flood Hotspots Detail');
+
+    // Clear any pending timeouts from other panels
+    clearAllPanelTimeouts();
+
+    // 1️⃣ Fly to the valley view
+    smoothFlyTo(defaultViewBounds);
+
+    // 2️⃣ Make DEM fully visible
+    setOpa('dem', 0.4);
+    setOpa('wards', 0.4);
+    toggleLayerOff('hillshade');
+
+    // Define groups/layers to stay visible or turn on (same as handleSecondaryDetail + flood hotspots)
+    const keepGroups = {
+        groups: [
+            'dem',
+            'valleys',
+            'tanks',
+            'primarydrains',
+            'secondarydrains',
+            'subvalleys',
+            'wards',
+            'losttanks',
+            'valleylabels',
+            'floodhotspots',
+            'greens',
             ...alwaysVisible
         ]
     };
@@ -6203,6 +6291,11 @@ document.querySelectorAll('#panel sl-details').forEach(detail => {
             return;
         }
 
+        if (selectedId === 'flood-hotspots-detail') {
+            handleFloodHotspotsDetail();
+            return;
+        }
+
         if (selectedId === 'filterandfind-detail') {
             handlefilterDetail();
             return;
@@ -6427,6 +6520,310 @@ async function populateDownloadTable() {
 map.on('load', () => {
     populateDownloadTable();
 });
+//#endregion
+
+//#region Upload Custom GeoJSON Layer
+
+let uploadedLayerId = null;
+
+// Initialize upload functionality
+function initializeUpload() {
+    const dropzone = document.getElementById('upload-dropzone');
+    const fileInput = document.getElementById('geojson-file-input');
+    const removeBtn = document.getElementById('remove-upload');
+    const colorInput = document.getElementById('upload-layer-color');
+    const opacitySlider = document.getElementById('upload-layer-opacity');
+
+    // Click to browse
+    dropzone.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    // Drag and drop events
+    dropzone.addEventListener('dragover', e => {
+        e.preventDefault();
+        dropzone.classList.add('drag-over');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('drag-over');
+    });
+
+    dropzone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropzone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        handleFileUpload(file);
+    });
+
+    // File input change
+    fileInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        handleFileUpload(file);
+    });
+
+    // Remove uploaded layer
+    removeBtn.addEventListener('click', () => {
+        removeUploadedLayer();
+    });
+
+    // Color change
+    colorInput.addEventListener('change', e => {
+        if (uploadedLayerId) {
+            updateLayerColor(e.target.value);
+        }
+    });
+
+    // Opacity change
+    opacitySlider.addEventListener('sl-change', e => {
+        if (uploadedLayerId) {
+            updateLayerOpacity(e.target.value / 100);
+        }
+    });
+}
+
+// Handle file upload
+function handleFileUpload(file) {
+    if (!file) return;
+
+    // Check file type
+    const validTypes = ['application/json', 'application/geo+json', 'application/vnd.google-earth.kml+xml', ''];
+    const isValidExtension =
+        file.name.endsWith('.json') || file.name.endsWith('.geojson') || file.name.endsWith('.kml');
+
+    if (!validTypes.includes(file.type) && !isValidExtension) {
+        alert('Please upload a valid GeoJSON or KML file (.json, .geojson, or .kml)');
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = e => {
+        try {
+            let geojson;
+
+            // Check if file is KML
+            if (file.name.endsWith('.kml')) {
+                // Parse KML to GeoJSON
+                const parser = new DOMParser();
+                const kmlDoc = parser.parseFromString(e.target.result, 'text/xml');
+                geojson = toGeoJSON.kml(kmlDoc);
+            } else {
+                // Parse as JSON
+                geojson = JSON.parse(e.target.result);
+            }
+
+            // Validate GeoJSON
+            if (!geojson.type || (geojson.type !== 'FeatureCollection' && geojson.type !== 'Feature')) {
+                alert('Invalid file format. Must be a valid GeoJSON or KML file.');
+                return;
+            }
+
+            // Add layer to map
+            addUploadedLayer(geojson, file.name);
+
+            // Show upload info
+            document.getElementById('upload-dropzone').style.display = 'none';
+            document.getElementById('upload-info').style.display = 'block';
+            document.getElementById('upload-filename').textContent = file.name;
+        } catch (error) {
+            console.error('Error parsing file:', error);
+            alert('Error parsing file. Please check the file format.');
+        }
+    };
+
+    reader.readAsText(file);
+}
+
+// Add uploaded layer to map
+function addUploadedLayer(geojson, filename) {
+    // Remove previous upload if exists
+    if (uploadedLayerId) {
+        removeUploadedLayer();
+    }
+
+    uploadedLayerId = 'uploaded-layer-' + Date.now();
+    const color = document.getElementById('upload-layer-color').value;
+    const opacity = document.getElementById('upload-layer-opacity').value / 100;
+
+    // Add source
+    map.addSource(uploadedLayerId, {
+        type: 'geojson',
+        data: geojson
+    });
+
+    // Determine geometry type and add appropriate layers
+    const geometryType = geojson.features?.[0]?.geometry?.type || geojson.geometry?.type;
+
+    if (geometryType === 'Point' || geometryType === 'MultiPoint') {
+        // Add circle layer for points
+        map.addLayer({
+            id: uploadedLayerId,
+            type: 'circle',
+            source: uploadedLayerId,
+            paint: {
+                'circle-radius': 6,
+                'circle-color': color,
+                'circle-opacity': opacity,
+                'circle-stroke-width': 2,
+                'circle-stroke-color': '#ffffff'
+            }
+        });
+    } else if (geometryType === 'LineString' || geometryType === 'MultiLineString') {
+        // Add line layer
+        map.addLayer({
+            id: uploadedLayerId,
+            type: 'line',
+            source: uploadedLayerId,
+            paint: {
+                'line-color': color,
+                'line-width': 3,
+                'line-opacity': opacity
+            }
+        });
+    } else if (geometryType === 'Polygon' || geometryType === 'MultiPolygon') {
+        // Add fill and outline layers
+        map.addLayer({
+            id: uploadedLayerId + '-fill',
+            type: 'fill',
+            source: uploadedLayerId,
+            paint: {
+                'fill-color': color,
+                'fill-opacity': opacity * 0.6
+            }
+        });
+
+        map.addLayer({
+            id: uploadedLayerId + '-outline',
+            type: 'line',
+            source: uploadedLayerId,
+            paint: {
+                'line-color': color,
+                'line-width': 2,
+                'line-opacity': opacity
+            }
+        });
+    }
+
+    // Fit map to uploaded layer bounds
+    const bounds = turf.bbox(geojson);
+    map.fitBounds(bounds, { padding: 50, duration: 1000 });
+
+    // Add interactivity - integrate with existing interactive layers system
+    addUploadedLayerInteractivity(geometryType);
+
+    console.log('✅ Uploaded layer added:', filename);
+}
+
+// Add uploaded layer to interactive layers system
+function addUploadedLayerInteractivity(geometryType) {
+    if (!uploadedLayerId) return;
+
+    // Determine which layer(s) to add to interactive layers
+    let layerToAdd;
+
+    if (geometryType === 'Point' || geometryType === 'MultiPoint') {
+        layerToAdd = uploadedLayerId;
+    } else if (geometryType === 'LineString' || geometryType === 'MultiLineString') {
+        layerToAdd = uploadedLayerId;
+    } else if (geometryType === 'Polygon' || geometryType === 'MultiPolygon') {
+        // For polygons, we add the fill layer to interactiveLayers
+        layerToAdd = uploadedLayerId + '-fill';
+    }
+
+    // Add to interactive layers array if not already present
+    if (layerToAdd && !interactiveLayers.includes(layerToAdd)) {
+        interactiveLayers.push(layerToAdd);
+    }
+
+    // Add hover cursor change
+    if (map.getLayer(layerToAdd)) {
+        map.on('mouseenter', layerToAdd, () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        map.on('mouseleave', layerToAdd, () => {
+            map.getCanvas().style.cursor = '';
+        });
+    }
+
+    console.log('✅ Uploaded layer added to interactive layers:', layerToAdd);
+}
+
+// Update layer color
+function updateLayerColor(color) {
+    if (!uploadedLayerId || !map.getLayer(uploadedLayerId)) return;
+
+    const layerType = map.getLayer(uploadedLayerId).type;
+
+    if (layerType === 'circle') {
+        map.setPaintProperty(uploadedLayerId, 'circle-color', color);
+    } else if (layerType === 'line') {
+        map.setPaintProperty(uploadedLayerId, 'line-color', color);
+    } else if (layerType === 'fill') {
+        map.setPaintProperty(uploadedLayerId + '-fill', 'fill-color', color);
+        map.setPaintProperty(uploadedLayerId + '-outline', 'line-color', color);
+    }
+}
+
+// Update layer opacity
+function updateLayerOpacity(opacity) {
+    if (!uploadedLayerId || !map.getLayer(uploadedLayerId)) return;
+
+    const layerType = map.getLayer(uploadedLayerId).type;
+
+    if (layerType === 'circle') {
+        map.setPaintProperty(uploadedLayerId, 'circle-opacity', opacity);
+    } else if (layerType === 'line') {
+        map.setPaintProperty(uploadedLayerId, 'line-opacity', opacity);
+    } else if (layerType === 'fill') {
+        map.setPaintProperty(uploadedLayerId + '-fill', 'fill-opacity', opacity * 0.6);
+        map.setPaintProperty(uploadedLayerId + '-outline', 'line-opacity', opacity);
+    }
+}
+
+// Remove uploaded layer
+function removeUploadedLayer() {
+    if (!uploadedLayerId) return;
+
+    // Remove from interactive layers array
+    const layersToRemove = [uploadedLayerId, uploadedLayerId + '-fill', uploadedLayerId + '-outline'];
+    layersToRemove.forEach(layerId => {
+        const index = interactiveLayers.indexOf(layerId);
+        if (index > -1) {
+            interactiveLayers.splice(index, 1);
+        }
+    });
+
+    // Remove event listeners from layers
+    layersToRemove.forEach(layerId => {
+        if (map.getLayer(layerId)) {
+            map.off('mouseenter', layerId);
+            map.off('mouseleave', layerId);
+            map.off('click', layerId);
+            map.removeLayer(layerId);
+        }
+    });
+
+    // Remove source
+    if (map.getSource(uploadedLayerId)) {
+        map.removeSource(uploadedLayerId);
+    }
+
+    // Reset UI
+    document.getElementById('upload-dropzone').style.display = 'block';
+    document.getElementById('upload-info').style.display = 'none';
+    document.getElementById('geojson-file-input').value = '';
+
+    uploadedLayerId = null;
+    console.log('✅ Uploaded layer removed');
+}
+
+// Initialize on map load
+map.on('load', () => {
+    initializeUpload();
+});
+
 //#endregion
 
 //#endregion
