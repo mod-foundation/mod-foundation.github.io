@@ -1,6 +1,6 @@
 # <span style="color: #0d6aff;">Datasets and Sources</span>
 
-Most of the data has been created and analysed by MOD Foundation. Some datasets have been taken from [Open City](https://data.opencity.in) and [Well Labs](https://welllabs.org).
+Most of the data has been created and analysed by Mod Foundation. Some datasets have been taken from [Open City](https://data.opencity.in) and [Well Labs](https://welllabs.org).
 
 ## <span style="color: #0d6aff;">Data Catalog</span>
 
