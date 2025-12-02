@@ -5359,6 +5359,12 @@ function lakes1700() {
             bearing: 0
         };
         smoothFlyTo(View_1700);
+        createLineCallout(
+            'krmarket_marker',
+            [77.57629753355575, 12.965721984110177],
+            'KR Market',
+            'Siddhakatte Kere in the 1790s'
+        );
 
         // Wait for layers to load before counting
         setTimeout(() => {
@@ -5388,13 +5394,23 @@ function lakes1800() {
     setOpa('tanks1800', 0.6);
 
     const View_1800 = {
-        center: [77.61, 12.98],
-        zoom: 12.15,
+        bounds: [
+            [77.54, 12.91], // Southwest coordinates
+            [77.66, 13.04] // Northeast coordinates
+        ],
         pitch: 0,
-        bearing: 0
+        bearing: 0,
+        padding: 0
     };
 
     smoothFlyTo(View_1800);
+
+    createLineCallout(
+        'krmarket_marker',
+        [77.57629753355575, 12.965721984110177],
+        'KR Market',
+        'Siddhakatte Kere in the 1790s'
+    );
 
     // Wait for layers to load before counting
     setTimeout(() => {
@@ -5424,12 +5440,21 @@ function lakes1900() {
     setOpa('tanks1900', 0.8);
 
     const View_1900 = {
-        center: [77.594, 12.988],
-        zoom: 11.8,
-
+        bounds: [
+            [77.5, 12.88], // Southwest coordinates
+            [77.7, 13.09] // Northeast coordinates
+        ],
         pitch: 0,
-        bearing: 0
+        bearing: 0,
+        padding: 0
     };
+
+    createLineCallout(
+        'krmarket_marker',
+        [77.57629753355575, 12.965721984110177],
+        'KR Market',
+        'Siddhakatte Kere in the 1790s'
+    );
 
     smoothFlyTo(View_1900);
 
@@ -5516,8 +5541,18 @@ function basin1() {
         groups: ['gba', 'streamorder', 'allbasins', 'basinbg']
     };
 
+    const basin1View = {
+        bounds: [
+            [77.36, 12.72], // Southwest coordinates
+            [77.83, 13.23] // Northeast coordinates
+        ],
+        pitch: 0,
+        bearing: 0,
+        padding: 0
+    };
+
     setOpa('basinbg', 0.6);
-    smoothFlyTo(valleyViewBounds);
+    smoothFlyTo(basin1View);
 
     panelHandle(keepGroups.groups);
 
@@ -5563,11 +5598,13 @@ function basin2() {
     setOpa('valleyscategory', 0.3);
 
     const basin2View = {
-        center: [77.616, 12.93],
-        zoom: 10.1,
+        bounds: [
+            [77.32, 12.65], // Southwest coordinates
+            [77.83, 13.2] // Northeast coordinates
+        ],
         pitch: 0,
         bearing: 0,
-        minZoom: 10.5
+        padding: 0
     };
 
     smoothFlyTo(basin2View);
@@ -5616,14 +5653,17 @@ function basin3() {
     setOpa('basinbg', 0.6);
     setOpa('valleyscategory', 0.3);
 
-    const basin2View = {
-        center: [77.616, 12.886],
-        zoom: 9,
+    const basin3View = {
+        bounds: [
+            [77.04, 12.34], // Southwest coordinates
+            [78.18, 13.53] // Northeast coordinates
+        ],
         pitch: 0,
-        bearing: 0
+        bearing: 0,
+        padding: 0
     };
 
-    smoothFlyTo(basin2View);
+    smoothFlyTo(basin3View);
 
     panelHandle(keepGroups.groups);
 
@@ -5668,14 +5708,17 @@ function basin4() {
 
     setOpa('basinbg', 0.6);
     setOpa('valleyscategory', 0.3);
-    const basin2View = {
-        center: [78.416, 12.616],
-        zoom: 8,
+    const basin4View = {
+        bounds: [
+            [77.25, 11.33], // Southwest coordinates
+            [79.69, 14.01] // Northeast coordinates
+        ],
         pitch: 0,
-        bearing: 0
+        bearing: 0,
+        padding: 0
     };
 
-    smoothFlyTo(basin2View);
+    smoothFlyTo(basin4View);
 
     panelHandle(keepGroups.groups);
 
@@ -5726,14 +5769,16 @@ function basin5() {
 
     setOpa('basinbg', 0.6);
     setOpa('valleyscategory', 0.3);
-    const basin2View = {
-        center: [78.416, 12.616],
-        zoom: 6.3,
+    const basin5View = {
+        bounds: [
+            [75.52, 10.18], // Southwest coordinates
+            [81.19, 16.55] // Northeast coordinates
+        ],
         pitch: 0,
-        bearing: 0
+        bearing: 0,
+        padding: 0
     };
-
-    smoothFlyTo(basin2View);
+    smoothFlyTo(basin5View);
 
     panelHandle(keepGroups.groups);
 
@@ -6351,7 +6396,8 @@ async function populateDownloadTable() {
             // Download Link
             const linkCell = document.createElement('td');
             const downloadLink = document.createElement('a');
-            const url = row.Link || row.link || row.URL || row.url || row['Download Link'] || row['download link'] || '';
+            const url =
+                row.Link || row.link || row.URL || row.url || row['Download Link'] || row['download link'] || '';
             const layerName = nameCell.textContent;
             const sourceName = sourceCell.textContent;
 
@@ -6370,10 +6416,10 @@ async function populateDownloadTable() {
         });
 
         console.log('✅ Download table populated successfully');
-
     } catch (error) {
         console.error('❌ Error loading download centre data:', error);
-        tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: red;">Error loading download data</td></tr>';
+        tableBody.innerHTML =
+            '<tr><td colspan="3" style="text-align: center; color: red;">Error loading download data</td></tr>';
     }
 }
 
