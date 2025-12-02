@@ -1458,6 +1458,7 @@ wa-dropdown wa-button::part(caret) {
 
 wa-dropdown::part(menu) {
     margin-top: 5px;
+    padding: 8px 0 8px 12px;
     background-color: white;
     border: 1px solid var(--highlight-yellow);
     border-radius: 0px;
@@ -1472,6 +1473,60 @@ wa-dropdown-item {
 
 wa-dropdown-item:hover {
     background-color: var(--highlight-yellow);
+}
+
+/* Checkbox styling for dropdown items - fixes Mac visibility */
+wa-dropdown-item[type="checkbox"] {
+    --wa-checkbox-size: 18px;
+    --wa-color-primary-600: var(--darker-blue);
+    padding: 8px 12px;
+}
+
+wa-dropdown-item[type="checkbox"]::part(base) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0;
+}
+
+wa-dropdown-item[type="checkbox"]::part(control) {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--darker-blue);
+    border-radius: 3px;
+    background-color: white;
+    flex-shrink: 0;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+wa-dropdown-item[type="checkbox"]::part(checked-icon) {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--darker-blue);
+    border-radius: 3px;
+    background-color: white;
+    flex-shrink: 0;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+wa-dropdown-item[type="checkbox"][checked]::part(control),
+wa-dropdown-item[type="checkbox"][checked]::part(checked-icon) {
+    background-color: var(--darker-blue) !important;
+    border-color: var(--darker-blue) !important;
+}
+
+/* Ensure label is visible */
+wa-dropdown-item[type="checkbox"]::part(label) {
+    color: var(--darker-blue);
+    flex: 1;
 }
 
 /* Filter controls container */
