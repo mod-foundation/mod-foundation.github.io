@@ -1,5 +1,5 @@
 # Building A Resilient Bengaluru
-# The Bengaluru Stormwater Ecosystem Interactive Map
+# The Bengaluru Stormwater Ecosystem Map
 
 " When we see how water flows in our cities, we understand where our city breathes — resilience begins with awareness."
 
