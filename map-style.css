@@ -1560,6 +1560,46 @@ sl-input[type='search'] {
     --sl-input-border-radius-medium: 0px;
 }
 
+/* Upload Dropzone Styling */
+.upload-dropzone {
+    border: 2px dashed var(--highlight-yellow);
+    border-radius: 8px;
+    padding: 30px 20px;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-dropzone:hover,
+.upload-dropzone.drag-over {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--highlight-green);
+}
+
+.upload-icon {
+    color: var(--highlight-yellow);
+    margin-bottom: 10px;
+}
+
+.upload-text {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 10px 0 5px 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.upload-subtext {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    margin: 0;
+}
+
+.upload-dropzone.drag-over .upload-icon {
+    color: var(--highlight-green);
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     .filter-container {
