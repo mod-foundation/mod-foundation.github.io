@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+
+    <title>Maja Maadi</title>
+
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+
+    <!-- Fonts -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wdth,wght@0,75..100,100..900;1,75..100,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!--shoelace-->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/light.css"
+    />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace-autoloader.js"
+    ></script>
+
+    <!-- Web Awesome CSS -->
+    <script
+      src="https://kit.webawesome.com/f432acd2a16749ed.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+    <img src="collateral/png/1x/background.png" id="background_img" />
+
+    <!-- Image Overlay for Clues -->
+    <div id="clue-overlay" class="hidden">
+      <div id="clue-overlay-content">
+        <button id="close-clue" class="close-overlay">&times;</button>
+        <img id="clue-image" src="" alt="Clue Image" />
+      </div>
+    </div>
+
+    <!-- Location Question Popup -->
+    <div id="location-overlay" class="hidden">
+      <div id="location-overlay-content">
+        <button id="close-location" class="close-overlay">&times;</button>
+        <h2>Time to Bid!</h2>
+
+
+
+
+        <div id="location-team-selection">
+          <div id="location-teams">
+            <button class="location-team-btn" data-team-id="team-a">CHICKPETE</button>
+            <button class="location-team-btn" data-team-id="team-b">Malleshwaram</button>
+            <button class="location-team-btn" data-team-id="team-c">Electronic City</button>
+            <button class="location-team-btn" data-team-id="team-d">Shivajinagar</button>
+            <button class="location-team-btn" data-team-id="team-e">Indiranagar</button>
+          </div>
+        </div>
+                <div id="location-bid-selection" class="hidden">
+          <div id="location-bids">
+            <button class="location-bid-btn" data-points="-5">-5</button>
+            <button class="location-bid-btn" data-points="-10">-10</button>
+            <button class="location-bid-btn" data-points="-15">-15</button>
+            <button class="location-bid-btn" data-points="-20">-20</button>
+          </div>
+        </div>
+
+
+        <div id="location-result-selection" class="hidden">
+          <div id="location-results">
+            <button id="location-identified" class="location-result-btn">Identified! (+40 points)</button>
+            <button id="location-wrong" class="location-result-btn">Wrong!</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shuffle Card Popup -->
+    <div id="shuffle-overlay" class="hidden">
+      <div id="shuffle-overlay-content">
+        <button id="close-shuffle" class="close-overlay">&times;</button>
+        <h2>City Shuffle - Power Up!</h2>
+        <div id="shuffle-cards-container">
+          <!-- Shuffle cards will be dynamically inserted here -->
+        </div>
+        <div id="selected-shuffle-card" class="hidden">
+          <div class="shuffle-card selected">
+            <h3 class="shuffle-effect"></h3>
+            <p class="shuffle-detail"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floor Round Popup -->
+    <div id="floor-overlay" class="hidden">
+      <div id="floor-overlay-content">
+        <h1>OPEN TO THE FLOOR!</h1>
+        <h2>HIT THE BUZZER TO ANSWER</h2>
+      </div>
+    </div>
+
+    <div id="start-screen">
+            <img src="collateral/png/1x/blr_play.png" id="main_logo" />
+      <div id="start-screen-content">
+        <div class="maja_maadi_button">
+          <img
+            src="collateral/SVG/maja_maadi_default.svg"
+            class="maja_maadi_button_default"
+          />
+          <img
+            src="collateral/SVG/maja_maadi_hover.svg"
+            class="maja_maadi_button_hover"
+          />
+        </div>
+
+
+        <div class="title-group">
+          <h1>Walk on Bengaluru</h1>
+          <h3>Trivia Edition</h3>
+        </div>
+
+                <div id="game-buttons">
+          <button class="game-action-button" id="newGame">New Game</button>
+          <button class="game-action-button" id="resumeGame">Resume Game</button>
+        </div>
+      </div>
+
+      <div id="logo-stack">
+        <img src="collateral/png/1x/mod_logo.png" class="sub_logo" />
+        <img src="collateral/png/1x/bdc_logo.png" class="sub_logo" />
+      </div>
+    </div>
+<div id="game-board-wrapper">
+    <div id="game-board" class="hidden">
+
+      <div id="timer-container">
+        <div id="timer-countdown" contenteditable="true">00:25</div>
+        <div id="timer-buttons">
+          <sl-button class="timerbtns" id="timer-start">Start</sl-button>
+          <sl-button  class="timerbtns" id="timer-reset">Reset</sl-button>
+          <sl-button  class="timerbtns" id="save-game">Save</sl-button>
+        </div>
+      </div>
+
+      <div id="timeline-container">
+        <div class="timeline-line"></div>
+        <div class="timeline-buttons">
+          <div class="timeline-item">
+                        <span class="timeline-label">Pre 18th<br>Century</span>
+
+            <button id="t1" class="timeline-button"></button>
+          </div>
+          <div class="timeline-item">
+                        <span class="timeline-label">18th<br>Century</span>
+
+            <button id="t2" class="timeline-button"></button>
+          </div>
+          <div class="timeline-item">
+                        <span class="timeline-label">19th<br>Century</span>
+
+            <button id="t3" class="timeline-button"></button>
+          </div>
+          <div class="timeline-item">
+                        <span class="timeline-label">20th<br>Century</span>
+            <button id="t4" class="timeline-button"></button>
+
+          </div>
+          <div class="timeline-item">
+                        <span class="timeline-label">Rapid<br>Fire</span>
+
+            <button id="t5" class="timeline-button"></button>
+          </div>
+        </div>
+      </div>
+
+      <div id="teams-counter-container">
+        <div class="team-item" data-team-id="team-a">
+          <input type="number" class="team-order-number" value="1" min="1" max="5" data-team-index="0">
+          <div id="team-a" class="team-label">
+          <h4 class="team-name">Chickpete</h4>
+          <h4 class="score">0</h4></div>
+          <div class="score-controls">
+            <sl-icon-button name="caret-up-fill" class="score-up" data-team-id="team-a"></sl-icon-button>
+            <sl-icon-button name="caret-down-fill" class="score-down" data-team-id="team-a"></sl-icon-button>
+          </div>
+        </div>
+        <div class="team-item" data-team-id="team-b">
+          <input type="number" class="team-order-number" value="2" min="1" max="5" data-team-index="1">
+          <div id="team-b" class="team-label">
+          <h4 class="team-name">Malleshwaram</h4>
+          <h4 class="score">0</h4></div>
+          <div class="score-controls">
+            <sl-icon-button name="caret-up-fill" class="score-up" data-team-id="team-b"></sl-icon-button>
+            <sl-icon-button name="caret-down-fill" class="score-down" data-team-id="team-b"></sl-icon-button>
+          </div>
+        </div>
+        <div class="team-item" data-team-id="team-c">
+          <input type="number" class="team-order-number" value="3" min="1" max="5" data-team-index="2">
+          <div id="team-c" class="team-label">
+          <h4 class="team-name">Electronic City</h4>
+          <h4 class="score">0</h4></div>
+          <div class="score-controls">
+            <sl-icon-button name="caret-up-fill" class="score-up" data-team-id="team-c"></sl-icon-button>
+            <sl-icon-button name="caret-down-fill" class="score-down" data-team-id="team-c"></sl-icon-button>
+          </div>
+        </div>
+        <div class="team-item" data-team-id="team-d">
+          <input type="number" class="team-order-number" value="4" min="1" max="5" data-team-index="3">
+          <div id="team-d" class="team-label">
+          <h4 class="team-name">Shivajinagar</h4>
+          <h4 class="score">0</h4></div>
+          <div class="score-controls">
+            <sl-icon-button name="caret-up-fill" class="score-up" data-team-id="team-d"></sl-icon-button>
+            <sl-icon-button name="caret-down-fill" class="score-down" data-team-id="team-d"></sl-icon-button>
+          </div>
+        </div>
+        <div class="team-item" data-team-id="team-e">
+          <input type="number" class="team-order-number" value="5" min="1" max="5" data-team-index="4">
+          <div id="team-e" class="team-label">
+          <h4 class="team-name">Indiranagar</h4>
+          <h4 class="score">0</h4></div>
+          <div class="score-controls">
+            <sl-icon-button name="caret-up-fill" class="score-up" data-team-id="team-e"></sl-icon-button>
+            <sl-icon-button name="caret-down-fill" class="score-down" data-team-id="team-e"></sl-icon-button>
+          </div>
+        </div>
+      </div>
+
+      <div id="question-container">
+        <div id="question-grid">
+          <!-- Culture Row -->
+          <div id="cat-c" class="category-label cat-c">
+            <div class="category-icon"><img src="/collateral/png/1x/culture-card.png"></div>
+          </div>
+          <div class="tile-option">
+            <sl-button id="c_t1_1" class="question-tile cat-c" data-category="c" data-timeline="t1" data-question="1"></sl-button>
+            <sl-button id="c_t1_2" class="question-tile cat-c" data-category="c" data-timeline="t1" data-question="2"></sl-button>
+          </div>
+          <div class="tile-option">
+            <sl-button id="c_t2_1" class="question-tile cat-c" data-category="c" data-timeline="t2" data-question="1"></sl-button>
+            <sl-button id="c_t2_2" class="question-tile cat-c" data-category="c" data-timeline="t2" data-question="2"></sl-button>
+          </div>
+          <div class="tile-option">
+            <sl-button id="c_t3_1" class="question-tile cat-c" data-category="c" data-timeline="t3" data-question="1"></sl-button>
+            <sl-button id="c_t3_2" class="question-tile cat-c" data-category="c" data-timeline="t3" data-question="2"></sl-button>
+          </div>
+          <div class="tile-option">
+            <sl-button id="c_t4_1" class="question-tile cat-c" data-category="c" data-timeline="t4" data-question="1"></sl-button>
+            <sl-button id="c_t4_2" class="question-tile cat-c" data-category="c" data-timeline="t4" data-question="2"></sl-button>
+          </div>
+
+          <!-- Urban Row -->
+          <div id="cat-u" class="category-label cat-u">
+            <div class="category-icon"><img src="/collateral/png/1x/urban-card.png"></div>
+          </div>
+          <div class="tile-option">
+            <sl-button id="u_t1_1" class="question-tile cat-u" data-category="u" data-timeline="t1" data-question="1"></sl-button>
+            <sl-button id="u_t1_2" class="question-tile cat-u" data-category="u" data-timeline="t1" data-question="2"></sl-button>
+          </div>
+          <div class="tile-option">
+            <sl-button id="u_t2_1" class="question-tile cat-u" data-category="u" data-timeline="t2" data-question="1"></sl-button>
+            <sl-button id="u_t2_2" class="question-tile cat-u" data-category="u" data-timeline="t2" data-question="2"></sl-button>
+          </div>
+          <div class="tile-option">
+            <sl-button id="u_t3_1" class="question-tile cat-u" data-category="u" data-timeline="t3" data-question="1"></sl-button>
+            <sl-button id="u_t3_2" class="question-tile cat-u" data-category="u" data-timeline="t3" data-question="2"></sl-button>
+          </div>
+          <div class="tile-option">
+            <sl-button id="u_t4_1" class="question-tile cat-u" data-category="u" data-timeline="t4" data-question="1"></sl-button>
+            <sl-button id="u_t4_2" class="question-tile cat-u" data-category="u" data-timeline="t4" data-question="2"></sl-button>
+          </div>
+
+          <!-- Ecology Row -->
+          <div id="cat-e" class="category-label cat-e">
+            <div class="category-icon"><img src="/collateral/png/1x/ecology-card.png"></div>
+          </div>
+          <div class="tile-option">
+            <sl-button id="e_t1_1" class="question-tile cat-e" data-category="e" data-timeline="t1" data-question="1"></sl-button>
+            <sl-button id="e_t1_2" class="question-tile cat-e" data-category="e" data-timeline="t1" data-question="2"></sl-button>
+          </div>
+          <div class="tile-option">
+            <sl-button id="e_t2_1" class="question-tile cat-e" data-category="e" data-timeline="t2" data-question="1"></sl-button>
+            <sl-button id="e_t2_2" class="question-tile cat-e" data-category="e" data-timeline="t2" data-question="2"></sl-button>
+          </div>
+          <div class="tile-option">
+            <sl-button id="e_t3_1" class="question-tile cat-e" data-category="e" data-timeline="t3" data-question="1"></sl-button>
+            <sl-button id="e_t3_2" class="question-tile cat-e" data-category="e" data-timeline="t3" data-question="2"></sl-button>
+          </div>
+          <div class="tile-option">
+            <sl-button id="e_t4_1" class="question-tile cat-e" data-category="e" data-timeline="t4" data-question="1"></sl-button>
+            <sl-button id="e_t4_2" class="question-tile cat-e" data-category="e" data-timeline="t4" data-question="2"></sl-button>
+          </div>
+
+          <!-- Governance Row -->
+          <div id="cat-g" class="category-label cat-g">
+            <div class="category-icon"><img src="/collateral/png/1x/governance-card.png"></div>
+          </div>
+          <div class="tile-option">
+            <sl-button id="g_t1_1" class="question-tile cat-g" data-category="g" data-timeline="t1" data-question="1"></sl-button>
+            <sl-button id="g_t1_2" class="question-tile cat-g" data-category="g" data-timeline="t1" data-question="2"></sl-button>
+          </div>
+          <div class="tile-option">
+            <sl-button id="g_t2_1" class="question-tile cat-g" data-category="g" data-timeline="t2" data-question="1"></sl-button>
+            <sl-button id="g_t2_2" class="question-tile cat-g" data-category="g" data-timeline="t2" data-question="2"></sl-button>
+          </div>
+          <div class="tile-option">
+            <sl-button id="g_t3_1" class="question-tile cat-g" data-category="g" data-timeline="t3" data-question="1"></sl-button>
+            <sl-button id="g_t3_2" class="question-tile cat-g" data-category="g" data-timeline="t3" data-question="2"></sl-button>
+          </div>
+          <div class="tile-option">
+            <sl-button id="g_t4_1" class="question-tile cat-g" data-category="g" data-timeline="t4" data-question="1"></sl-button>
+            <sl-button id="g_t4_2" class="question-tile cat-g" data-category="g" data-timeline="t4" data-question="2"></sl-button>
+          </div>
+        </div>
+
+        <div id="question-display" class="hidden">
+          <!-- Badge Column (stacked vertically) -->
+          <div id="qd-badges-container">
+            <div id="qd-question-badge" class="question-category-badge">
+              <div class="qd-badge-icon"><img id="qd-question-icon" src="/collateral/png/1x/culture-card.png"></div>
+            </div>
+            <div id="qd-location-badge" class="question-category-badge">
+              <div class="qd-badge-icon"><img src="/collateral/png/1x/locate-card.png"></div>
+            </div>
+            <div id="qd-shuffle-badge" class="question-category-badge">
+              <div class="qd-badge-icon"><img src="/collateral/png/1x/shuffle-card.png"></div>
+            </div>
+          </div>
+
+          <!-- Question Content -->
+          <div id="qd-question-content" class="question-content-box">
+            <div class="question-header">
+              <h3>Question:</h3>
+              <sl-button id="show-clue" variant="default" size="small" circle>
+                <sl-icon name="lightbulb"></sl-icon>
+              </sl-button>
+            </div>
+            <p id="qd-question-text"></p>
+            <p id="qd-clue-status"></p>
+          </div>
+
+          <!-- Answer Content -->
+          <div id="qd-answer-content" class="question-content-box">
+            <h3>Answer:</h3>
+            <p id="qd-answer-text"></p>
+          </div>
+
+          <!-- Empty Spacer -->
+          <div id="qd-spacer"></div>
+
+          <!-- Buttons -->
+          <div id="qd-buttons">
+            <sl-button id="qd-correct" variant="default">Correct</sl-button>
+            <sl-button id="qd-wrong" variant="default">Wrong</sl-button>
+            <sl-button id="qd-undo" variant="default">Undo</sl-button>
+            <sl-button id="qd-back" variant="default">Back to Grid</sl-button>
+          </div>
+        </div>
+
+        <!-- Rapid Fire Title Screen -->
+        <div id="rf-title-screen" class="hidden">
+          <h1>The Last Round - Rapid Fire!</h1>
+          <p>Select a team to begin</p>
+        </div>
+
+        <!-- Rapid Fire Question Screen -->
+        <div id="rf-question-screen" class="hidden">
+          <div id="rf-header">
+            <div id="rf-question-counter">1/5</div>
+            <sl-icon-button name="x-circle" class="rf-close-btn" id="rf-close"></sl-icon-button>
+          </div>
+          <div id="rf-question-content"></div>
+          <div id="rf-answer-content" class="hidden"></div>
+          <div id="rf-controls">
+            <sl-icon-button name="arrow-left-circle-fill" class="rf-nav-btn" id="rf-prev"></sl-icon-button>
+            <sl-icon-button name="x-circle-fill" class="rf-wrong-btn" id="rf-wrong"></sl-icon-button>
+            <sl-icon-button name="check-circle-fill" class="rf-check-btn" id="rf-correct"></sl-icon-button>
+            <sl-icon-button name="arrow-right-circle-fill" class="rf-nav-btn" id="rf-next"></sl-icon-button>
+            <sl-button id="rf-end-round" variant="primary">End Round</sl-button>
+          </div>
+        </div>
+
+        <!-- Rapid Fire Score Screen -->
+        <div id="rf-score-screen" class="hidden">
+          <h1 id="rf-score-title">Round Complete!</h1>
+          <div id="rf-score-details">
+            <h2 id="rf-team-name"></h2>
+            <p id="rf-score-text"></p>
+          </div>
+          <p id="rf-next-instruction">Select another team to continue</p>
+        </div>
+      </div>
+    </div>
+</div>
+    <!-- Your JS -->
+    <script src="main.js"></script>
+  </body>
+</html>
