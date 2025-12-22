@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MapLibre Map</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+    <link rel="stylesheet" href="style.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/@geomatico/maplibre-cog-protocol@0.5.0/dist/index.js"></script>
+
+    <!-- Layer Manager Plugin -->
+    <link href="https://unpkg.com/maplibre-gl-layer-manager@latest/src/layer-manager.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl-layer-manager@latest/src/layer-manager.js"></script>
+
+</head>
+<body>
+            <!-- year -->
+    <div id="year-timeline">
+
+    </div>
+
+    
+    <!-- Map container - fixed position -->
+    <div id="map"></div>
+
+    <!-- Story content container - scrollable -->
+    <div id="story">
+        <!-- Chapters will be dynamically inserted here -->
+    </div>
+
+    <!-- Layer manager menu -->
+    <div id="layers-menu"></div>
+
+    <!-- Next chapter arrow -->
+    <div id="next-chapter-arrow">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+        </svg>
+    </div>
+
+
+    <script src="mapConfig.js"></script>
+    <script src="storyConfig.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
