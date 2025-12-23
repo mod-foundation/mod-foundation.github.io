@@ -43,7 +43,7 @@ const mapConfig = {
         // Historical Map 1870
     historicalMap1870: {
       type: "raster",
-      url: "cog://./datasets/geotiff/1870_3857_cog.tif",
+      url: "cog://./datasets/geotiff/1870_final_cog.tif",
       tileSize: 256,
     },
 
