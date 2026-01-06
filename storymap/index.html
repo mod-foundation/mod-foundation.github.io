@@ -10,7 +10,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Open+Sans+Condensed:wght@300;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
     <script src="https://unpkg.com/@geomatico/maplibre-cog-protocol@0.5.0/dist/index.js"></script>
 
@@ -22,10 +22,17 @@
 <body>
             <!-- year -->
     <div id="year-timeline">
-
+        <div id="year-label">Year</div>
+        <div id="year-value"></div>
     </div>
 
-    
+    <!-- population -->
+    <div id="population-display">
+        <div id="population-label">Population</div>
+        <div id="population-value"></div>
+    </div>
+
+
     <!-- Map container - fixed position -->
     <div id="map"></div>
 
@@ -37,11 +44,33 @@
     <!-- Layer manager menu -->
     <div id="layers-menu"></div>
 
-    <!-- Next chapter arrow -->
-    <div id="next-chapter-arrow">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-        </svg>
+    <!-- Legend -->
+    <div id="map-legend">
+        <img src="datasets/images/dem-legend.png" alt="DEM Legend">
+    </div>
+
+    <!-- Scroll indicator -->
+    <div id="scroll-indicator" class="icon-scroll"></div>
+
+    <!-- Chapter Navigation Widget -->
+    <div id="chapter-nav-widget">
+        <div id="chapter-nav-button">
+            <span id="chapter-nav-counter">1/15</span>
+        </div>
+        <div id="chapter-nav-menu" class="hidden">
+            <!-- Chapter list will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <!-- Instructions Panel -->
+    <div id="instructions-panel">
+        <ul>
+            <li><strong>Instructions:</strong></li>
+            <li>Click and Hold the Map to view present day condition</li>
+            <li>Click and Hold an image to enlarge it</li>
+            <li>Scroll to go to the next section</li>
+            <li>Double click on the map to zoom in</li>
+        </ul>
     </div>
 
 
