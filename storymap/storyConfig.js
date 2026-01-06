@@ -1,12 +1,17 @@
 // Story Map Configuration
-// Generated on 22/12/2025, 5:41:27 pm
+// Generated on 6/1/2026, 3:54:05 pm
 
 const storyConfig = {
   "chapters": [
     {
-      "id": "1",
-      "title": "Historical Bangalore",
-      "description": "Explore the transformation of Bangalore through historical maps and ecological data.",
+      "id": "0",
+      "isTitleSlide": true,
+      "title": "DRAWING BORDERS DRAINING WATER",
+      "subtitle": "1800-1880",
+      "instructions": [
+        "Click and Hold the Map to view present-day satellite imagery",
+        "Click and Hold an image to enlarge it"
+      ],
       "center": [
         77.576613,
         12.966851
@@ -29,6 +34,14 @@ const storyConfig = {
           "opacity": 1
         },
         "1884-ulsoor-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-cantonment-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-city-map": {
           "visible": false,
           "opacity": 1
         },
@@ -56,15 +69,11 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
-        "barracks": {
+        "1897-boundary": {
           "visible": false,
           "opacity": 1
         },
         "cantonment-boundary": {
-          "visible": false,
-          "opacity": 1
-        },
-        "drainage-boundary": {
           "visible": false,
           "opacity": 1
         },
@@ -151,23 +160,31 @@ const storyConfig = {
         "9-label": {
           "visible": false,
           "opacity": 1
+        },
+        "osm-place-labels": {
+          "visible": true,
+          "opacity": 1
         }
       },
+      "description": "",
+      "year": null,
+      "population": null,
       "image": null,
-      "onChapterEnter": [],
-      "onChapterExit": [],
-      "alignment": "left",
-      "year": "1800s"
+      "imageCaption": null,
+      "source": null,
+      "alignment": "center",
+      "subtitle2": "The British Cantonment sparked urban expansion near Bengaluru's Kote and Pete. How did our relationship with water change in the 1800s in the face of growing demands and changing lifestyles?",
+      "quote": null,
+      "descriptionSource": null,
+      "quoteSource": null,
+      "buttonText": null,
+      "buttonUrl": null
     },
     {
-      "id": "2",
-      "title": "Establishing the Cantonment",
-      "description": "During negotiations with Krishnaraja Wodeyar III in 1814 on the jurisdiction of military authorities in the newly established Cantonment, the commanding officer suggested that its limits should be well defined by “high roads, bunds, impassable ravines, etc.' 'The boundaries are those of nature, [so] that the whole cantonment forms a kind of elevated island during many months of the year.",
-      "center": [
-        77.6006,
-        12.975494
-      ],
-      "zoom": 13.06,
+      "id": "1",
+      "title": "From Srirangapatna to Bengaluru",
+      "description": "After the fall of Tipu Sultan and the capture of Bengaluru’s Fort during the Fourth Anglo-Mysore War in 1799, the British decided that Srirangapatna was no longer suitable for them.\n\n<light>Bangalore’s climate had long attracted the attention of the East India Company, and the British were drawn to shift their forces here.</light>",
+      "population": null,
       "pitch": 0,
       "bearing": 0,
       "duration": 2000,
@@ -185,6 +202,206 @@ const storyConfig = {
           "opacity": 1
         },
         "1884-ulsoor-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-cantonment-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-city-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "dem-colored-layer": {
+          "visible": true,
+          "opacity": 0.5
+        },
+        "fort-1854": {
+          "visible": true,
+          "opacity": 1
+        },
+        "satellite-layer": {
+          "visible": true,
+          "opacity": 1
+        },
+        "ulsoor-village": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1870-bazaar": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1870-drainage-areas": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-boundary": {
+          "visible": false,
+          "opacity": 1
+        },
+        "cantonment-boundary": {
+          "visible": false,
+          "opacity": 1
+        },
+        "fort-boundary": {
+          "visible": true,
+          "opacity": 1
+        },
+        "oviform": {
+          "visible": false,
+          "opacity": 1
+        },
+        "soldiers-gardens-outline": {
+          "visible": false,
+          "opacity": 1
+        },
+        "tanks-1854-outline": {
+          "visible": false,
+          "opacity": 1
+        },
+        "tanks-1870-added-outline": {
+          "visible": false,
+          "opacity": 1
+        },
+        "tanks-1870-outline": {
+          "visible": false,
+          "opacity": 1
+        },
+        "ulsoor-stormwater": {
+          "visible": false,
+          "opacity": 1
+        },
+        "ulsoor-village-boundary": {
+          "visible": false,
+          "opacity": 1
+        },
+        "ulsoor-water-line": {
+          "visible": false,
+          "opacity": 1
+        },
+        "ulsoor-water-works": {
+          "visible": false,
+          "opacity": 1
+        },
+        "soldiers-gardens": {
+          "visible": false,
+          "opacity": 1
+        },
+        "tanks-1854": {
+          "visible": false,
+          "opacity": 1
+        },
+        "tanks-1870": {
+          "visible": false,
+          "opacity": 1
+        },
+        "tanks-1870-added": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1-label": {
+          "visible": true,
+          "opacity": 1
+        },
+        "11-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "4-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "5-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "6-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "7-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "9-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "osm-place-labels": {
+          "visible": true,
+          "opacity": 1
+        }
+      },
+      "image": null,
+      "onChapterEnter": [],
+      "onChapterExit": [],
+      "alignment": "left",
+      "year": "1799",
+      "imageCaption": null,
+      "source": "Hasan, M. F. (2023). Bangalore through the centuries (2nd ed.). Metaform Design.",
+      "subtitle": null,
+      "subtitle2": null,
+      "buttonText": null,
+      "buttonUrl": null,
+      "quote": null,
+      "descriptionSource": "Hasan, M. F. (2023). Bangalore through the centuries (2nd ed.). Metaform Design.",
+      "quoteSource": null,
+      "bounds": [
+        77.550518,
+        12.946692,
+        77.602708,
+        12.987008
+      ],
+      "boundsIpad": [
+        77.54094,
+        12.940091,
+        77.613319,
+        12.996001
+      ],
+      "boundsMobile": [
+        77.53041,
+        12.926076,
+        77.628373,
+        13.001828
+      ],
+      "boundsIpadPortrait": [
+        77.54475,
+        12.941381,
+        77.612665,
+        12.993844
+      ]
+    },
+    {
+      "id": "2",
+      "title": "Establishing the Cantonment",
+      "description": "The British identified a boundary formed through high grounds and ravines that would clearly separate the cantonment from the surrounding areas, making it easier to defend and control.",
+      "pitch": 0,
+      "bearing": 0,
+      "duration": 2000,
+      "layers": {
+        "1854-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1870-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1884-barracks-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1884-ulsoor-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-cantonment-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-city-map": {
           "visible": false,
           "opacity": 1
         },
@@ -212,12 +429,12 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
-        "cantonment-boundary": {
-          "visible": true,
+        "1897-boundary": {
+          "visible": false,
           "opacity": 1
         },
-        "drainage-boundary": {
-          "visible": false,
+        "cantonment-boundary": {
+          "visible": true,
           "opacity": 1
         },
         "fort-boundary": {
@@ -303,20 +520,54 @@ const storyConfig = {
         "9-label": {
           "visible": false,
           "opacity": 1
+        },
+        "osm-place-labels": {
+          "visible": true,
+          "opacity": 1
         }
       },
       "alignment": "left",
-      "year": "1800s"
+      "year": "1800",
+      "image": null,
+      "imageCaption": null,
+      "source": null,
+      "population": null,
+      "subtitle": null,
+      "subtitle2": null,
+      "quote": "During negotiations with Krishnaraja Wodeyar III in 1814 on the jurisdiction of military authorities in the newly established Cantonment, the commanding officer suggested that its limits should be well defined by <light>high roads, bunds, impassable ravines, etc. The boundaries are those of nature, [so] that the whole cantonment forms a kind of elevated island</light>  during many months of the year.",
+      "descriptionSource": null,
+      "quoteSource": "Report on the station, barracks and hospitals of Bangalore. (1865). Gantz Brothers, Adelphi Press",
+      "buttonText": null,
+      "buttonUrl": null,
+      "bounds": [
+        77.537737,
+        12.92233,
+        77.667394,
+        13.025096
+      ],
+      "boundsIpad": [
+        77.497543,
+        12.901251,
+        77.694837,
+        13.057624
+      ],
+      "boundsMobile": [
+        77.478036,
+        12.880379,
+        77.72692,
+        13.072821
+      ],
+      "boundsIpadPortrait": [
+        77.524399,
+        12.908182,
+        77.677872,
+        13.026736
+      ]
     },
     {
       "id": "3",
-      "title": "Halasuru Village",
-      "description": "Bangalore’s salubrious climate had long drawn the attention of the ‘Sharks of Madras’, the ruling classes of the East India Company in the south. As early as 1807, the Madras Government which controlled the provincial army had approached the Mysore Durbar to permit it to build quarters for British troops near Halsuru village situated about four miles northeast of Bangalore fort.",
-      "center": [
-        77.6006,
-        12.975494
-      ],
-      "zoom": 13.06,
+      "title": "Halasuru",
+      "description": "In the early 1800s, British forces chose Halasuru as the location for Bangalore's first military station.",
       "pitch": 0,
       "bearing": 0,
       "duration": 2000,
@@ -334,6 +585,14 @@ const storyConfig = {
           "opacity": 1
         },
         "1884-ulsoor-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-cantonment-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-city-map": {
           "visible": false,
           "opacity": 1
         },
@@ -361,16 +620,12 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
-        "barracks": {
+        "1897-boundary": {
           "visible": false,
           "opacity": 1
         },
         "cantonment-boundary": {
           "visible": true,
-          "opacity": 1
-        },
-        "drainage-boundary": {
-          "visible": false,
           "opacity": 1
         },
         "fort-boundary": {
@@ -455,6 +710,10 @@ const storyConfig = {
         },
         "9-label": {
           "visible": false,
+          "opacity": 1
+        },
+        "osm-place-labels": {
+          "visible": true,
           "opacity": 1
         }
       },
@@ -462,18 +721,47 @@ const storyConfig = {
       "alignment": "right",
       "onChapterEnter": [],
       "onChapterExit": [],
-      "year": "1800s"
+      "year": "1800",
+      "imageCaption": null,
+      "source": "Hasan, M. F. (2023). Bangalore through the centuries (2nd ed.). Metaform Design.",
+      "population": null,
+      "subtitle": null,
+      "subtitle2": null,
+      "buttonText": null,
+      "buttonUrl": null,
+      "quote": "As early as 1807, the Madras Government which controlled the provincial army had approached the Mysore Durbar to permit it to <light> build quarters for British troops near Halsuru village </light> situated about four miles northeast of Bangalore fort.",
+      "descriptionSource": null,
+      "quoteSource": "Hasan, M. F. (2023). Bangalore through the centuries (2nd ed.). Metaform Design.",
+      "bounds": [
+        77.548771,
+        12.935415,
+        77.652429,
+        13.015567
+      ],
+      "boundsIpad": [
+        77.55262,
+        12.925106,
+        77.685658,
+        13.027872
+      ],
+      "boundsMobile": [
+        77.538752,
+        12.917651,
+        77.686016,
+        13.03152
+      ],
+      "boundsIpadPortrait": [
+        77.524399,
+        12.908182,
+        77.677872,
+        13.026736
+      ]
     },
     {
       "id": "4",
       "title": "Growth of the Cantonment",
-      "description": "Very soon, private dwellings sprang up on the fringe of the military lands. Bazars sprang up with goods in dazzling display. Mercers, fruit-sellers and grocers began their deals with the opulent Europeans in scarlet uniform with all the ardour lent to novelty. Gradually, streets were laid out across bleak lands and fringing the streets were built shops, mosques, temples and churches. Before long, a native town was bristling with activity.",
+      "description": "By the 1850s, the cantonment expanded, with churches, mosques, settlements, and bazaars emerging throughout the area.",
       "image": "./datasets/images/bangalore-cantonment.png",
-      "center": [
-        77.6006,
-        12.975494
-      ],
-      "zoom": 13.06,
       "pitch": 0,
       "bearing": 0,
       "duration": 2000,
@@ -491,6 +779,14 @@ const storyConfig = {
           "opacity": 1
         },
         "1884-ulsoor-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-cantonment-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-city-map": {
           "visible": false,
           "opacity": 1
         },
@@ -518,12 +814,12 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
-        "cantonment-boundary": {
-          "visible": true,
+        "1897-boundary": {
+          "visible": false,
           "opacity": 1
         },
-        "drainage-boundary": {
-          "visible": false,
+        "cantonment-boundary": {
+          "visible": true,
           "opacity": 1
         },
         "fort-boundary": {
@@ -609,22 +905,55 @@ const storyConfig = {
         "9-label": {
           "visible": false,
           "opacity": 1
+        },
+        "osm-place-labels": {
+          "visible": true,
+          "opacity": 1
         }
       },
       "onChapterEnter": [],
       "onChapterExit": [],
       "alignment": "left",
-      "year": "1854"
+      "year": "1854",
+      "imageCaption": "View of the Cantonment (Bangalore through the Centuries)",
+      "source": "Hasan, M. F. (2023). Bangalore through the centuries (2nd ed.). Metaform Design.",
+      "population": "~1,25,000",
+      "subtitle": null,
+      "subtitle2": null,
+      "buttonText": null,
+      "buttonUrl": null,
+      "quote": "Bazars sprang up with goods in dazzling display. Mercers, fruit-sellers and grocers began their deals with the opulent Europeans in scarlet uniform with all the ardour lent to novelty. Gradually, streets were laid out across bleak lands and fringing the streets were built shops, mosques, temples and churches. ",
+      "descriptionSource": null,
+      "quoteSource": "Hasan, M. F. (2023). Bangalore through the centuries (2nd ed.). Metaform Design.",
+      "bounds": [
+        77.548771,
+        12.935415,
+        77.652429,
+        13.015567
+      ],
+      "boundsIpad": [
+        77.55262,
+        12.925106,
+        77.685658,
+        13.027872
+      ],
+      "boundsMobile": [
+        77.517907,
+        12.905144,
+        77.699566,
+        13.045608
+      ],
+      "boundsIpadPortrait": [
+        77.524399,
+        12.908182,
+        77.677872,
+        13.026736
+      ]
     },
     {
       "id": "5",
       "title": "Water Supply",
-      "description": "\"The water supply of Bangalore is chiefly dependent upon wells in public and private Compounds and upon the Ulsoor and Shoolay tanks. An analysis of these waters has been made, and it shows results which are on the whole satisfactory.\"",
-      "center": [
-        77.6006,
-        12.975494
-      ],
-      "zoom": 13.06,
+      "description": "The water supply of the cantonment depended on <light>the Ulsoor and Shoolay tanks</light> and private and public wells.",
       "pitch": 0,
       "bearing": 0,
       "duration": 2000,
@@ -642,6 +971,14 @@ const storyConfig = {
           "opacity": 1
         },
         "1884-ulsoor-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-cantonment-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-city-map": {
           "visible": false,
           "opacity": 1
         },
@@ -669,12 +1006,12 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
-        "cantonment-boundary": {
-          "visible": true,
+        "1897-boundary": {
+          "visible": false,
           "opacity": 1
         },
-        "drainage-boundary": {
-          "visible": false,
+        "cantonment-boundary": {
+          "visible": true,
           "opacity": 1
         },
         "fort-boundary": {
@@ -760,23 +1097,56 @@ const storyConfig = {
         "9-label": {
           "visible": false,
           "opacity": 1
+        },
+        "osm-place-labels": {
+          "visible": true,
+          "opacity": 1
         }
       },
       "image": "./datasets/images/ulsoor-lake.png",
       "onChapterEnter": [],
       "onChapterExit": [],
       "alignment": "right",
-      "year": "1854"
+      "year": "1854",
+      "imageCaption": "View of Ulsoor Lake.  Source: the Macnabb Collection (Col James Henry Erskine Reid): Album of Indian views, taken in 1902.",
+      "source": "Report on the station, barracks and hospitals of Bangalore. (1865). Gantz Brothers, Adelphi Press.",
+      "population": "~1,25,000",
+      "subtitle": null,
+      "subtitle2": null,
+      "buttonText": null,
+      "buttonUrl": null,
+      "quote": null,
+      "descriptionSource": null,
+      "quoteSource": "Report on the station, barracks and hospitals of Bangalore. (1865). Gantz Brothers, Adelphi Press",
+      "bounds": [
+        77.548771,
+        12.935415,
+        77.652429,
+        13.015567
+      ],
+      "boundsIpad": [
+        77.55262,
+        12.925106,
+        77.685658,
+        13.027872
+      ],
+      "boundsMobile": [
+        77.517907,
+        12.905144,
+        77.699566,
+        13.045608
+      ],
+      "boundsIpadPortrait": [
+        77.554612,
+        12.927172,
+        77.668002,
+        13.014763
+      ]
     },
     {
       "id": "6",
-      "title": "Wetland to Recreational Grounds: The Soldiers’ Gardens",
-      "description": "“ A large portion of swampy, marshy ground underneath the Shoolay Tank covering an area of 9 acres and 1087 yards, lying in the close proximity of the Foot Artillery Barracks on the West side and about 1 of a mile to the North of the new Barracks at the Race Course, has been re-claimed and converted into Soldiers’ Gardens, In which several of the men of the battery and 66th Regiment, find profitable and healthful recreation.\"",
-      "center": [
-        77.613668,
-        12.968527
-      ],
-      "zoom": 15.29,
+      "title": "Changing Landscapes: The Soldiers’ Gardens",
+      "description": "With stations and settlements, the British lifestyle also brought changes to our landscape. Marshlands, once considered valuable fertile lands, were now seen as swampy and unhygienic. In the place of a marshland near Shoolay tank, one of the first recreational gardens was created in the 1860s.",
       "pitch": 0,
       "bearing": 0,
       "duration": 2000,
@@ -794,6 +1164,14 @@ const storyConfig = {
           "opacity": 1
         },
         "1884-ulsoor-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-cantonment-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-city-map": {
           "visible": false,
           "opacity": 1
         },
@@ -821,16 +1199,12 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
-        "barracks": {
+        "1897-boundary": {
           "visible": false,
           "opacity": 1
         },
         "cantonment-boundary": {
           "visible": true,
-          "opacity": 1
-        },
-        "drainage-boundary": {
-          "visible": false,
           "opacity": 1
         },
         "fort-boundary": {
@@ -916,23 +1290,56 @@ const storyConfig = {
         "9-label": {
           "visible": false,
           "opacity": 1
+        },
+        "osm-place-labels": {
+          "visible": true,
+          "opacity": 1
         }
       },
-      "image": null,
+      "image": "./datasets/images/soldiers-gardens.png",
       "onChapterEnter": [],
       "onChapterExit": [],
       "alignment": "left",
-      "year": "1860s"
+      "year": "1860s",
+      "imageCaption": "Henry DIXON Soldier's Gardens, Bangalore 1864-National Gallery of Victoria, Melbourne Purchased, 1977",
+      "source": "Report on the station, barracks and hospitals of Bangalore. (1865). Gantz Brothers, Adelphi Press.",
+      "population": "~1,25,000",
+      "subtitle": null,
+      "subtitle2": null,
+      "buttonText": null,
+      "buttonUrl": null,
+      "quote": "... A large portion of swampy, marshy ground underneath the Shoolay Tank ... has been re-claimed and converted into Soldiers’ Gardens, <light>In which several of the men of the battery and 66th Regiment, find profitable and healthful recreation.</light>",
+      "descriptionSource": null,
+      "quoteSource": "Reported by Robert S. Ellis, President of the Sanitary Commission. Source : Report on the station, barracks and hospitals of Bangalore. (1865). Gantz Brothers, Adelphi Press",
+      "bounds": [
+        77.598855,
+        12.958375,
+        77.625793,
+        12.979321
+      ],
+      "boundsIpad": [
+        77.592064,
+        12.956464,
+        77.62528,
+        12.982147
+      ],
+      "boundsMobile": [
+        77.596386,
+        12.94972,
+        77.630684,
+        12.976241
+      ],
+      "boundsIpadPortrait": [
+        77.603386,
+        12.957554,
+        77.622897,
+        12.972627
+      ]
     },
     {
       "id": "7",
       "title": "Growth of the Cantonment ",
-      "description": "Meanwhile, the native town, lying in the valley, boomed with trade. Population increased. The boundaries of the Cantonment were enlarged to 13 ½ square miles constituting 18 suburbs at the expense of l5 villages. The Parade Ground, two miles from east to west and surrounded by a ride or Mall, the Rotton Row of the Station, became the centre of military activity. At the western end of it was built a fine bungalow for the Commissioner, which later became famous as the Residency, in front of which on a flag staff, wafted the Union Jack. To the north of the Parade Ground, where now runs the Infantry Road, houses for the Sepoys of native regiments were built. To the northeast were built the Baird Barracks for the use of British infantrymen. Artillery and Cavalry Barracks were constructed close to the Trinity Church near Halsuru.",
-      "center": [
-        77.606787,
-        12.976612
-      ],
-      "zoom": 13.19,
+      "description": "The 1870s brought further expansion to the cantonment. Across the area rose the Parade Ground, the Commissioner's bungalow (which later became the Residency), housing for sepoys, the Baird Barracks for British infantry, and separate barracks for artillery and cavalry regiments",
       "pitch": 0,
       "bearing": 0,
       "duration": 2000,
@@ -950,6 +1357,14 @@ const storyConfig = {
           "opacity": 1
         },
         "1884-ulsoor-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-cantonment-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-city-map": {
           "visible": false,
           "opacity": 1
         },
@@ -977,12 +1392,12 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
-        "cantonment-boundary": {
-          "visible": true,
+        "1897-boundary": {
+          "visible": false,
           "opacity": 1
         },
-        "drainage-boundary": {
-          "visible": false,
+        "cantonment-boundary": {
+          "visible": true,
           "opacity": 1
         },
         "fort-boundary": {
@@ -1068,23 +1483,56 @@ const storyConfig = {
         "9-label": {
           "visible": false,
           "opacity": 1
+        },
+        "osm-place-labels": {
+          "visible": true,
+          "opacity": 1
         }
       },
       "image": "./datasets/images/avenue-road.png",
       "onChapterEnter": [],
       "onChapterExit": [],
       "alignment": "right",
-      "year": "1870s"
+      "year": "1870s",
+      "imageCaption": "Avenue Road, Cantonment Bazaar (Bangalore through the Centuries)",
+      "source": "Hasan, M. F. (2023). Bangalore through the centuries (2nd ed.). Metaform Design.",
+      "population": "~1,44,000",
+      "subtitle": null,
+      "subtitle2": null,
+      "buttonText": null,
+      "buttonUrl": null,
+      "quote": "<light>The native town, lying in the valley, boomed with trade. Population increased.</light> The boundaries of the Cantonment were enlarged to 13 ½ square miles constituting 18 suburbs at the expense of l5 villages.",
+      "descriptionSource": null,
+      "quoteSource": "Hasan, M. F. (2023). Bangalore through the centuries (2nd ed.). Metaform Design",
+      "bounds": [
+        77.553721,
+        12.936853,
+        77.657779,
+        13.017827
+      ],
+      "boundsIpad": [
+        77.5627,
+        12.934734,
+        77.67187,
+        13.019062
+      ],
+      "boundsMobile": [
+        77.529321,
+        12.913322,
+        77.690902,
+        13.038261
+      ],
+      "boundsIpadPortrait": [
+        77.544792,
+        12.926066,
+        77.658183,
+        13.013657
+      ]
     },
     {
       "id": "8",
       "title": "Drainage Areas",
-      "description": "From the peculiar conformation of the ground in the neighborhood of Bangalore there are three distinct drainage areas, the first and most important being that, which includes the Cantonment Bazaar, the old Light Cavalry Lines, the present Dragoon and Infantry lines and the village of Ulsoor; the second, the district of Shoolay; and the third the Fort and Pettah of Bangalore.",
-      "center": [
-        77.607715,
-        12.981635
-      ],
-      "zoom": 14.04,
+      "description": "From the terrain of Bengaluru and growth of its settlements, three main drainage areas were identified.\n\n<light> 1. The Cantonment Bazaar, the Cavalry and Infantry lines, and Ulsoor village. \n2. Shoolay Village\n3. The Bangalore Fort and Pettah.</light>",
       "pitch": 0,
       "bearing": 0,
       "duration": 2000,
@@ -1102,6 +1550,14 @@ const storyConfig = {
           "opacity": 1
         },
         "1884-ulsoor-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-cantonment-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-city-map": {
           "visible": false,
           "opacity": 1
         },
@@ -1129,16 +1585,12 @@ const storyConfig = {
           "visible": true,
           "opacity": 1
         },
-        "barracks": {
+        "1897-boundary": {
           "visible": false,
           "opacity": 1
         },
         "cantonment-boundary": {
           "visible": true,
-          "opacity": 1
-        },
-        "drainage-boundary": {
-          "visible": false,
           "opacity": 1
         },
         "fort-boundary": {
@@ -1224,23 +1676,56 @@ const storyConfig = {
         "9-label": {
           "visible": false,
           "opacity": 1
+        },
+        "osm-place-labels": {
+          "visible": true,
+          "opacity": 1
         }
       },
       "image": null,
       "alignment": "left",
       "onChapterEnter": [],
       "onChapterExit": [],
-      "year": "1870s"
+      "year": "1870s",
+      "imageCaption": null,
+      "source": "Report on the station, barracks and hospitals of Bangalore. (1865). Gantz Brothers, Adelphi Press.",
+      "population": "~1,44,000",
+      "subtitle": null,
+      "subtitle2": null,
+      "buttonText": null,
+      "buttonUrl": null,
+      "quote": null,
+      "descriptionSource": null,
+      "quoteSource": "Reported by Major Sankey. Source : Report on the station, barracks and hospitals of Bangalore. (1865). Gantz Brothers, Adelphi Press",
+      "bounds": [
+        77.573683,
+        12.952222,
+        77.642067,
+        13.005436
+      ],
+      "boundsIpad": [
+        77.556128,
+        12.944777,
+        77.642825,
+        13.011745
+      ],
+      "boundsMobile": [
+        77.529321,
+        12.913322,
+        77.690902,
+        13.038261
+      ],
+      "boundsIpadPortrait": [
+        77.544792,
+        12.926066,
+        77.658183,
+        13.013657
+      ]
     },
     {
       "id": "9",
-      "title": "Ulsoor Contamination",
-      "description": "In addition to the obvious advantage of providing in a systematic manner for the drainage of the first named area, it was sufficiently apparent that the scheme, whatever it should be, must in the first place cut off the sewage of the Cantonment Bazaar before reaching the Ulsoor tank, the water of which being used by both the troops and the inhabitants of the bazaar had hitherto been contaminated by its reception.",
-      "center": [
-        77.607715,
-        12.981635
-      ],
-      "zoom": 14.04,
+      "title": "Contamination of Ulsoor",
+      "description": "By the 1860s, Ulsoor Tank was polluted. <light>Sewage and activity from the Bazaar and Barracks contaminated the rajakaluve, now called C100, which feeds into the tank.</light>\n",
       "pitch": 0,
       "bearing": 0,
       "duration": 2000,
@@ -1258,6 +1743,14 @@ const storyConfig = {
           "opacity": 1
         },
         "1884-ulsoor-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-cantonment-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-city-map": {
           "visible": false,
           "opacity": 1
         },
@@ -1285,12 +1778,12 @@ const storyConfig = {
           "visible": true,
           "opacity": 0.3
         },
-        "cantonment-boundary": {
-          "visible": true,
+        "1897-boundary": {
+          "visible": false,
           "opacity": 1
         },
-        "drainage-boundary": {
-          "visible": false,
+        "cantonment-boundary": {
+          "visible": true,
           "opacity": 1
         },
         "fort-boundary": {
@@ -1376,23 +1869,56 @@ const storyConfig = {
         "9-label": {
           "visible": true,
           "opacity": 1
+        },
+        "osm-place-labels": {
+          "visible": true,
+          "opacity": 1
         }
       },
       "image": null,
       "onChapterEnter": [],
       "onChapterExit": [],
       "alignment": "right",
-      "year": "1870s"
+      "year": "1870",
+      "imageCaption": null,
+      "source": "Report on the station, barracks and hospitals of Bangalore. (1865). Gantz Brothers, Adelphi Press.",
+      "population": "~1,44,000",
+      "subtitle": null,
+      "subtitle2": null,
+      "buttonText": null,
+      "buttonUrl": null,
+      "quote": "\"[we] must in the first place cut off the sewage of the Cantonment Bazaar before reaching the Ulsoor tank, the water of which being used by both the troops and the inhabitants of the bazaar had hitherto been contaminated by its reception.\"",
+      "descriptionSource": null,
+      "quoteSource": "Reported by Major Sankey. Source : Report on the station, barracks and hospitals of Bangalore. (1865). Gantz Brothers, Adelphi Press",
+      "bounds": [
+        77.57871,
+        12.958641,
+        77.641035,
+        13.007139
+      ],
+      "boundsIpad": [
+        77.57742,
+        12.955646,
+        77.64855,
+        13.010589
+      ],
+      "boundsMobile": [
+        77.544656,
+        12.926204,
+        77.677248,
+        13.028727
+      ],
+      "boundsIpadPortrait": [
+        77.576843,
+        12.954399,
+        77.637992,
+        13.001633
+      ]
     },
     {
       "id": "10",
-      "title": "Oviform",
-      "description": "Suffice it to say, a large oviform sewer has been constructed for upwards of ¾ of a mile in length, and passing under the bed of the Ulsoor tank, delivers the sewage into \"an open masonry channel, which again is succeeded by another one delivering the filth eventually into a tank 3 ½  miles away from the Cantonment.",
-      "center": [
-        77.607715,
-        12.981635
-      ],
-      "zoom": 14.04,
+      "title": "Construction of Sewer",
+      "description": "To address the contamination, a sewer was built under the bed of Ulsoor Tank. This oviform channel   discharges the sewage into a tank 3.5 miles away from the cantonment.",
       "pitch": 0,
       "bearing": 0,
       "duration": 2000,
@@ -1410,6 +1936,14 @@ const storyConfig = {
           "opacity": 1
         },
         "1884-ulsoor-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-cantonment-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-city-map": {
           "visible": false,
           "opacity": 1
         },
@@ -1437,12 +1971,12 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
-        "cantonment-boundary": {
-          "visible": true,
+        "1897-boundary": {
+          "visible": false,
           "opacity": 1
         },
-        "drainage-boundary": {
-          "visible": false,
+        "cantonment-boundary": {
+          "visible": true,
           "opacity": 1
         },
         "fort-boundary": {
@@ -1526,6 +2060,10 @@ const storyConfig = {
           "opacity": 1
         },
         "9-label": {
+          "visible": true,
+          "opacity": 1
+        },
+        "osm-place-labels": {
           "visible": true,
           "opacity": 1
         }
@@ -1534,17 +2072,46 @@ const storyConfig = {
       "onChapterEnter": [],
       "onChapterExit": [],
       "alignment": "left",
-      "year": "1870s"
+      "year": "1870s",
+      "imageCaption": "Reference image. Does not represent actual historical condition",
+      "source": "Report on the station, barracks and hospitals of Bangalore. (1865). Gantz Brothers, Adelphi Press.",
+      "population": "~1,44,000",
+      "subtitle": null,
+      "subtitle2": null,
+      "buttonText": null,
+      "buttonUrl": null,
+      "quote": "\"Suffice it to say, a large oviform sewer has been constructed for upwards of ¾ of a mile in length, and passing under the bed of the Ulsoor tank, delivers the sewage into \"an open masonry channel, which again is succeeded by another one delivering the filth eventually into a tank 3 ½  miles away from the Cantonment.\"",
+      "descriptionSource": null,
+      "quoteSource": "Reported by Major Sankey. Source : Report on the station, barracks and hospitals of Bangalore. (1865). Gantz Brothers, Adelphi Press",
+      "bounds": [
+        77.57871,
+        12.958641,
+        77.641035,
+        13.007139
+      ],
+      "boundsIpad": [
+        77.577205,
+        12.955661,
+        77.648334,
+        13.010604
+      ],
+      "boundsMobile": [
+        77.544656,
+        12.926204,
+        77.677248,
+        13.028727
+      ],
+      "boundsIpadPortrait": [
+        77.582429,
+        12.953689,
+        77.643577,
+        13.000923
+      ]
     },
     {
       "id": "11",
       "title": "Millers Tanks",
-      "description": "The first attempt to provide protected water supply to the town began in 1873 with the erection of a chain of tanks known as the Miller’s Tanks, in the erstwhile Cantonment area. This construction was necessitated because water pumped from the Halsuru, Shoolay and Pudupacherry tanks was too inadequate to meet the growing needs of the Civil and Military Station. In the City area, water was drawn through the primordial ‘Karanjee” system4, from the Dharmambudhi and Sampangi Tanks.",
-      "center": [
-        77.599338,
-        12.990964
-      ],
-      "zoom": 15.15,
+      "description": "As the cantonment expanded rapidly through the 1870s, the Ulsoor and Shoolay tanks could no longer supply sufficient water for its growing population. Miller's Tank was subsequently constructed to address this shortage.",
       "pitch": 0,
       "bearing": 0,
       "duration": 2000,
@@ -1562,6 +2129,14 @@ const storyConfig = {
           "opacity": 1
         },
         "1884-ulsoor-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-cantonment-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-city-map": {
           "visible": false,
           "opacity": 1
         },
@@ -1589,12 +2164,12 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
-        "cantonment-boundary": {
-          "visible": true,
+        "1897-boundary": {
+          "visible": false,
           "opacity": 1
         },
-        "drainage-boundary": {
-          "visible": false,
+        "cantonment-boundary": {
+          "visible": true,
           "opacity": 1
         },
         "fort-boundary": {
@@ -1680,178 +2255,59 @@ const storyConfig = {
         "9-label": {
           "visible": false,
           "opacity": 1
+        },
+        "osm-place-labels": {
+          "visible": true,
+          "opacity": 1
         }
       },
-      "image": null,
+      "image": "./datasets/images/millers-tank.png",
       "alignment": "left",
       "onChapterEnter": [],
       "onChapterExit": [],
-      "year": "1870s"
+      "year": "1870",
+      "imageCaption": "Millers Tank (Source: BYGONE BANGALORE)",
+      "source": "Hasan, M. F. (2023). Bangalore through the centuries (2nd ed.). Metaform Design.",
+      "population": "~1,44,000",
+      "subtitle": null,
+      "subtitle2": null,
+      "buttonText": null,
+      "buttonUrl": null,
+      "quote": "<light>\"The first attempt to provide protected water supply to the town began in 1873 with the erection of a chain of tanks known as the Miller’s Tanks</light>, in the erstwhile Cantonment area. In the City area, water was drawn through the primordial ‘Karanjee” system, from the Dharmambudhi and Sampangi Tanks.\"",
+      "descriptionSource": null,
+      "quoteSource": "Hasan, M. F. (2023). Bangalore through the centuries (2nd ed.). Metaform Design",
+      "bounds": [
+        77.58345,
+        12.983048,
+        77.605537,
+        13.000235
+      ],
+      "boundsIpad": [
+        77.57664,
+        12.979807,
+        77.60631,
+        13.002725
+      ],
+      "boundsMobile": [
+        77.577729,
+        12.975788,
+        77.612447,
+        13.002632
+      ],
+      "boundsIpadPortrait": [
+        77.584053,
+        12.982756,
+        77.603329,
+        12.997645
+      ]
     },
     {
       "id": "12",
       "title": "Ulsoor Water Works",
-      "description": "During the progress of my inspection of this station I visited the reservoirs in the course of erection on the Ulsoor Rock situated in the middle of the tank of the same name. Large Chambers of solid masonry are here built into which water will be lifted from the Tank by steam power...",
-      "center": [
-        77.620891,
-        12.983406
-      ],
-      "zoom": 15.1,
+      "description": "To meet growing demands and pump water to expanding settlements, <light>Bengaluru's first steam powered water works was built near Ulsoor Tank.</light>",
       "pitch": 0,
       "bearing": 0,
-      "duration": 2000,
-      "layers": {
-        "1854-map": {
-          "visible": false,
-          "opacity": 0.8
-        },
-        "1870-map": {
-          "visible": true,
-          "opacity": 1
-        },
-        "1884-barracks-map": {
-          "visible": false,
-          "opacity": 1
-        },
-        "1884-ulsoor-map": {
-          "visible": true,
-          "opacity": 1
-        },
-        "dem-colored-layer": {
-          "visible": true,
-          "opacity": 0.5
-        },
-        "fort-1854": {
-          "visible": true,
-          "opacity": 1
-        },
-        "satellite-layer": {
-          "visible": true,
-          "opacity": 1
-        },
-        "ulsoor-village": {
-          "visible": false,
-          "opacity": 1
-        },
-        "1870-bazaar": {
-          "visible": false,
-          "opacity": 1
-        },
-        "1870-drainage-areas": {
-          "visible": false,
-          "opacity": 1
-        },
-        "cantonment-boundary": {
-          "visible": false,
-          "opacity": 1
-        },
-        "drainage-boundary": {
-          "visible": false,
-          "opacity": 1
-        },
-        "fort-boundary": {
-          "visible": false,
-          "opacity": 1
-        },
-        "oviform": {
-          "visible": false,
-          "opacity": 1
-        },
-        "soldiers-gardens-outline": {
-          "visible": false,
-          "opacity": 1
-        },
-        "tanks-1854-outline": {
-          "visible": false,
-          "opacity": 1
-        },
-        "tanks-1870-added-outline": {
-          "visible": false,
-          "opacity": 1
-        },
-        "tanks-1870-outline": {
-          "visible": false,
-          "opacity": 1
-        },
-        "ulsoor-stormwater": {
-          "visible": false,
-          "opacity": 1
-        },
-        "ulsoor-village-boundary": {
-          "visible": false,
-          "opacity": 1
-        },
-        "ulsoor-water-line": {
-          "visible": false,
-          "opacity": 1
-        },
-        "ulsoor-water-works": {
-          "visible": false,
-          "opacity": 1
-        },
-        "soldiers-gardens": {
-          "visible": false,
-          "opacity": 1
-        },
-        "tanks-1854": {
-          "visible": false,
-          "opacity": 1
-        },
-        "tanks-1870": {
-          "visible": false,
-          "opacity": 1
-        },
-        "tanks-1870-added": {
-          "visible": false,
-          "opacity": 1
-        },
-        "1-label": {
-          "visible": false,
-          "opacity": 1
-        },
-        "11-label": {
-          "visible": false,
-          "opacity": 1
-        },
-        "4-label": {
-          "visible": false,
-          "opacity": 1
-        },
-        "5-label": {
-          "visible": false,
-          "opacity": 1
-        },
-        "6-label": {
-          "visible": false,
-          "opacity": 1
-        },
-        "7-label": {
-          "visible": false,
-          "opacity": 1
-        },
-        "9-label": {
-          "visible": false,
-          "opacity": 1
-        }
-      },
-      "image": "./datasets/images/ulsoor-works.png",
-      "onChapterEnter": [],
-      "onChapterExit": [],
-      "alignment": "right",
-      "year": "1880s"
-    },
-    {
-      "id": "13",
-      "title": "Ulsoor Water Works",
-      "description": "Description for this chapter",
-      "center": [
-        77.62101,
-        12.979976
-      ],
-      "zoom": 16.9,
-      "pitch": 0,
-      "bearing": 0,
-      "duration": 2000,
+      "duration": 5000,
       "layers": {
         "1854-map": {
           "visible": false,
@@ -1869,6 +2325,14 @@ const storyConfig = {
           "visible": true,
           "opacity": 1
         },
+        "1897-cantonment-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-city-map": {
+          "visible": false,
+          "opacity": 1
+        },
         "dem-colored-layer": {
           "visible": true,
           "opacity": 0.5
@@ -1893,11 +2357,11 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
-        "cantonment-boundary": {
+        "1897-boundary": {
           "visible": false,
           "opacity": 1
         },
-        "drainage-boundary": {
+        "cantonment-boundary": {
           "visible": false,
           "opacity": 1
         },
@@ -1984,23 +2448,56 @@ const storyConfig = {
         "9-label": {
           "visible": false,
           "opacity": 1
+        },
+        "osm-place-labels": {
+          "visible": true,
+          "opacity": 1
         }
       },
-      "image": "./datasets/images/ulsoor-works-zoom.png",
+      "image": "./datasets/images/ulsoor-works.png",
       "onChapterEnter": [],
       "onChapterExit": [],
       "alignment": "right",
-      "year": "1880s"
+      "year": "1873",
+      "imageCaption": "Ulsoor Water Works. Source: the Macnabb Collection (Col James Henry Erskine Reid): Album of Indian views, taken in 1902.",
+      "source": "Report on the station, barracks and hospitals of Bangalore. (1865). Gantz Brothers, Adelphi Press.",
+      "population": "~1,44,000",
+      "subtitle": null,
+      "subtitle2": null,
+      "buttonText": null,
+      "buttonUrl": null,
+      "quote": "\"...I visited the reservoirs in the course of erection on the Ulsoor Rock situated in the middle of the tank of the same name.\"",
+      "descriptionSource": null,
+      "quoteSource": "Reported by Robert S. Ellis, President of the Sanitary Commission. Source : Report on the station, barracks and hospitals of Bangalore. (1865). Gantz Brothers, Adelphi Press",
+      "bounds": [
+        77.604353,
+        12.969952,
+        77.634615,
+        12.9935
+      ],
+      "boundsIpad": [
+        77.604546,
+        12.971081,
+        77.635353,
+        12.994878
+      ],
+      "boundsMobile": [
+        77.608527,
+        12.971399,
+        77.633561,
+        12.990756
+      ],
+      "boundsIpadPortrait": [
+        77.608135,
+        12.972926,
+        77.631625,
+        12.991071
+      ]
     },
     {
-      "id": "14",
-      "title": "New Barracks",
-      "description": "and thence passed through filtering beds into large iron pipes by which it will be conveyed to the new Barracks in course of erection on the Race Course. Present day - Army Service Corps Centre an School.",
-      "center": [
-        77.623155,
-        12.97198
-      ],
-      "zoom": 14.55,
+      "id": "13",
+      "title": "Shifting the Barracks",
+      "description": "To reduce contamination of Ulsoor tank, barracks were shifted to the South.\n\nWater from Ulsoor Water Works was pumped to the newly constructed barracks which stood at a higher elevation than the existing tanks.",
       "pitch": 0,
       "bearing": 0,
       "duration": 2000,
@@ -2019,6 +2516,14 @@ const storyConfig = {
         },
         "1884-ulsoor-map": {
           "visible": true,
+          "opacity": 1
+        },
+        "1897-cantonment-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-city-map": {
+          "visible": false,
           "opacity": 1
         },
         "dem-colored-layer": {
@@ -2045,11 +2550,11 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
-        "cantonment-boundary": {
+        "1897-boundary": {
           "visible": false,
           "opacity": 1
         },
-        "drainage-boundary": {
+        "cantonment-boundary": {
           "visible": false,
           "opacity": 1
         },
@@ -2090,7 +2595,7 @@ const storyConfig = {
           "opacity": 0.8
         },
         "ulsoor-water-works": {
-          "visible": false,
+          "visible": true,
           "opacity": 1
         },
         "soldiers-gardens": {
@@ -2136,23 +2641,56 @@ const storyConfig = {
         "9-label": {
           "visible": false,
           "opacity": 1
+        },
+        "osm-place-labels": {
+          "visible": true,
+          "opacity": 1
         }
       },
       "image": null,
       "onChapterEnter": [],
       "onChapterExit": [],
       "alignment": "right",
-      "year": "1880s"
+      "year": "1873",
+      "imageCaption": null,
+      "source": "Report on the station, barracks and hospitals of Bangalore. (1865). Gantz Brothers, Adelphi Press.",
+      "population": "~1,44,000",
+      "subtitle": null,
+      "subtitle2": null,
+      "buttonText": null,
+      "buttonUrl": null,
+      "quote": null,
+      "descriptionSource": null,
+      "quoteSource": "Reported by Robert S. Ellis, President of the Sanitary Commission. Source : Report on the station, barracks and hospitals of Bangalore. (1865). Gantz Brothers, Adelphi Press",
+      "bounds": [
+        77.604474,
+        12.956717,
+        77.641804,
+        12.985766
+      ],
+      "boundsIpad": [
+        77.600925,
+        12.953824,
+        77.646195,
+        12.989025
+      ],
+      "boundsMobile": [
+        77.590364,
+        12.946816,
+        77.654743,
+        12.996596
+      ],
+      "boundsIpadPortrait": [
+        77.588677,
+        12.949769,
+        77.648355,
+        12.995868
+      ]
     },
     {
-      "id": "15",
-      "title": "Overall",
-      "description": "Description for this chapter",
-      "center": [
-        77.6006,
-        12.975494
-      ],
-      "zoom": 13.06,
+      "id": "14",
+      "title": "City of Two Minds: One Thirst",
+      "description": "The city—the Kote, Pete, and surrounding villages—and the British Cantonment continued to expand rapidly in the 1880s. \n\nFollowing the Rendition of Mysore in 1881, the city was formally split into two administrative entities. \nThe old city remained a part of the Mysore State, while the Cantonment was under British Administration.  \n\n<light>Bengaluru began to function as two cities, sharing one increasingly strained water supply. </light>\n\nHow was this challenge addressed?",
       "pitch": 0,
       "bearing": 0,
       "duration": 2000,
@@ -2166,10 +2704,18 @@ const storyConfig = {
           "opacity": 1
         },
         "1884-barracks-map": {
-          "visible": true,
+          "visible": false,
           "opacity": 1
         },
         "1884-ulsoor-map": {
+          "visible": false,
+          "opacity": 1
+        },
+        "1897-cantonment-map": {
+          "visible": true,
+          "opacity": 1
+        },
+        "1897-city-map": {
           "visible": true,
           "opacity": 1
         },
@@ -2197,16 +2743,16 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
-        "cantonment-boundary": {
+        "1897-boundary": {
           "visible": true,
           "opacity": 1
         },
-        "drainage-boundary": {
+        "cantonment-boundary": {
           "visible": false,
           "opacity": 1
         },
         "fort-boundary": {
-          "visible": true,
+          "visible": false,
           "opacity": 1
         },
         "oviform": {
@@ -2262,7 +2808,7 @@ const storyConfig = {
           "opacity": 1
         },
         "1-label": {
-          "visible": true,
+          "visible": false,
           "opacity": 1
         },
         "11-label": {
@@ -2288,13 +2834,51 @@ const storyConfig = {
         "9-label": {
           "visible": false,
           "opacity": 1
+        },
+        "osm-place-labels": {
+          "visible": true,
+          "opacity": 1
         }
       },
       "image": null,
       "onChapterEnter": [],
       "onChapterExit": [],
       "alignment": "left",
-      "year": "1880s"
+      "year": "1880",
+      "population": null,
+      "imageCaption": null,
+      "source": null,
+      "subtitle": null,
+      "subtitle2": null,
+      "buttonText": "Next Chapter Releasing Soon",
+      "buttonUrl": null,
+      "quote": null,
+      "descriptionSource": null,
+      "quoteSource": null,
+      "bounds": [
+        77.533724,
+        12.917622,
+        77.678035,
+        13.029921
+      ],
+      "boundsIpad": [
+        77.514628,
+        12.905312,
+        77.688502,
+        13.040509
+      ],
+      "boundsMobile": [
+        77.417416,
+        12.816226,
+        77.791551,
+        13.105533
+      ],
+      "boundsIpadPortrait": [
+        77.488735,
+        12.880812,
+        77.716653,
+        13.056872
+      ]
     }
   ]
 };
