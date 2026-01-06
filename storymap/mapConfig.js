@@ -26,10 +26,28 @@ const mapConfig = {
       attribution: "© Google",
     },
 
+   placelabels: {
+  type: 'vector',
+  url: 'https://api.maptiler.com/tiles/v3/tiles.json?key=cAJaZlDdlxWFr7dh91XQ'
+},
     // DEM (Digital Elevation Model) - Colored Raster
     demColored: {
       type: "raster",
       url: "cog://./datasets/geotiff/dem_3857_cog.tif",
+      tileSize: 256,
+    },
+
+                // 1897 city
+    cityMap1897: {
+      type: "raster",
+      url: "cog://./datasets/geotiff/1897_city_cog.tif",
+      tileSize: 256,
+    },
+
+            // 1897 cantonment
+    cantonmentMap1897: {
+      type: "raster",
+      url: "cog://./datasets/geotiff/1897_cantonment_cog.tif",
       tileSize: 256,
     },
 
@@ -73,6 +91,7 @@ const mapConfig = {
       tileSize: 256,
     },
 
+
     // 1854 Boundary GeoJSON
     boundary1854: {
       type: "geojson",
@@ -114,6 +133,13 @@ const mapConfig = {
       type: "geojson",
       data: "./datasets/json/ulsoor-water-works.geojson",
     },
+
+            // 1897 boundary
+    boundary1897: {
+      type: "geojson",
+      data: "./datasets/json/1897-boundary.geojson",
+    },
+
         //Labels
     labels: {
       type: "geojson",
@@ -135,6 +161,45 @@ const mapConfig = {
         "raster-opacity": 1,
       },
     },
+  {
+
+  id: 'osm-place-labels',
+  type: 'symbol',
+  source: 'placelabels',
+  'source-layer': 'place',
+  minzoom: 10,
+  layout: {
+    'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']],
+    'text-font': ['Open Sans Regular'],
+    'text-size': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      10, 9,
+      14, 11
+    ],
+    'text-anchor': 'center',
+    'text-allow-overlap': false,
+    'text-optional': true,
+    'visibility': 'visible'
+  },
+  paint: {
+    'text-color': '#555555',
+    'text-halo-color': '#ffffff',
+    'text-halo-width': 1,
+    'text-opacity': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      10, 0,
+      13, 1
+    ]
+  
+}
+
+},
+
+
     {
       id: "dem-colored-layer",
       type: "raster",
@@ -143,7 +208,23 @@ const mapConfig = {
         "raster-opacity": 0.5,
       },
     },
+                {
+      id: "1897-city-map",
+      type: "raster",
+      source: "cityMap1897",
+      paint: {
+        "raster-opacity": 1,
+      },
+    },
 
+                {
+      id: "1897-cantonment-map",
+      type: "raster",
+      source: "cantonmentMap1897",
+      paint: {
+        "raster-opacity": 1,
+      },
+    },
     {
       id: "1854-map",
       type: "raster",
@@ -198,7 +279,9 @@ const mapConfig = {
         "raster-opacity": 1,
       },
     },
-    
+
+
+
     //boundaries
 
                 {
@@ -232,14 +315,14 @@ const mapConfig = {
         "line-width": 3,
       },
     },
-    {
-      id: "drainage-boundary",
+
+        {
+      id: "1897-boundary",
       type: "line",
-      source: "drainageboundary",
-      filter: ["all", ["has", "name"], ["in", "Bazaar", ["get", "name"]]],
+      source: "boundary1897",
       paint: {
-        "line-color": "rgba(255, 0, 0, 1)",
-        "line-width": 2,
+        "line-color": "#0d6aff",
+        "line-width": 3,
       },
     },
 
@@ -251,7 +334,7 @@ const mapConfig = {
       filter: ["all", ["has", "name"], ["in", "Oviform", ["get", "name"]]],
       paint: {
         "line-color": "rgba(255, 0, 0, 1)",
-        "line-width": 3,
+        "line-width": 5,
       },
     },
     {
@@ -282,7 +365,7 @@ const mapConfig = {
       filter: ["==", ["get", "chapter"], 9],
       paint: {
         "line-color": "#6fe6fd",
-        "line-width": 4,
+        "line-width": 6,
       },
     },
 
@@ -403,18 +486,18 @@ const mapConfig = {
       layout: {
         "text-field": ["get", "name"],
 "text-font": ["Open Sans Condensed Bold"],
-        "text-size": 13,
+        "text-size": 17,
         "text-anchor": "left",
         "text-allow-overlap": true,
         "text-optional": true,
-        "text-padding": 4,
+        "text-padding": 8,
         "text-justify": "left",
         "text-transform": "uppercase"
       },
       paint: {
-        "text-color": "#ffffff",
-        "text-halo-color": "#0d6aff",
-        "text-halo-width": 6,
+        "text-color": "#0d6aff",
+        "text-halo-color": "#f9ea46",
+        "text-halo-width": 8,
         "text-halo-blur": 5
       }
     },
@@ -426,7 +509,7 @@ const mapConfig = {
       layout: {
         "text-field": ["get", "name"],
         "text-font": ["Open Sans Condensed Bold"],
-        "text-size": 11,
+        "text-size": 15,
         "text-anchor": "left",
         "text-allow-overlap": true,
         "text-optional": true,
@@ -435,8 +518,8 @@ const mapConfig = {
 
       },
       paint: {
-        "text-color": "#3f3f3fcc",
-        "text-halo-color": "#ffffffe0",
+        "text-color": "#0d6aff",
+        "text-halo-color": "#f9ea46",
         "text-halo-width": 6,
         "text-halo-blur": 5
       }
@@ -450,7 +533,7 @@ const mapConfig = {
       layout: {
         "text-field": ["get", "name"],
         "text-font": ["Open Sans Condensed Bold"],
-        "text-size": 11,
+        "text-size": 15,
         "text-anchor": "left",
         "text-allow-overlap": true,
         "text-optional": true,
@@ -460,8 +543,8 @@ const mapConfig = {
 
       },
       paint: {
-        "text-color": "#3f3f3f",
-        "text-halo-color": "#ffffff",
+        "text-color": "#0d6aff",
+        "text-halo-color": "#85fbeb",
         "text-halo-width": 6,
         "text-halo-blur": 5
       }
@@ -475,7 +558,7 @@ const mapConfig = {
       layout: {
         "text-field": ["get", "name"],
         "text-font": ["Open Sans Condensed Bold"],
-        "text-size": 11,
+        "text-size": 15,
         "text-anchor": "left",
         "text-allow-overlap": true,
         "text-optional": true,
@@ -485,8 +568,8 @@ const mapConfig = {
 
       },
       paint: {
-        "text-color": "#3f3f3f",
-        "text-halo-color": "#ffffff",
+        "text-color": "#0d6aff",
+        "text-halo-color": "#f9ea46",
         "text-halo-width": 6,
         "text-halo-blur": 5
       }
@@ -502,7 +585,7 @@ const mapConfig = {
         "text-font": ["Open Sans Condensed Bold"],
             "text-max-width": 5,   // <-- maximum width in em units
 
-        "text-size": 12,
+        "text-size": 15,
         "text-anchor": "center",
         "text-allow-overlap": true,
         "text-optional": true,
@@ -512,8 +595,8 @@ const mapConfig = {
 
       },
       paint: {
-        "text-color": "#ffffff",
-        "text-halo-color": "#008fee",
+        "text-color": "#0d6aff",
+        "text-halo-color": "#f9ea46",
         "text-halo-width": 6,
         "text-halo-blur": 5
       }
@@ -529,7 +612,7 @@ const mapConfig = {
         "text-font": ["Open Sans Condensed Bold"],
             "text-max-width": 5,   // <-- maximum width in em units
 
-        "text-size": 12,
+        "text-size": 15,
         "text-anchor": "center",
         "text-allow-overlap": true,
         "text-optional": true,
@@ -539,8 +622,8 @@ const mapConfig = {
 
       },
       paint: {
-        "text-color": "#ffffff",
-        "text-halo-color": "#008fee",
+        "text-color": "#0d6aff",
+        "text-halo-color": "#f9ea46",
         "text-halo-width": 6,
         "text-halo-blur": 5
       }
@@ -550,13 +633,13 @@ const mapConfig = {
       id: "11-label",
       type: "symbol",
       source: "labels",
-      filter: ["==", ["get", "chapter"],11],
+      filter: ["==", ["get", "chapter"],12],
       layout: {
         "text-field": ["get", "name"],
         "text-font": ["Open Sans Condensed Bold"],
             "text-max-width": 5,   // <-- maximum width in em units
 
-        "text-size": 12,
+        "text-size": 15,
         "text-anchor": "left",
         "text-allow-overlap": true,
         "text-optional": true,
@@ -567,8 +650,8 @@ const mapConfig = {
 
       },
       paint: {
-        "text-color": "#5a5a5a",
-        "text-halo-color": "#ffffff",
+        "text-color": "#0d6aff",
+        "text-halo-color": "#f9ea46",
         "text-halo-width": 6,
         "text-halo-blur": 5
       }
