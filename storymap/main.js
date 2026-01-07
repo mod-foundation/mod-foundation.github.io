@@ -20,6 +20,40 @@ var map = new maplibregl.Map({
   touchPitch: false // Disable pitch with two-finger touch
 });
 
+// Preload viewpoint icon image using standard Image object
+const viewpointImg = new Image();
+viewpointImg.crossOrigin = 'anonymous';
+viewpointImg.onload = function() {
+  console.log('Viewpoint image loaded successfully, dimensions:', viewpointImg.width, 'x', viewpointImg.height);
+  // Add to map immediately after loading
+  if (map.loaded() && !map.hasImage('viewpoint-icon')) {
+    map.addImage('viewpoint-icon', viewpointImg);
+    console.log('Viewpoint icon added to map from preloaded image');
+  }
+};
+viewpointImg.onerror = function(e) {
+  console.error('Failed to load viewpoint image:', e);
+};
+viewpointImg.src = './datasets/images/viewpoint.png';
+
+// Handle missing images - load them on demand
+map.on('styleimagemissing', function(e) {
+  const id = e.id;
+  console.log('Missing image requested:', id);
+
+  if (id === 'viewpoint-icon') {
+    console.log('Checking if preloaded viewpoint icon is ready...');
+    if (viewpointImg.complete && viewpointImg.naturalWidth > 0) {
+      if (!map.hasImage(id)) {
+        map.addImage(id, viewpointImg);
+        console.log('Viewpoint icon added to map from preloaded image');
+      }
+    } else {
+      console.log('Viewpoint icon not ready yet, waiting...');
+    }
+  }
+});
+
 //#endregion
 
 //#region  MAP CONTROLS
