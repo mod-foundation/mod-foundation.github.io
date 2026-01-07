@@ -146,6 +146,12 @@ const mapConfig = {
       data: "./datasets/json/labels.geojson",
     },
 
+            //Viewpoints
+    viewpoints: {
+      type: "geojson",
+      data: "./datasets/json/viewpoints.geojson",
+    },
+
   },
 
   // Layer configurations
@@ -654,6 +660,97 @@ const mapConfig = {
         "text-halo-color": "#f9ea46",
         "text-halo-width": 6,
         "text-halo-blur": 5
+      }
+    },
+
+        //Viewpoints
+        {
+      id: "3-view",
+      type: "symbol",
+      source: "viewpoints",
+      filter: ["==", ["get", "chapter"], 4],
+      layout: {
+        "icon-image": "viewpoint-icon",
+        "icon-size": 0.2,
+        "icon-rotate": ["get", "angle"],
+        "icon-rotation-alignment": "map",
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true
+      },
+      paint: {
+        "icon-opacity": 1
+      }
+    },
+
+            {
+      id: "5-view",
+      type: "symbol",
+      source: "viewpoints",
+      filter: ["==", ["get", "chapter"], 6],
+      layout: {
+        "icon-image": "viewpoint-icon",
+        "icon-size": 0.1,
+        "icon-rotate": ["get", "angle"],
+        "icon-rotation-alignment": "map",
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true
+      },
+      paint: {
+        "icon-opacity": 1
+      }
+    },
+
+                {
+      id: "6-view",
+      type: "symbol",
+      source: "viewpoints",
+      filter: ["==", ["get", "chapter"], 5],
+      layout: {
+        "icon-image": "viewpoint-icon",
+        "icon-size": 0.15,
+        "icon-rotate": ["get", "angle"],
+        "icon-rotation-alignment": "map",
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true
+      },
+      paint: {
+        "icon-opacity": 1
+      }
+    },
+
+            {
+      id: "10-view",
+      type: "symbol",
+      source: "viewpoints",
+      filter: ["==", ["get", "chapter"], 11],
+      layout:{
+        "icon-image": "viewpoint-icon",
+        "icon-size": 0.15,
+        "icon-rotate": ["get", "angle"],
+        "icon-rotation-alignment": "map",
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true
+      },
+      paint: {
+        "icon-opacity": 1
+      }
+    },
+
+                {
+      id: "11-view",
+      type: "symbol",
+      source: "viewpoints",
+      filter: ["==", ["get", "chapter"], 12],
+      layout: {
+        "icon-image": "viewpoint-icon",
+        "icon-size": 0.2,
+        "icon-rotate": ["get", "angle"],
+        "icon-rotation-alignment": "map",
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true
+      },
+      paint: {
+        "icon-opacity": 1
       }
     },
 
