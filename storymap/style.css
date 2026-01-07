@@ -621,8 +621,12 @@ body {
   z-index: 4;
   transition: opacity 0.3s ease;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* Mouse scroll animation dot - shown on desktop */
 .icon-scroll:before {
   content: '';
   position: absolute;
@@ -638,6 +642,15 @@ body {
   animation-name: scroll;
 }
 
+/* Arrow icon - hidden on desktop */
+.icon-scroll .arrow-icon {
+  display: none !important;
+  width: 20px;
+  height: 20px;
+  color: var(--primary-blue);
+  animation: bounce-arrow 1.5s infinite;
+}
+
 .icon-scroll.hidden {
   opacity: 0;
   pointer-events: none;
@@ -650,6 +663,15 @@ body {
   100% {
     opacity: 0;
     transform: translateY(46px);
+  }
+}
+
+@keyframes bounce-arrow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
   }
 }
 
@@ -793,7 +815,7 @@ body {
 }
 
 /* Responsive styles for large desktop screens */
-@media screen and (max-width:1500px){
+@media screen and (max-width: 1500px) {
   /* Chapter content */
 
       .chapter-wrapper{
@@ -909,9 +931,11 @@ body {
   }
 
   .icon-scroll:before {
-    width: 5px;
-    height: 10px;
-    margin-left: -2.5px;
+    display: none !important;
+  }
+
+  .icon-scroll .arrow-icon {
+    display: block !important;
   }
 
   @keyframes scroll {
@@ -1062,9 +1086,11 @@ body {
   }
 
   .icon-scroll:before {
-    width: 7px;
-    height: 7px;
-    margin-left: -3.5px;
+    display: none !important;
+  }
+
+  .icon-scroll .arrow-icon {
+    display: block !important;
   }
 
   /* Instructions panel */
@@ -1217,14 +1243,15 @@ body {
     width: 22px;
     height: 35px;
     margin-left: -15px;
-    box-shadow: inset 0 0 0 1.5px var(--primary-blue);
+    box-shadow: none;
   }
 
   .icon-scroll:before {
-    width: 6px;
-    height: 6px;
-    margin-left: -3px;
-    top: 6px;
+    display: none !important;
+  }
+
+  .icon-scroll .arrow-icon {
+    display: block !important;
   }
 
   @keyframes scroll {
@@ -1412,14 +1439,15 @@ body {
     width: 20px;
     height: 35px;
     margin-left: -15px;
-    box-shadow: inset 0 0 0 1.5px var(--primary-blue);
+    box-shadow: none;
   }
 
   .icon-scroll:before {
-    width: 3px;
-    height: 12px;
-    margin-left: -1.5px;
-    top: 6px;
+    display: none !important;
+  }
+
+  .icon-scroll .arrow-icon {
+    display: block !important;
   }
 
   @keyframes scroll {
