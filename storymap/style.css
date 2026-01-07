@@ -793,7 +793,7 @@ body {
 }
 
 /* Responsive styles for large desktop screens */
-@media screen and (max-width:1500px){
+@media screen and (max-width:1499px){
   /* Chapter content */
 
       .chapter-wrapper{
