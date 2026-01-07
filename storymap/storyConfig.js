@@ -1,5 +1,5 @@
 // Story Map Configuration
-// Generated on 6/1/2026, 3:54:05 pm
+// Generated on 7/1/2026, 4:36:34 pm
 
 const storyConfig = {
   "chapters": [
@@ -134,10 +134,22 @@ const storyConfig = {
           "opacity": 1
         },
         "1-label": {
-          "visible": true,
+          "visible": false,
+          "opacity": 1
+        },
+        "10-view": {
+          "visible": false,
           "opacity": 1
         },
         "11-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "11-view": {
+          "visible": false,
+          "opacity": 1
+        },
+        "3-view": {
           "visible": false,
           "opacity": 1
         },
@@ -149,7 +161,15 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "5-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "6-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "6-view": {
           "visible": false,
           "opacity": 1
         },
@@ -305,7 +325,19 @@ const storyConfig = {
           "visible": true,
           "opacity": 1
         },
+        "10-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "11-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "11-view": {
+          "visible": false,
+          "opacity": 1
+        },
+        "3-view": {
           "visible": false,
           "opacity": 1
         },
@@ -317,7 +349,15 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "5-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "6-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "6-view": {
           "visible": false,
           "opacity": 1
         },
@@ -497,7 +537,19 @@ const storyConfig = {
           "visible": true,
           "opacity": 1
         },
+        "10-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "11-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "11-view": {
+          "visible": false,
+          "opacity": 1
+        },
+        "3-view": {
           "visible": false,
           "opacity": 1
         },
@@ -509,7 +561,15 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "5-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "6-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "6-view": {
           "visible": false,
           "opacity": 1
         },
@@ -688,7 +748,19 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "10-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "11-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "11-view": {
+          "visible": false,
+          "opacity": 1
+        },
+        "3-view": {
           "visible": false,
           "opacity": 1
         },
@@ -700,7 +772,15 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "5-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "6-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "6-view": {
           "visible": false,
           "opacity": 1
         },
@@ -882,19 +962,39 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "10-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "11-label": {
           "visible": false,
           "opacity": 1
         },
-        "4-label": {
+        "11-view": {
+          "visible": false,
+          "opacity": 1
+        },
+        "3-view": {
           "visible": true,
+          "opacity": 1
+        },
+        "4-label": {
+          "visible": false,
           "opacity": 1
         },
         "5-label": {
           "visible": false,
           "opacity": 1
         },
+        "5-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "6-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "6-view": {
           "visible": false,
           "opacity": 1
         },
@@ -1074,7 +1174,19 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "10-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "11-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "11-view": {
+          "visible": false,
+          "opacity": 1
+        },
+        "3-view": {
           "visible": false,
           "opacity": 1
         },
@@ -1086,7 +1198,15 @@ const storyConfig = {
           "visible": true,
           "opacity": 1
         },
+        "5-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "6-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "6-view": {
           "visible": false,
           "opacity": 1
         },
@@ -1103,7 +1223,7 @@ const storyConfig = {
           "opacity": 1
         }
       },
-      "image": "./datasets/images/ulsoor-lake.png",
+      "image": "./datasets/images/ulsoor-tank-1900.png",
       "onChapterEnter": [],
       "onChapterExit": [],
       "alignment": "right",
@@ -1267,7 +1387,19 @@ const storyConfig = {
           "visible": true,
           "opacity": 1
         },
+        "10-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "11-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "11-view": {
+          "visible": false,
+          "opacity": 1
+        },
+        "3-view": {
           "visible": false,
           "opacity": 1
         },
@@ -1279,7 +1411,15 @@ const storyConfig = {
           "visible": true,
           "opacity": 1
         },
+        "5-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "6-label": {
+          "visible": true,
+          "opacity": 1
+        },
+        "6-view": {
           "visible": true,
           "opacity": 1
         },
@@ -1460,7 +1600,19 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "10-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "11-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "11-view": {
+          "visible": false,
+          "opacity": 1
+        },
+        "3-view": {
           "visible": false,
           "opacity": 1
         },
@@ -1472,7 +1624,15 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "5-view": {
+          "visible": true,
+          "opacity": 1
+        },
         "6-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "6-view": {
           "visible": false,
           "opacity": 1
         },
@@ -1489,12 +1649,12 @@ const storyConfig = {
           "opacity": 1
         }
       },
-      "image": "./datasets/images/avenue-road.png",
+      "image": "./datasets/images/cant-area.png",
       "onChapterEnter": [],
       "onChapterExit": [],
       "alignment": "right",
       "year": "1870s",
-      "imageCaption": "Avenue Road, Cantonment Bazaar (Bangalore through the Centuries)",
+      "imageCaption": "British Cantonment Area Bangalore, 1880 Photo. Past-India. https://www.past-india.com/photos-items/british-cantonment-area-bangalore-1880-photo/",
       "source": "Hasan, M. F. (2023). Bangalore through the centuries (2nd ed.). Metaform Design.",
       "population": "~1,44,000",
       "subtitle": null,
@@ -1653,7 +1813,19 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "10-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "11-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "11-view": {
+          "visible": false,
+          "opacity": 1
+        },
+        "3-view": {
           "visible": false,
           "opacity": 1
         },
@@ -1665,7 +1837,15 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "5-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "6-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "6-view": {
           "visible": false,
           "opacity": 1
         },
@@ -1846,7 +2026,19 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "10-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "11-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "11-view": {
+          "visible": false,
+          "opacity": 1
+        },
+        "3-view": {
           "visible": false,
           "opacity": 1
         },
@@ -1858,7 +2050,15 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "5-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "6-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "6-view": {
           "visible": false,
           "opacity": 1
         },
@@ -2039,7 +2239,19 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "10-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "11-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "11-view": {
+          "visible": false,
+          "opacity": 1
+        },
+        "3-view": {
           "visible": false,
           "opacity": 1
         },
@@ -2051,7 +2263,15 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "5-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "6-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "6-view": {
           "visible": false,
           "opacity": 1
         },
@@ -2232,8 +2452,20 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "10-view": {
+          "visible": true,
+          "opacity": 1
+        },
         "11-label": {
           "visible": true,
+          "opacity": 1
+        },
+        "11-view": {
+          "visible": false,
+          "opacity": 1
+        },
+        "3-view": {
+          "visible": false,
           "opacity": 1
         },
         "4-label": {
@@ -2244,7 +2476,15 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "5-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "6-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "6-view": {
           "visible": false,
           "opacity": 1
         },
@@ -2425,7 +2665,19 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "10-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "11-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "11-view": {
+          "visible": true,
+          "opacity": 1
+        },
+        "3-view": {
           "visible": false,
           "opacity": 1
         },
@@ -2437,7 +2689,15 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "5-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "6-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "6-view": {
           "visible": false,
           "opacity": 1
         },
@@ -2618,8 +2878,20 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "10-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "11-label": {
           "visible": false,
+          "opacity": 1
+        },
+        "11-view": {
+          "visible": true,
+          "opacity": 1
+        },
+        "3-view": {
+          "visible": true,
           "opacity": 1
         },
         "4-label": {
@@ -2630,7 +2902,15 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "5-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "6-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "6-view": {
           "visible": false,
           "opacity": 1
         },
@@ -2811,8 +3091,20 @@ const storyConfig = {
           "visible": false,
           "opacity": 1
         },
+        "10-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "11-label": {
           "visible": true,
+          "opacity": 1
+        },
+        "11-view": {
+          "visible": false,
+          "opacity": 1
+        },
+        "3-view": {
+          "visible": false,
           "opacity": 1
         },
         "4-label": {
@@ -2823,7 +3115,15 @@ const storyConfig = {
           "visible": true,
           "opacity": 1
         },
+        "5-view": {
+          "visible": false,
+          "opacity": 1
+        },
         "6-label": {
+          "visible": false,
+          "opacity": 1
+        },
+        "6-view": {
           "visible": false,
           "opacity": 1
         },
