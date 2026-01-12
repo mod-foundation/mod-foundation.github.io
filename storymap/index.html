@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Open+Sans+Condensed:wght@300;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
     <script src="https://unpkg.com/@geomatico/maplibre-cog-protocol@0.5.0/dist/index.js"></script>
 
@@ -20,16 +21,19 @@
 
 </head>
 <body>
-            <!-- year -->
-    <div id="year-timeline">
-        <div id="year-label">Year</div>
-        <div id="year-value"></div>
-    </div>
+    <!-- Top Left Info Grid -->
+    <div id="top-left-info">
+        <!-- year -->
+        <div id="year-timeline">
+            <div id="year-label">Year</div>
+            <div id="year-value"></div>
+        </div>
 
-    <!-- population -->
-    <div id="population-display">
-        <div id="population-label">Population</div>
-        <div id="population-value"></div>
+        <!-- population -->
+        <div id="population-display">
+            <div id="population-label">Population</div>
+            <div id="population-value"></div>
+        </div>
     </div>
 
 
@@ -66,15 +70,25 @@
         </div>
     </div>
 
-    <!-- Instructions Panel -->
-    <div id="instructions-panel">
-        <ul>
-            <li><strong>Instructions:</strong></li>
-            <li>Click and Hold the Map to view present day condition</li>
-            <li>Click and Hold an image to enlarge it</li>
-            <li>Scroll to go to the next section</li>
-            <li>Double click on the map to zoom in</li>
-        </ul>
+    <!-- Top Right Controls Grid -->
+    <div id="top-right-controls">
+        <!-- Instructions Panel -->
+        <div id="instructions-panel">
+            <ul>
+                <li><strong>Instructions:</strong></li>
+                <li>Click and Hold the Map to view present day condition</li>
+                <li>Click and Hold an image to enlarge it</li>
+                <li>Scroll to go to the next section</li>
+                <li>Double click on the map to zoom in</li>
+            </ul>
+        </div>
+
+        <!-- MapLibre navigation controls will be inserted here by JS -->
+
+        <!-- Info Icon (shown after chapter 2) -->
+        <div id="info-icon" class="hidden">
+            <i class="material-icons">info</i>
+        </div>
     </div>
 
 
