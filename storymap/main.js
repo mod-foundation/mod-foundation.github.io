@@ -58,8 +58,25 @@ map.on('styleimagemissing', function(e) {
 
 //#region  MAP CONTROLS
 
-// Add navigation controls (zoom, rotation)
-map.addControl(new maplibregl.NavigationControl(), "top-right");
+// Add navigation controls (zoom, rotation) - will be moved to grid container
+const navControl = new maplibregl.NavigationControl();
+map.addControl(navControl, "top-right");
+
+// Move navigation control into grid container after it's added
+setTimeout(() => {
+  const navControlElement = document.querySelector('.maplibregl-ctrl-top-right');
+  const topRightControls = document.getElementById('top-right-controls');
+  const instructionsPanel = document.getElementById('instructions-panel');
+
+  if (navControlElement && topRightControls) {
+    // Move the entire control group to position 2 in the grid (between instructions and info icon)
+    const controlGroup = navControlElement.querySelector('.maplibregl-ctrl-group');
+    if (controlGroup && instructionsPanel) {
+      // Insert after instructions panel
+      instructionsPanel.insertAdjacentElement('afterend', controlGroup);
+    }
+  }
+}, 100);
 
 // Click-and-hold to temporarily reduce raster layer opacity
 let savedOpacities = {}; // Store original opacity values
@@ -743,22 +760,43 @@ function setActiveChapter(chapter) {
     populationValue.textContent = '';
   }
 
-  // Hide/show UI elements based on title slide
+  // Hide/show UI elements based on title slide and chapter
   const instructionsPanel = document.getElementById('instructions-panel');
+  const infoIcon = document.getElementById('info-icon');
   const scrollIndicator = document.getElementById('scroll-indicator');
   const chapterNavWidget = document.getElementById('chapter-nav-widget');
   const mapLegend = document.getElementById('map-legend');
+  const topLeftInfo = document.getElementById('top-left-info');
+  const topRightControls = document.getElementById('top-right-controls');
 
   if (chapter.isTitleSlide) {
     // Hide UI elements on title slide
-    if (instructionsPanel) instructionsPanel.style.display = 'none';
+    if (instructionsPanel) instructionsPanel.classList.add('hidden');
+    if (infoIcon) infoIcon.classList.add('hidden');
     if (scrollIndicator) scrollIndicator.style.display = 'none';
     if (chapterNavWidget) chapterNavWidget.style.display = 'none';
+    if (topLeftInfo) topLeftInfo.style.display = 'none';
+    if (topRightControls) topRightControls.style.display = 'none';
   } else {
     // Show UI elements on regular chapters
-    if (instructionsPanel) instructionsPanel.style.display = '';
     if (scrollIndicator) scrollIndicator.style.display = '';
     if (chapterNavWidget) chapterNavWidget.style.display = '';
+    if (topLeftInfo) topLeftInfo.style.display = '';
+    if (topRightControls) topRightControls.style.display = '';
+
+    // Show instructions panel for first 2 chapters (index 0 and 1, excluding title slide)
+    // Chapter index 0 is title slide, so chapters 1 and 2 are at index 1 and 2
+    // BUT: For screens 600px and below, always hide panel and show icon only
+    const isSmallScreen = window.innerWidth <= 600;
+
+    if (activeChapterIndex <= 2 && !isSmallScreen) {
+      if (instructionsPanel) instructionsPanel.classList.remove('hidden');
+      if (infoIcon) infoIcon.classList.add('hidden');
+    } else {
+      // After chapter 2, OR on small screens, hide instructions and show info icon
+      if (instructionsPanel) instructionsPanel.classList.add('hidden');
+      if (infoIcon) infoIcon.classList.remove('hidden');
+    }
   }
 
   // Show legend only on chapter 2 (id === '2')
@@ -910,6 +948,41 @@ function updateChapterNavigationCounter() {
       }
     });
   }
+}
+
+//#endregion
+
+//#region INFO ICON TOGGLE
+
+// Info icon click handler - toggles instructions panel
+const infoIcon = document.getElementById('info-icon');
+const instructionsPanel = document.getElementById('instructions-panel');
+
+if (infoIcon && instructionsPanel) {
+  infoIcon.addEventListener('click', (e) => {
+    e.stopPropagation();
+
+    // Simply toggle panel visibility with expanded state
+    if (instructionsPanel.classList.contains('hidden')) {
+      // Show panel
+      instructionsPanel.classList.remove('hidden');
+      instructionsPanel.classList.add('expanded');
+    } else {
+      // Hide panel
+      instructionsPanel.classList.add('hidden');
+      instructionsPanel.classList.remove('expanded');
+    }
+  });
+
+  // Click outside to close when expanded
+  document.addEventListener('click', (e) => {
+    if (instructionsPanel.classList.contains('expanded') &&
+        !instructionsPanel.contains(e.target) &&
+        !infoIcon.contains(e.target)) {
+      instructionsPanel.classList.add('hidden');
+      instructionsPanel.classList.remove('expanded');
+    }
+  });
 }
 
 //#endregion
