@@ -54,7 +54,6 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  min-height: 100vh;
   overflow-x: hidden;
   background-color: var(--primary-blue);
 }
@@ -66,20 +65,39 @@ body {
   background: white;
   border-radius: 15px;
 }
-#year-timeline {
+
+/* Top Left Info Grid Container */
+#top-left-info {
   position: fixed;
   top: 3rem;
   left: 50%;
-  transform: translateX(calc(-100% - 0.5rem));
+  transform: translateX(-50%);
   z-index: 10;
-  text-align: center;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 1rem;
+  align-items: start;
+  justify-content: center;
   pointer-events: none;
 }
 
-/* Center year when population is empty */
-#year-timeline:has(~ #population-display #population-value:empty) {
-  transform: translateX(-50%);
+#top-left-info > * {
+  pointer-events: auto;
+}
+
+#year-timeline {
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+
+/* Hide year when its value is empty */
+#year-timeline:has(#year-value:empty) {
+  display: none;
+}
+
+/* Hide population when its value is empty */
+#population-display:has(#population-value:empty) {
+  display: none;
 }
 
 #year-label {
@@ -105,24 +123,10 @@ body {
   min-width: 90px;
 }
 
-#year-value:empty {
-  display: none;
-}
-
-#year-label:has(+ #year-value:empty) {
-  display: none;
-}
-
 /* Population display */
 #population-display {
-  position: fixed;
-  top: 3rem;
-  left: 50%;
-  transform: translateX(0.5rem);
-  z-index: 10;
   text-align: center;
   transition: opacity 0.3s ease;
-  pointer-events: none;
 }
 
 #population-label {
@@ -148,18 +152,12 @@ body {
   min-width: 90px;
 }
 
-#population-value:empty {
-  display: none;
-}
-
-#population-label:has(+ #population-value:empty) {
-  display: none;
-}
 
 /* Scrollable story container */
 #story {
   position: relative;
   z-index: 1;
+  min-height: 100vh;
   pointer-events: none; /* Allow map interaction through transparent areas */
 }
 
@@ -588,6 +586,7 @@ body {
   border-radius: 0px !important;
   box-shadow: 4px 4px 0px var(--dark-blue) !important;
   z-index: 4 !important;
+  order: 2 !important;
 }
 
 .maplibregl-ctrl-group button {
@@ -752,44 +751,82 @@ body {
   max-width: 80vw;
 }
 
-/* Instructions Panel */
-#instructions-panel {
+/* Top Right Controls Grid Container */
+#top-right-controls {
   position: fixed;
   top: 4.5vmin;
-  right: 9.5vmin;
+  right: 4.5vmin;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: 0.75rem;
+  align-items: start;
+  pointer-events: none;
+}
+
+#top-right-controls > * {
+  pointer-events: auto;
+}
+
+/* Info Icon Button */
+#info-icon {
+  width: 44px;
+  height: 44px;
+  background: var(--highlight-green);
+  border: 2px solid var(--primary-blue);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px var(--dark-blue);
+  transition: all 0.3s ease;
+  order: 1;
+}
+
+#info-icon:hover {
+  background: var(--highlight-yellow);
+  transform: scale(1.05);
+  box-shadow: 4px 4px 0px var(--dark-blue);
+}
+
+#info-icon i {
+  font-size: 28px;
+  color: var(--primary-blue);
+}
+
+#info-icon.hidden {
+  display: none;
+}
+
+/* Instructions Panel */
+#instructions-panel {
+  position: relative;
+  top: 0;
+  right: 0;
   background-color: var(--highlight-green);
   border-radius: 0px;
-  z-index: 0;
-  pointer-events: auto;
-  max-width: 20rem;
+  border: 2px solid var(--primary-blue);
+  box-shadow: 4px 4px 0px var(--dark-blue);
+  max-width: 16rem;
   padding: 0.5rem;
   transition: all 0.3s ease;
+  opacity: 1;
+  order: 3;
 }
 
-/* Popup mode for instructions panel */
-#instructions-panel.popup-mode {
-  top: 50%;
-  left: 50%;
-  right: auto;
-  transform: translate(-50%, -50%);
-  z-index: 1001;
-  max-width: 30rem;
-  padding: 2rem;
-  border: 4px solid var(--primary-blue);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  scale: 1.2;
+#instructions-panel.hidden {
+  display: none;
 }
 
-/* Backdrop for popup */
-.instructions-backdrop {
+#instructions-panel.expanded {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 1000;
-  cursor: pointer;
+  top: 4.5vmin;
+  right: calc(4.5vmin + 44px + 44px + 1.5rem);
+  max-width: 20rem;
+  padding: 0.75rem;
+  z-index: 11;
+  box-shadow: 6px 6px 0px var(--dark-blue);
 }
 
 #instructions-panel ul {
@@ -824,7 +861,7 @@ body {
 }
 
 /* Responsive styles for large desktop screens */
-@media screen and (max-width: 1500px) {
+@media screen and (max-width: 1550px) {
   /* Chapter content */
 
       .chapter-wrapper{
@@ -872,27 +909,30 @@ body {
   }
   /* Title slide */
   .title-slide-wrapper {
-    max-width: 60%;
-    padding: 3rem 4rem;
-    gap: 0.2rem;
+    max-width: 50%;
+    padding: 1rem 0rem;
+    gap: 0.9rem;
   }
 
   .title-slide-title {
-    font-size: 3rem;
-    padding: 1.2rem 2.5rem;
+    font-size: 2.5rem;
+    padding: 0.5rem 1rem;
   }
 
   .title-slide-subtitle1 {
-    font-size: 2rem;
+    font-size: 1.5rem;
+    padding: 1rem 0rem;
+    margin: 0px;
   }
 
   .title-slide-subtitle2 {
-    font-size: 1.3rem;
+    font-size: 1rem;
+    padding: 0.5rem 0.5rem;
   }
 
-  .title-slide-instructions {
-    font-size: 1.1rem;
-    padding: 1.5rem 2rem;
+  .title-slide-instructions p{
+    font-size: 0.9rem;
+
   }
 
   /* Year and population */
@@ -909,7 +949,12 @@ body {
   }
 
   /* Buttons */
-  .dive-in-button,
+    .dive-in-button{
+    font-size: 1rem;
+    padding: 0.8rem 1.5rem;
+  }
+
+
   .chapter-button {
     font-size: 1.3rem;
     padding: 1rem 2.5rem;
@@ -959,7 +1004,7 @@ body {
 
   /* Instructions panel */
   #instructions-panel {
-    max-width: 24rem;
+    max-width: 20rem;
     padding: 0.4rem;
   }
 
@@ -1104,10 +1149,19 @@ body {
 
   /* Instructions panel */
   #instructions-panel {
-    top: 5vmin;
-    right: 10vmin;
-    max-width: 18%;
+    top: 0vmin;
+    right: 0vmin;
+    max-width: 20rem;
     padding: 0.4rem;
+  }
+
+  #instructions-panel.expanded {
+    position: fixed;
+    top: 4.5vmin;
+    right: calc(4.5vmin + 44px + 44px + 1.5rem);
+    max-width: 18rem;
+    padding: 0.6rem;
+    z-index: 11;
   }
 
   #instructions-panel li {
@@ -1212,15 +1266,11 @@ body {
   }
 
   /* Year and population - stack vertically on mobile */
-  #year-timeline,
-  #population-display {
+  #top-left-info {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    gap: 0.5rem;
     top: 6vmin;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  #population-display {
-    top: 14vmin;
   }
 
   #year-value,
@@ -1273,17 +1323,46 @@ body {
     }
   }
 
-  /* Instructions panel */
-  #instructions-panel {
+  /* Top Right Controls - tablet */
+  #top-right-controls {
     top: 6vmin;
-    right: 12vmin;
-    max-width: 10rem;
-    padding: 0.3rem;
+    right: 6vmin;
+    gap: 0.6rem;
+  }
+
+  /* Instructions panel - smaller on tablet */
+  #instructions-panel {
+    max-width: 12rem;
+    padding: 0.4rem;
+  }
+
+  #instructions-panel.expanded {
+    position: fixed;
+    top: 6vmin;
+    right: calc(6vmin + 40px + 40px + 1.2rem);
+    max-width: 16rem;
+    padding: 0.6rem;
+    z-index: 11;
   }
 
   #instructions-panel li {
-    font-size: 0.6rem;
+    font-size: 0.65rem;
     margin-bottom: 0.4rem;
+  }
+
+  /* Info icon - slightly smaller on tablet */
+  #info-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  #info-icon i {
+    font-size: 24px;
+  }
+
+  /* Map controls - slightly smaller on tablet */
+  .maplibregl-ctrl-group {
+    transform: scale(0.95);
   }
 
   /* Legend */
@@ -1408,15 +1487,11 @@ body {
   }
 
   /* Year and population - stack vertically on mobile */
-  #year-timeline,
-  #population-display {
+  #top-left-info {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    gap: 0.4rem;
     top: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  #population-display {
-    top: 5rem;
   }
 
   #year-value,
@@ -1469,18 +1544,46 @@ body {
     }
   }
 
-  /* Instructions panel */
-  #instructions-panel {
+  /* Top Right Controls - mobile */
+  #top-right-controls {
     top: 6vmin;
-    opacity: 0;
-    right: 15vmin;
+    right: 6vmin;
+    gap: 0.5rem;
+  }
+
+  /* Instructions panel - hide on mobile, only show icon */
+  #instructions-panel {
+    display: none !important;
+  }
+
+  #instructions-panel.expanded {
+    display: block !important;
+    position: fixed;
+    top: 6vmin;
+    right: calc(6vmin + 36px + 36px + 1rem);
     max-width: 14rem;
-    padding: 0.3rem;
+    padding: 0.5rem;
+    z-index: 11;
   }
 
   #instructions-panel li {
     font-size: 0.7rem;
     margin-bottom: 0.4rem;
+  }
+
+  /* Info icon - smaller on mobile */
+  #info-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  #info-icon i {
+    font-size: 22px;
+  }
+
+  /* Map controls - smaller on mobile */
+  .maplibregl-ctrl-group {
+    transform: scale(0.9);
   }
 
   /* Legend */
