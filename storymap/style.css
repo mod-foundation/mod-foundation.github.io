@@ -770,10 +770,10 @@ body {
 
 /* Info Icon Button */
 #info-icon {
-  width: 44px;
-  height: 44px;
-  background: var(--highlight-green);
+  width: 28px;
+  height: 28px;
   border: 2px solid var(--primary-blue);
+  background-color: var(--primary-blue);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -785,14 +785,19 @@ body {
 }
 
 #info-icon:hover {
-  background: var(--highlight-yellow);
+  background: var(--primary-blue);
   transform: scale(1.05);
   box-shadow: 4px 4px 0px var(--dark-blue);
 }
 
 #info-icon i {
-  font-size: 28px;
-  color: var(--primary-blue);
+  font-size: 30px;
+  color: var(--highlight-green);
+}
+
+#info-icon i:hover {
+  font-size: 30px;
+  color: var(--highlight-yellow);
 }
 
 #info-icon.hidden {
