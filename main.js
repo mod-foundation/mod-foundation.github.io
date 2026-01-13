@@ -2443,7 +2443,9 @@ function setupInteraction() {
 
         // Check if the clicked layer is visible
         const visibleFeatures = features.filter(f => {
-            const baseLayerId = f.layer.id.replace('-interaction', '');
+            // For uploaded layers, use the actual layer ID (don't remove -interaction)
+            const isUploadedLayer = f.layer.id.includes('uploaded-layer');
+            const baseLayerId = isUploadedLayer ? f.layer.id : f.layer.id.replace('-interaction', '');
             const visibility = map.getLayoutProperty(baseLayerId, 'visibility');
 
             // If typology panel is open, exclude primary drains
@@ -6524,15 +6526,14 @@ map.on('load', () => {
 
 //#region Upload Custom GeoJSON Layer
 
-let uploadedLayerId = null;
+// Track multiple uploaded layers (max 5)
+let uploadedLayers = [];
+const MAX_UPLOADED_LAYERS = 5;
 
 // Initialize upload functionality
 function initializeUpload() {
     const dropzone = document.getElementById('upload-dropzone');
     const fileInput = document.getElementById('geojson-file-input');
-    const removeBtn = document.getElementById('remove-upload');
-    const colorInput = document.getElementById('upload-layer-color');
-    const opacitySlider = document.getElementById('upload-layer-opacity');
 
     // Click to browse
     dropzone.addEventListener('click', () => {
@@ -6561,38 +6562,33 @@ function initializeUpload() {
         const file = e.target.files[0];
         handleFileUpload(file);
     });
-
-    // Remove uploaded layer
-    removeBtn.addEventListener('click', () => {
-        removeUploadedLayer();
-    });
-
-    // Color change
-    colorInput.addEventListener('change', e => {
-        if (uploadedLayerId) {
-            updateLayerColor(e.target.value);
-        }
-    });
-
-    // Opacity change
-    opacitySlider.addEventListener('sl-change', e => {
-        if (uploadedLayerId) {
-            updateLayerOpacity(e.target.value / 100);
-        }
-    });
 }
 
 // Handle file upload
 function handleFileUpload(file) {
     if (!file) return;
 
-    // Check file type
-    const validTypes = ['application/json', 'application/geo+json', 'application/vnd.google-earth.kml+xml', ''];
-    const isValidExtension =
-        file.name.endsWith('.json') || file.name.endsWith('.geojson') || file.name.endsWith('.kml');
+    // Check layer limit
+    if (uploadedLayers.length >= MAX_UPLOADED_LAYERS) {
+        alert(`Maximum ${MAX_UPLOADED_LAYERS} layers can be uploaded. Please remove a layer first.`);
+        return;
+    }
 
-    if (!validTypes.includes(file.type) && !isValidExtension) {
-        alert('Please upload a valid GeoJSON or KML file (.json, .geojson, or .kml)');
+    // Check file type - be more permissive with validation
+    const validExtensions = ['.json', '.geojson', '.kml', '.xml'];
+    const hasValidExtension = validExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+
+    const validMimeTypes = [
+        'application/json',
+        'application/geo+json',
+        'application/vnd.google-earth.kml+xml',
+        'application/xml',
+        'text/xml',
+        '' // Some systems don't set MIME type
+    ];
+
+    if (!hasValidExtension && !validMimeTypes.includes(file.type)) {
+        alert('Please upload a valid GeoJSON or KML file (.json, .geojson, .kml, or .xml)');
         return;
     }
 
@@ -6601,34 +6597,85 @@ function handleFileUpload(file) {
     reader.onload = e => {
         try {
             let geojson;
+            const fileContent = e.target.result;
 
-            // Check if file is KML
-            if (file.name.endsWith('.kml')) {
+            // Determine if file is KML/XML or JSON based on content
+            const isXML = fileContent.trim().startsWith('<');
+            const isKML = file.name.toLowerCase().endsWith('.kml') ||
+                         file.name.toLowerCase().endsWith('.xml') ||
+                         isXML;
+
+            if (isKML) {
+                // Check if toGeoJSON library is loaded
+                if (typeof toGeoJSON === 'undefined') {
+                    alert('KML conversion library not loaded. Please refresh the page and try again.');
+                    console.error('toGeoJSON library is not available');
+                    return;
+                }
+
                 // Parse KML to GeoJSON
                 const parser = new DOMParser();
-                const kmlDoc = parser.parseFromString(e.target.result, 'text/xml');
+                const kmlDoc = parser.parseFromString(fileContent, 'text/xml');
+
+                // Check for XML parsing errors
+                const parserError = kmlDoc.querySelector('parsererror');
+                if (parserError) {
+                    alert('Error parsing KML/XML file. The file may be corrupted or invalid.');
+                    console.error('XML parse error:', parserError.textContent);
+                    return;
+                }
+
+                // Check if it's actually a KML document
+                const kmlElement = kmlDoc.querySelector('kml');
+                if (!kmlElement) {
+                    alert('This XML file does not appear to be a valid KML file. Please upload a proper KML file.');
+                    console.error('No <kml> root element found in XML');
+                    return;
+                }
+
                 geojson = toGeoJSON.kml(kmlDoc);
+                console.log('KML converted to GeoJSON:', geojson);
             } else {
                 // Parse as JSON
-                geojson = JSON.parse(e.target.result);
+                geojson = JSON.parse(fileContent);
             }
 
             // Validate GeoJSON
-            if (!geojson.type || (geojson.type !== 'FeatureCollection' && geojson.type !== 'Feature')) {
-                alert('Invalid file format. Must be a valid GeoJSON or KML file.');
+            if (!geojson || !geojson.type || (geojson.type !== 'FeatureCollection' && geojson.type !== 'Feature')) {
+                alert('Invalid file format. Must be a valid GeoJSON or KML file with proper geometry data.');
+                console.error('Invalid GeoJSON structure:', geojson);
+                return;
+            }
+
+            // Check if there are features/geometry
+            if (geojson.type === 'FeatureCollection' && (!geojson.features || geojson.features.length === 0)) {
+                alert('The file contains no features. Please upload a file with geometry data.');
+                return;
+            }
+
+            if (geojson.type === 'Feature' && !geojson.geometry) {
+                alert('The file contains no geometry. Please upload a file with geometry data.');
                 return;
             }
 
             // Add layer to map
             addUploadedLayer(geojson, file.name);
 
-            // Show upload info
-            document.getElementById('upload-dropzone').style.display = 'none';
-            document.getElementById('upload-info').style.display = 'block';
-            document.getElementById('upload-filename').textContent = file.name;
+            // Update UI to show layer list
+            updateUploadedLayersList();
         } catch (error) {
             console.error('Error parsing file:', error);
-            alert('Error parsing file. Please check the file format.');
+            console.error('Error stack:', error.stack);
+            console.error('File name:', file.name);
+            console.error('File type:', file.type);
+
+            let errorMessage = 'Error parsing file';
+            if (error.message) {
+                errorMessage += ': ' + error.message;
+            }
+            errorMessage += '\n\nPlease check the file format and try again.';
+
+            alert(errorMessage);
         }
     };
 
@@ -6637,30 +6684,80 @@ function handleFileUpload(file) {
 
 // Add uploaded layer to map
 function addUploadedLayer(geojson, filename) {
-    // Remove previous upload if exists
-    if (uploadedLayerId) {
-        removeUploadedLayer();
-    }
+    const layerId = 'uploaded-layer-' + Date.now();
 
-    uploadedLayerId = 'uploaded-layer-' + Date.now();
-    const color = document.getElementById('upload-layer-color').value;
-    const opacity = document.getElementById('upload-layer-opacity').value / 100;
+    // Get color and opacity from input elements, or use defaults if elements don't exist yet
+    const colorInput = document.getElementById('upload-layer-color');
+    const opacityInput = document.getElementById('upload-layer-opacity');
+
+    const color = colorInput ? colorInput.value : '#FF5733';
+    const opacity = opacityInput ? (opacityInput.value / 100) : 0.8;
+
+    console.log('Adding uploaded layer:', {
+        filename,
+        layerId,
+        color,
+        opacity,
+        geojsonType: geojson.type,
+        featureCount: geojson.features ? geojson.features.length : 1
+    });
 
     // Add source
-    map.addSource(uploadedLayerId, {
+    map.addSource(layerId, {
         type: 'geojson',
         data: geojson
     });
 
-    // Determine geometry type and add appropriate layers
-    const geometryType = geojson.features?.[0]?.geometry?.type || geojson.geometry?.type;
+    // Determine geometry type - check all features for mixed types
+    const geometryTypes = new Set();
+    if (geojson.type === 'FeatureCollection') {
+        geojson.features.forEach(f => {
+            if (f.geometry) geometryTypes.add(f.geometry.type);
+        });
+    } else if (geojson.geometry) {
+        geometryTypes.add(geojson.geometry.type);
+    }
 
-    if (geometryType === 'Point' || geometryType === 'MultiPoint') {
-        // Add circle layer for points
+    // Check if we found any geometry types
+    if (geometryTypes.size === 0) {
+        console.error('No valid geometry types found in the file');
+        alert('The uploaded file contains no valid geometry. Please check the file and try again.');
+        // Remove the source we just added
+        if (map.getSource(layerId)) {
+            map.removeSource(layerId);
+        }
+        return;
+    }
+
+    // Handle different geometry types
+    const hasPoint = geometryTypes.has('Point') || geometryTypes.has('MultiPoint');
+    const hasLine = geometryTypes.has('LineString') || geometryTypes.has('MultiLineString');
+    const hasPolygon = geometryTypes.has('Polygon') || geometryTypes.has('MultiPolygon');
+
+    console.log('Geometry types detected:', {
+        geometryTypes: Array.from(geometryTypes),
+        hasPoint,
+        hasLine,
+        hasPolygon
+    });
+
+    const layerInfo = {
+        id: layerId,
+        filename: filename,
+        color: color,
+        opacity: opacity,
+        geometryTypes: Array.from(geometryTypes),
+        mapLayerIds: []
+    };
+
+    // Add Point/MultiPoint layers
+    if (hasPoint) {
+        const pointLayerId = layerId + '-point';
         map.addLayer({
-            id: uploadedLayerId,
+            id: pointLayerId,
             type: 'circle',
-            source: uploadedLayerId,
+            source: layerId,
+            filter: ['in', ['geometry-type'], ['literal', ['Point', 'MultiPoint']]],
             paint: {
                 'circle-radius': 6,
                 'circle-color': color,
@@ -6669,24 +6766,46 @@ function addUploadedLayer(geojson, filename) {
                 'circle-stroke-color': '#ffffff'
             }
         });
-    } else if (geometryType === 'LineString' || geometryType === 'MultiLineString') {
-        // Add line layer
+        layerInfo.mapLayerIds.push(pointLayerId);
+        if (!interactiveLayers.includes(pointLayerId)) {
+            interactiveLayers.push(pointLayerId);
+        }
+        addLayerInteractivity(pointLayerId);
+        console.log('Added point layer:', pointLayerId);
+    }
+
+    // Add LineString/MultiLineString layers
+    if (hasLine) {
+        const lineLayerId = layerId + '-line';
         map.addLayer({
-            id: uploadedLayerId,
+            id: lineLayerId,
             type: 'line',
-            source: uploadedLayerId,
+            source: layerId,
+            filter: ['in', ['geometry-type'], ['literal', ['LineString', 'MultiLineString']]],
             paint: {
                 'line-color': color,
                 'line-width': 3,
                 'line-opacity': opacity
             }
         });
-    } else if (geometryType === 'Polygon' || geometryType === 'MultiPolygon') {
-        // Add fill and outline layers
+        layerInfo.mapLayerIds.push(lineLayerId);
+        if (!interactiveLayers.includes(lineLayerId)) {
+            interactiveLayers.push(lineLayerId);
+        }
+        addLayerInteractivity(lineLayerId);
+        console.log('Added line layer:', lineLayerId);
+    }
+
+    // Add Polygon/MultiPolygon layers
+    if (hasPolygon) {
+        const fillLayerId = layerId + '-fill';
+        const outlineLayerId = layerId + '-outline';
+
         map.addLayer({
-            id: uploadedLayerId + '-fill',
+            id: fillLayerId,
             type: 'fill',
-            source: uploadedLayerId,
+            source: layerId,
+            filter: ['in', ['geometry-type'], ['literal', ['Polygon', 'MultiPolygon']]],
             paint: {
                 'fill-color': color,
                 'fill-opacity': opacity * 0.6
@@ -6694,129 +6813,263 @@ function addUploadedLayer(geojson, filename) {
         });
 
         map.addLayer({
-            id: uploadedLayerId + '-outline',
+            id: outlineLayerId,
             type: 'line',
-            source: uploadedLayerId,
+            source: layerId,
+            filter: ['in', ['geometry-type'], ['literal', ['Polygon', 'MultiPolygon']]],
             paint: {
                 'line-color': color,
                 'line-width': 2,
                 'line-opacity': opacity
             }
         });
+
+        layerInfo.mapLayerIds.push(fillLayerId, outlineLayerId);
+        interactiveLayers.push(fillLayerId);
+        addLayerInteractivity(fillLayerId);
     }
+
+    // Store layer info
+    uploadedLayers.push(layerInfo);
 
     // Fit map to uploaded layer bounds
-    const bounds = turf.bbox(geojson);
-    map.fitBounds(bounds, { padding: 50, duration: 1000 });
+    try {
+        const bounds = turf.bbox(geojson);
+        map.fitBounds(bounds, { padding: 50, duration: 1000 });
+    } catch (error) {
+        console.warn('Could not fit bounds:', error);
+    }
 
-    // Add interactivity - integrate with existing interactive layers system
-    addUploadedLayerInteractivity(geometryType);
-
-    console.log('✅ Uploaded layer added:', filename);
+    console.log('✅ Uploaded layer added:', filename, layerInfo);
 }
 
-// Add uploaded layer to interactive layers system
-function addUploadedLayerInteractivity(geometryType) {
-    if (!uploadedLayerId) return;
+// Helper function to add interactivity to a layer
+function addLayerInteractivity(layerId) {
+    if (!map.getLayer(layerId)) return;
 
-    // Determine which layer(s) to add to interactive layers
-    let layerToAdd;
-
-    if (geometryType === 'Point' || geometryType === 'MultiPoint') {
-        layerToAdd = uploadedLayerId;
-    } else if (geometryType === 'LineString' || geometryType === 'MultiLineString') {
-        layerToAdd = uploadedLayerId;
-    } else if (geometryType === 'Polygon' || geometryType === 'MultiPolygon') {
-        // For polygons, we add the fill layer to interactiveLayers
-        layerToAdd = uploadedLayerId + '-fill';
+    // Remove any existing listeners first to prevent duplicates
+    try {
+        map.off('mouseenter', layerId);
+        map.off('mouseleave', layerId);
+    } catch (e) {
+        // Listeners might not exist yet, that's okay
     }
 
-    // Add to interactive layers array if not already present
-    if (layerToAdd && !interactiveLayers.includes(layerToAdd)) {
-        interactiveLayers.push(layerToAdd);
-    }
+    // Add new listeners
+    map.on('mouseenter', layerId, () => {
+        map.getCanvas().style.cursor = 'pointer';
+    });
 
-    // Add hover cursor change
-    if (map.getLayer(layerToAdd)) {
-        map.on('mouseenter', layerToAdd, () => {
-            map.getCanvas().style.cursor = 'pointer';
-        });
-
-        map.on('mouseleave', layerToAdd, () => {
-            map.getCanvas().style.cursor = '';
-        });
-    }
-
-    console.log('✅ Uploaded layer added to interactive layers:', layerToAdd);
+    map.on('mouseleave', layerId, () => {
+        map.getCanvas().style.cursor = '';
+    });
 }
 
 // Update layer color
-function updateLayerColor(color) {
-    if (!uploadedLayerId || !map.getLayer(uploadedLayerId)) return;
+function updateLayerColor(layerId, geometryTypes, color) {
+    const layerInfo = uploadedLayers.find(l => l.id === layerId);
+    if (!layerInfo) return;
 
-    const layerType = map.getLayer(uploadedLayerId).type;
+    // Update all map layers for this uploaded layer
+    layerInfo.mapLayerIds.forEach(mapLayerId => {
+        if (!map.getLayer(mapLayerId)) return;
 
-    if (layerType === 'circle') {
-        map.setPaintProperty(uploadedLayerId, 'circle-color', color);
-    } else if (layerType === 'line') {
-        map.setPaintProperty(uploadedLayerId, 'line-color', color);
-    } else if (layerType === 'fill') {
-        map.setPaintProperty(uploadedLayerId + '-fill', 'fill-color', color);
-        map.setPaintProperty(uploadedLayerId + '-outline', 'line-color', color);
-    }
+        if (mapLayerId.includes('-point')) {
+            map.setPaintProperty(mapLayerId, 'circle-color', color);
+        } else if (mapLayerId.includes('-line') && !mapLayerId.includes('-outline')) {
+            map.setPaintProperty(mapLayerId, 'line-color', color);
+        } else if (mapLayerId.includes('-fill')) {
+            map.setPaintProperty(mapLayerId, 'fill-color', color);
+        } else if (mapLayerId.includes('-outline')) {
+            map.setPaintProperty(mapLayerId, 'line-color', color);
+        }
+    });
 }
 
 // Update layer opacity
-function updateLayerOpacity(opacity) {
-    if (!uploadedLayerId || !map.getLayer(uploadedLayerId)) return;
+function updateLayerOpacity(layerId, geometryTypes, opacity) {
+    const layerInfo = uploadedLayers.find(l => l.id === layerId);
+    if (!layerInfo) return;
 
-    const layerType = map.getLayer(uploadedLayerId).type;
+    // Update all map layers for this uploaded layer
+    layerInfo.mapLayerIds.forEach(mapLayerId => {
+        if (!map.getLayer(mapLayerId)) return;
 
-    if (layerType === 'circle') {
-        map.setPaintProperty(uploadedLayerId, 'circle-opacity', opacity);
-    } else if (layerType === 'line') {
-        map.setPaintProperty(uploadedLayerId, 'line-opacity', opacity);
-    } else if (layerType === 'fill') {
-        map.setPaintProperty(uploadedLayerId + '-fill', 'fill-opacity', opacity * 0.6);
-        map.setPaintProperty(uploadedLayerId + '-outline', 'line-opacity', opacity);
-    }
+        if (mapLayerId.includes('-point')) {
+            map.setPaintProperty(mapLayerId, 'circle-opacity', opacity);
+        } else if (mapLayerId.includes('-line') && !mapLayerId.includes('-outline')) {
+            map.setPaintProperty(mapLayerId, 'line-opacity', opacity);
+        } else if (mapLayerId.includes('-fill')) {
+            map.setPaintProperty(mapLayerId, 'fill-opacity', opacity * 0.6);
+        } else if (mapLayerId.includes('-outline')) {
+            map.setPaintProperty(mapLayerId, 'line-opacity', opacity);
+        }
+    });
 }
 
-// Remove uploaded layer
-function removeUploadedLayer() {
-    if (!uploadedLayerId) return;
+// Update UI to show all uploaded layers
+function updateUploadedLayersList() {
+    const uploadInfo = document.getElementById('upload-info');
+    const uploadDropzone = document.getElementById('upload-dropzone');
 
-    // Remove from interactive layers array
-    const layersToRemove = [uploadedLayerId, uploadedLayerId + '-fill', uploadedLayerId + '-outline'];
-    layersToRemove.forEach(layerId => {
-        const index = interactiveLayers.indexOf(layerId);
-        if (index > -1) {
-            interactiveLayers.splice(index, 1);
+    if (uploadedLayers.length === 0) {
+        uploadDropzone.style.display = 'block';
+        uploadInfo.style.display = 'none';
+        return;
+    }
+
+    uploadDropzone.style.display = 'none';
+    uploadInfo.style.display = 'block';
+
+    // Create layers list HTML
+    let layersHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h4 style="color: white; margin: 0;">Uploaded Layers (${uploadedLayers.length}/${MAX_UPLOADED_LAYERS})</h4>
+            ${uploadedLayers.length < MAX_UPLOADED_LAYERS ?
+                '<sl-button id="add-another-layer-btn" variant="primary" size="small">+ Add Layer</sl-button>' :
+                '<span style="font-size: 11px; color: #ff9800;">Max layers reached</span>'
+            }
+        </div>
+    `;
+
+    uploadedLayers.forEach((layer, index) => {
+        layersHTML += `
+            <div class="layer-item" data-layer-id="${layer.id}" style="background: rgba(255,255,255,0.1); padding: 12px; margin-bottom: 12px; border-radius: 4px;">
+                <div style="margin-bottom: 12px;">
+                    <span style="font-size: 13px; color: white; font-weight: 500; display: block;" title="${layer.filename}">${layer.filename}</span>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label style="font-size: 11px; color: white; margin-bottom: 5px; display: block;">Layer Color:</label>
+                    <input type="color" class="layer-color-input" data-layer-id="${layer.id}" value="${layer.color}" style="width: 100%; height: 35px; border: none; cursor: pointer; border-radius: 4px;" />
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label style="font-size: 11px; color: white; margin-bottom: 5px; display: block;">Opacity:</label>
+                    <sl-range class="layer-opacity-slider" data-layer-id="${layer.id}" min="0" max="100" value="${layer.opacity * 100}" step="5"></sl-range>
+                </div>
+                <div style="margin-top: 12px;">
+                    <sl-button data-layer-id="${layer.id}" class="remove-layer-btn" variant="danger" size="small" outline style="width: 100%;">Remove Layer</sl-button>
+                </div>
+            </div>
+        `;
+    });
+
+    uploadInfo.innerHTML = layersHTML;
+
+    // Set up event handlers using event delegation (only once)
+    setupUploadEventHandlers();
+}
+
+// Set up event handlers using event delegation (called once, not repeatedly)
+let uploadEventHandlersInitialized = false;
+
+function setupUploadEventHandlers() {
+    if (uploadEventHandlersInitialized) return;
+    uploadEventHandlersInitialized = true;
+
+    const uploadInfo = document.getElementById('upload-info');
+
+    // Event delegation for all buttons, inputs, and sliders
+    uploadInfo.addEventListener('click', (e) => {
+        // Handle remove button clicks
+        if (e.target.classList.contains('remove-layer-btn') || e.target.closest('.remove-layer-btn')) {
+            const btn = e.target.classList.contains('remove-layer-btn') ? e.target : e.target.closest('.remove-layer-btn');
+            const layerId = btn.getAttribute('data-layer-id');
+            removeUploadedLayer(layerId);
+            return;
+        }
+
+        // Handle add layer button
+        if (e.target.id === 'add-another-layer-btn' || e.target.closest('#add-another-layer-btn')) {
+            const fileInput = document.getElementById('geojson-file-input');
+            fileInput.click();
+            return;
+        }
+
+        // Stop propagation for color inputs to prevent details toggle
+        if (e.target.classList.contains('layer-color-input')) {
+            e.stopPropagation();
         }
     });
 
-    // Remove event listeners from layers
-    layersToRemove.forEach(layerId => {
-        if (map.getLayer(layerId)) {
-            map.off('mouseenter', layerId);
-            map.off('mouseleave', layerId);
-            map.off('click', layerId);
-            map.removeLayer(layerId);
+    // Handle color changes
+    uploadInfo.addEventListener('change', (e) => {
+        if (e.target.classList.contains('layer-color-input')) {
+            const layerId = e.target.getAttribute('data-layer-id');
+            const layer = uploadedLayers.find(l => l.id === layerId);
+            if (layer) {
+                updateLayerColor(layer.id, layer.geometryTypes, e.target.value);
+                layer.color = e.target.value;
+            }
+        }
+    });
+
+    // Handle opacity slider changes
+    uploadInfo.addEventListener('sl-change', (e) => {
+        if (e.target.classList.contains('layer-opacity-slider')) {
+            const layerId = e.target.getAttribute('data-layer-id');
+            const layer = uploadedLayers.find(l => l.id === layerId);
+            if (layer) {
+                const opacityValue = e.target.value / 100;
+                updateLayerOpacity(layer.id, layer.geometryTypes, opacityValue);
+                layer.opacity = opacityValue;
+            }
+        }
+    });
+
+    // Prevent slider mousedown from interfering with details
+    uploadInfo.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('layer-opacity-slider') || e.target.closest('.layer-opacity-slider')) {
+            e.stopPropagation();
+        }
+    });
+
+    // Prevent color picker mousedown from interfering with details
+    uploadInfo.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('layer-color-input')) {
+            e.stopPropagation();
+        }
+    }, true); // Use capture phase
+}
+
+// Remove uploaded layer by ID
+function removeUploadedLayer(layerId) {
+    const layerIndex = uploadedLayers.findIndex(l => l.id === layerId);
+    if (layerIndex === -1) return;
+
+    const layerInfo = uploadedLayers[layerIndex];
+
+    // Remove all map layers associated with this uploaded layer
+    layerInfo.mapLayerIds.forEach(mapLayerId => {
+        // Remove from interactive layers array
+        const interactiveIndex = interactiveLayers.indexOf(mapLayerId);
+        if (interactiveIndex > -1) {
+            interactiveLayers.splice(interactiveIndex, 1);
+        }
+
+        // Remove event listeners and layer
+        if (map.getLayer(mapLayerId)) {
+            map.off('mouseenter', mapLayerId);
+            map.off('mouseleave', mapLayerId);
+            map.off('click', mapLayerId);
+            map.removeLayer(mapLayerId);
         }
     });
 
     // Remove source
-    if (map.getSource(uploadedLayerId)) {
-        map.removeSource(uploadedLayerId);
+    if (map.getSource(layerId)) {
+        map.removeSource(layerId);
     }
 
-    // Reset UI
-    document.getElementById('upload-dropzone').style.display = 'block';
-    document.getElementById('upload-info').style.display = 'none';
+    // Remove from uploadedLayers array
+    uploadedLayers.splice(layerIndex, 1);
+
+    // Update UI
+    updateUploadedLayersList();
+
+    // Reset file input
     document.getElementById('geojson-file-input').value = '';
 
-    uploadedLayerId = null;
-    console.log('✅ Uploaded layer removed');
+    console.log('✅ Uploaded layer removed:', layerInfo.filename);
 }
 
 // Initialize on map load
