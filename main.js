@@ -857,13 +857,13 @@ function displayTypologyPair(lhsFeature, rhsFeature) {
     const lhsImgHtml = lhsProps.description
         ? extractImageUrl(lhsProps.description)
         : lhsProps.img
-        ? extractImageUrl(lhsProps.img)
-        : '';
+          ? extractImageUrl(lhsProps.img)
+          : '';
     const rhsImgHtml = rhsProps.description
         ? extractImageUrl(rhsProps.description)
         : rhsProps.img
-        ? extractImageUrl(rhsProps.img)
-        : '';
+          ? extractImageUrl(rhsProps.img)
+          : '';
 
     // Close existing popups
     if (window.typologyPopups) {
@@ -4641,9 +4641,6 @@ window.addEventListener('load', () => {
 // Add zoom controls
 map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
-// Add fullscreen control
-map.addControl(new mapboxgl.FullscreenControl(), 'bottom-right');
-
 // Add geolocate control
 map.addControl(
     new mapboxgl.GeolocateControl({
@@ -4932,8 +4929,8 @@ function panelHandle(keepGroups) {
     const groupKeys = Array.isArray(keepGroups?.groups)
         ? keepGroups.groups
         : Array.isArray(keepGroups)
-        ? keepGroups
-        : [];
+          ? keepGroups
+          : [];
 
     console.log('Processed groupKeys:', groupKeys);
 
@@ -6601,9 +6598,7 @@ function handleFileUpload(file) {
 
             // Determine if file is KML/XML or JSON based on content
             const isXML = fileContent.trim().startsWith('<');
-            const isKML = file.name.toLowerCase().endsWith('.kml') ||
-                         file.name.toLowerCase().endsWith('.xml') ||
-                         isXML;
+            const isKML = file.name.toLowerCase().endsWith('.kml') || file.name.toLowerCase().endsWith('.xml') || isXML;
 
             if (isKML) {
                 // Check if toGeoJSON library is loaded
@@ -6691,7 +6686,7 @@ function addUploadedLayer(geojson, filename) {
     const opacityInput = document.getElementById('upload-layer-opacity');
 
     const color = colorInput ? colorInput.value : '#FF5733';
-    const opacity = opacityInput ? (opacityInput.value / 100) : 0.8;
+    const opacity = opacityInput ? opacityInput.value / 100 : 0.8;
 
     console.log('Adding uploaded layer:', {
         filename,
@@ -6925,9 +6920,10 @@ function updateUploadedLayersList() {
     let layersHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <h4 style="color: white; margin: 0;">Uploaded Layers (${uploadedLayers.length}/${MAX_UPLOADED_LAYERS})</h4>
-            ${uploadedLayers.length < MAX_UPLOADED_LAYERS ?
-                '<sl-button id="add-another-layer-btn" variant="primary" size="small">+ Add Layer</sl-button>' :
-                '<span style="font-size: 11px; color: #ff9800;">Max layers reached</span>'
+            ${
+                uploadedLayers.length < MAX_UPLOADED_LAYERS
+                    ? '<sl-button id="add-another-layer-btn" variant="primary" size="small">+ Add Layer</sl-button>'
+                    : '<span style="font-size: 11px; color: #ff9800;">Max layers reached</span>'
             }
         </div>
     `;
@@ -6969,10 +6965,12 @@ function setupUploadEventHandlers() {
     const uploadInfo = document.getElementById('upload-info');
 
     // Event delegation for all buttons, inputs, and sliders
-    uploadInfo.addEventListener('click', (e) => {
+    uploadInfo.addEventListener('click', e => {
         // Handle remove button clicks
         if (e.target.classList.contains('remove-layer-btn') || e.target.closest('.remove-layer-btn')) {
-            const btn = e.target.classList.contains('remove-layer-btn') ? e.target : e.target.closest('.remove-layer-btn');
+            const btn = e.target.classList.contains('remove-layer-btn')
+                ? e.target
+                : e.target.closest('.remove-layer-btn');
             const layerId = btn.getAttribute('data-layer-id');
             removeUploadedLayer(layerId);
             return;
@@ -6992,7 +6990,7 @@ function setupUploadEventHandlers() {
     });
 
     // Handle color changes
-    uploadInfo.addEventListener('change', (e) => {
+    uploadInfo.addEventListener('change', e => {
         if (e.target.classList.contains('layer-color-input')) {
             const layerId = e.target.getAttribute('data-layer-id');
             const layer = uploadedLayers.find(l => l.id === layerId);
@@ -7004,7 +7002,7 @@ function setupUploadEventHandlers() {
     });
 
     // Handle opacity slider changes
-    uploadInfo.addEventListener('sl-change', (e) => {
+    uploadInfo.addEventListener('sl-change', e => {
         if (e.target.classList.contains('layer-opacity-slider')) {
             const layerId = e.target.getAttribute('data-layer-id');
             const layer = uploadedLayers.find(l => l.id === layerId);
@@ -7017,18 +7015,22 @@ function setupUploadEventHandlers() {
     });
 
     // Prevent slider mousedown from interfering with details
-    uploadInfo.addEventListener('mousedown', (e) => {
+    uploadInfo.addEventListener('mousedown', e => {
         if (e.target.classList.contains('layer-opacity-slider') || e.target.closest('.layer-opacity-slider')) {
             e.stopPropagation();
         }
     });
 
     // Prevent color picker mousedown from interfering with details
-    uploadInfo.addEventListener('mousedown', (e) => {
-        if (e.target.classList.contains('layer-color-input')) {
-            e.stopPropagation();
-        }
-    }, true); // Use capture phase
+    uploadInfo.addEventListener(
+        'mousedown',
+        e => {
+            if (e.target.classList.contains('layer-color-input')) {
+                e.stopPropagation();
+            }
+        },
+        true
+    ); // Use capture phase
 }
 
 // Remove uploaded layer by ID
@@ -7075,6 +7077,52 @@ function removeUploadedLayer(layerId) {
 // Initialize on map load
 map.on('load', () => {
     initializeUpload();
+});
+
+//#endregion
+
+//#region Fullscreen Control
+
+function initializeFullscreenControl() {
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const fullscreenIcon = document.getElementById('fullscreen-icon');
+
+    if (!fullscreenBtn) return;
+
+    fullscreenBtn.addEventListener('click', () => {
+        document.body.classList.toggle('fullscreen-mode');
+
+        // Update icon
+        if (document.body.classList.contains('fullscreen-mode')) {
+            fullscreenIcon.setAttribute('name', 'arrows-angle-contract');
+            fullscreenBtn.setAttribute('title', 'Exit Fullscreen');
+        } else {
+            fullscreenIcon.setAttribute('name', 'arrows-angle-expand');
+            fullscreenBtn.setAttribute('title', 'Toggle Fullscreen');
+        }
+
+        // Trigger map resize after transition
+        setTimeout(() => {
+            map.resize();
+        }, 100);
+    });
+
+    // Handle Escape key to exit fullscreen
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && document.body.classList.contains('fullscreen-mode')) {
+            document.body.classList.remove('fullscreen-mode');
+            fullscreenIcon.setAttribute('name', 'arrows-angle-expand');
+            fullscreenBtn.setAttribute('title', 'Toggle Fullscreen');
+            setTimeout(() => {
+                map.resize();
+            }, 100);
+        }
+    });
+}
+
+// Initialize on map load
+map.on('load', () => {
+    initializeFullscreenControl();
 });
 
 //#endregion
