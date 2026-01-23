@@ -160,6 +160,71 @@ body {
 
 /* #endregion */
 
+/* #region Fullscreen Button -------------------------------*/
+
+.map-control-btn {
+    position: absolute;
+    bottom: 60px;
+    left: 50px;
+    padding: 0px;
+    z-index: 10;
+    width: 40px;
+    height: 40px;
+    background: var(--dark-blue);
+    border: 1.5px solid white;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-control-btn:hover {
+    background: var(--highlight-green);
+    border-color: var(--dark-blue);
+}
+
+.map-control-btn sl-icon {
+    color: white;
+}
+
+.map-control-btn:hover sl-icon {
+    color: var(--dark-blue);
+}
+
+/* Fullscreen mode styles */
+body.fullscreen-mode #map {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    border: none;
+    z-index: 9999;
+}
+
+body.fullscreen-mode #panel,
+body.fullscreen-mode #background {
+    display: none;
+}
+
+body.fullscreen-mode #legend-container {
+    z-index: 10000;
+}
+
+body.fullscreen-mode .map-control-btn {
+    z-index: 10000;
+}
+
+body.fullscreen-mode .mapboxgl-ctrl-top-right {
+    z-index: 10000;
+}
+
+/* #endregion */
+
 /* #region Search Bar --------------------------------------*/
 
 /* #endregion */
@@ -1476,20 +1541,20 @@ wa-dropdown-item:hover {
 }
 
 /* Checkbox styling for dropdown items - fixes Mac visibility */
-wa-dropdown-item[type="checkbox"] {
+wa-dropdown-item[type='checkbox'] {
     --wa-checkbox-size: 18px;
     --wa-color-primary-600: var(--darker-blue);
     padding: 8px 12px;
 }
 
-wa-dropdown-item[type="checkbox"]::part(base) {
+wa-dropdown-item[type='checkbox']::part(base) {
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 4px 0;
 }
 
-wa-dropdown-item[type="checkbox"]::part(control) {
+wa-dropdown-item[type='checkbox']::part(control) {
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
@@ -1503,7 +1568,7 @@ wa-dropdown-item[type="checkbox"]::part(control) {
     appearance: none;
 }
 
-wa-dropdown-item[type="checkbox"]::part(checked-icon) {
+wa-dropdown-item[type='checkbox']::part(checked-icon) {
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
@@ -1517,14 +1582,14 @@ wa-dropdown-item[type="checkbox"]::part(checked-icon) {
     opacity: 1 !important;
 }
 
-wa-dropdown-item[type="checkbox"][checked]::part(control),
-wa-dropdown-item[type="checkbox"][checked]::part(checked-icon) {
+wa-dropdown-item[type='checkbox'][checked]::part(control),
+wa-dropdown-item[type='checkbox'][checked]::part(checked-icon) {
     background-color: var(--darker-blue) !important;
     border-color: var(--darker-blue) !important;
 }
 
 /* Ensure label is visible */
-wa-dropdown-item[type="checkbox"]::part(label) {
+wa-dropdown-item[type='checkbox']::part(label) {
     color: var(--darker-blue);
     flex: 1;
 }
