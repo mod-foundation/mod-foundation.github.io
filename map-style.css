@@ -146,16 +146,10 @@ body {
 }
 
 #map {
-    position: absolute;
-    top: 30px;
-    bottom: 30px;
-    left: 30px;
-    width: 60%;
-    background-color: rgba(200, 200, 200, 0.3);
-    border: 1px solid #333;
-    border-radius: 20px;
-    z-index: 1;
-    padding: 10px;
+    position: relative !important;
+    width: 100% !important;
+    height: 600px !important;
+    background: yellow !important;
 }
 
 /* #endregion */
@@ -2071,5 +2065,6 @@ sl-input[type='search'] {
 }
 
 /* #endregion */
+
 
 
