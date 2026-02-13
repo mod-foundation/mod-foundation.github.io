@@ -142,7 +142,6 @@ body {
     width: 100%;
     height: 100%;
     top: 0;
-    background-color: var(--dark-blue);
     z-index: 0;
 }
 
@@ -2072,4 +2071,5 @@ sl-input[type='search'] {
 }
 
 /* #endregion */
+
 
