@@ -134,6 +134,7 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
+    background: red !important;
 }
 
 #background {
@@ -2071,3 +2072,4 @@ sl-input[type='search'] {
 }
 
 /* #endregion */
+
