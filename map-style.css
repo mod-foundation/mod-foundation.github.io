@@ -1989,3 +1989,85 @@ sl-input[type='search'] {
 }
 
 /* #endregion */
+
+/* #region Mobile Layout -----------------------------------*/
+
+/* Hide mobile message on desktop/tablet */
+#mobile-message {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    /* Make body scrollable */
+    body {
+        height: auto;
+        overflow-y: auto;
+    }
+
+    /* Hide the background overlay */
+    #background {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Map takes full width with blue padding */
+    #map {
+        position: relative;
+        top: 0;
+        left: 0;
+        bottom: auto;
+        width: calc(100% - 30px);
+        height: calc(100dvh - 30px);
+        margin: 15px;
+        border: 1px solid #333;
+        border-radius: 20px;
+        padding: 0;
+    }
+
+    /* Hide the panel entirely */
+    #panel {
+        display: none !important;
+    }
+
+    /* Reposition legend for mobile */
+    #legend-container {
+        top: 15px;
+        left: 15px;
+    }
+
+    /* Reposition fullscreen button for mobile */
+    .map-control-btn {
+        bottom: 30px;
+        left: 20px;
+    }
+
+    /* Show mobile message below map */
+    #mobile-message {
+        display: block;
+        position: relative;
+        background-color: var(--dark-blue);
+        padding: 20px 25px;
+        z-index: 1;
+    }
+
+    .mobile-features-notice {
+        font-family: 'Poppins', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--highlight-yellow);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        text-align: center;
+        padding: 15px;
+        margin: 0 0 15px 0;
+        border: 1px dashed var(--highlight-yellow);
+    }
+
+    /* Fullscreen mode should still work on mobile */
+    body.fullscreen-mode #mobile-message {
+        display: none;
+    }
+}
+
+/* #endregion */
