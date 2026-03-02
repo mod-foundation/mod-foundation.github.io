@@ -1,0 +1,28 @@
+{
+"type": "FeatureCollection",
+"name": "labels",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "fid": 1, "name": "General Bazaar", "chapter": 3 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.608185656279005, 12.986809931024281 ] ] } },
+{ "type": "Feature", "properties": { "fid": 2, "name": "Ulsoor Village", "chapter": 3 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.624296504217824, 12.97587057356713 ] ] } },
+{ "type": "Feature", "properties": { "fid": 3, "name": "Trinity Church", "chapter": 3 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.620984921907734, 12.972191743432534 ] ] } },
+{ "type": "Feature", "properties": { "fid": 4, "name": "Infantry", "chapter": 3 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.602655313821188, 12.982493944109235 ] ] } },
+{ "type": "Feature", "properties": { "fid": 5, "name": "Cavalry", "chapter": 3 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.615040631661003, 12.989270413373921 ] ] } },
+{ "type": "Feature", "properties": { "fid": 6, "name": "General Parade Ground", "chapter": 7 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.604443568268636, 12.977379200890898 ] ] } },
+{ "type": "Feature", "properties": { "fid": 7, "name": "Cantonment Bazaar", "chapter": 7 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.607945566561554, 12.987431104277773 ] ] } },
+{ "type": "Feature", "properties": { "fid": 8, "name": "Native Infantry Lines", "chapter": 7 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.600709759213956, 12.984123540501063 ] ] } },
+{ "type": "Feature", "properties": { "fid": 9, "name": "Cavalry Barracks", "chapter": 7 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.612035370714551, 12.977822913067552 ] ] } },
+{ "type": "Feature", "properties": { "fid": 10, "name": "Trinity Church", "chapter": 7 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.620239815887899, 12.972175608092801 ] ] } },
+{ "type": "Feature", "properties": { "fid": 11, "name": "Horse Artillery Barracks", "chapter": 7 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.624321341085121, 12.973280876445688 ] ] } },
+{ "type": "Feature", "properties": { "fid": 13, "name": "Shoolay Village", "chapter": 7 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.608881088564218, 12.96879523133682 ] ] } },
+{ "type": "Feature", "properties": { "fid": 14, "name": "Kote (Fort)", "chapter": 1 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.577747314138023, 12.959610784982589 ] ] } },
+{ "type": "Feature", "properties": { "fid": 15, "name": "Pete (Town)", "chapter": 1 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.58716465779159, 12.968814230277644 ] ] } },
+{ "type": "Feature", "properties": { "fid": 16, "name": "Chief Commissioner's Bungalow", "chapter": 7 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.591083131659488, 12.982686610471065 ] ] } },
+{ "type": "Feature", "properties": { "fid": 17, "name": "Ulsoor Tank", "chapter": 5 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.619699335104627, 12.983303788693233 ] ] } },
+{ "type": "Feature", "properties": { "fid": 18, "name": "Shoolay Tank", "chapter": 5 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.611883430569705, 12.968808838464836 ] ] } },
+{ "type": "Feature", "properties": { "fid": 19, "name": "Soldiers' Gardens", "chapter": 6 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.614116546151109, 12.966758432340091 ] ] } },
+{ "type": "Feature", "properties": { "fid": 20, "name": "Millers Tank", "chapter": 12 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.594514809338847, 12.992573471820238 ] ] } },
+{ "type": "Feature", "properties": { "fid": 21, "name": "C100", "chapter": 9 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.607177102699453, 12.98646408914324 ] ] } },
+{ "type": "Feature", "properties": { "fid": 22, "name": "Ulsoor Tank", "chapter": 9 }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 77.618257571163241, 12.98321492921777 ] ] } }
+]
+}
