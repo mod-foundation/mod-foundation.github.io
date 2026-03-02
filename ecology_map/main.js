@@ -296,7 +296,7 @@ let demTimeouts = [];
 
 //api
 mapboxgl.accessToken =
-    'YOUR_MAPBOX_TOKEN_HERE';
+     'pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A';
 
 //map container
 const map = new mapboxgl.Map({
