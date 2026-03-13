@@ -297,6 +297,20 @@ async function loadAuditAssignments() {
     const priCount = taggedPri.features.filter(f => f.properties.is_audited).length;
     const secCount = taggedSec.features.filter(f => f.properties.is_audited).length;
     console.log(`✓ Audit assignments: ${priCount} primary, ${secCount} secondary drains`);
+
+    // Calculate total length by audit status and update legend
+    const allFeatures = [...taggedPri.features, ...taggedSec.features];
+    const sumKm = (status) => allFeatures
+        .filter(f => (f.properties.audit_status || '').toLowerCase() === status)
+        .reduce((acc, f) => acc + (parseFloat(f.properties.length_m) || 0), 0) / 1000;
+
+    const donKm = sumKm('done');
+    const inpKm = sumKm('in progress');
+
+    document.getElementById('legend-km-done').textContent =
+        donKm > 0 ? `${donKm.toFixed(1)} km` : '—';
+    document.getElementById('legend-km-inprogress').textContent =
+        inpKm > 0 ? `${inpKm.toFixed(1)} km` : '—';
 }
 
 function addAuditDrainInteractivity(layerId) {
