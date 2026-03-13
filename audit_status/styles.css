@@ -1,3 +1,12 @@
+/* Full-bleed reset for iframe embedding */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
 /* Map Wrapper — sizing context for WordPress embedding */
 #map-wrap {
     position: relative;
