@@ -1,6 +1,5 @@
-//#region Map Configuration
-
 //#region Basemap Definitions
+
 const osm = {
     name: "OpenStreetMap",
     tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
@@ -39,23 +38,15 @@ const cartoPositron = {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>'
 };
 
-const baseLayers = {
-    osm,
-    satellite,
-    cartoLight,
-    cartoPositron
-};
+const baseLayers = { osm, satellite, cartoLight, cartoPositron };
+
 //#endregion
 
-//#region Map Initialization
+//#region Map Container
 const map = new maplibregl.Map({
     container: 'map-container',
-    style: {
-        version: 8,
-        sources: {},
-        layers: []
-    },
-    center: [77.5946, 12.9716], // Bengaluru coordinates
+    style: { version: 8, sources: {}, layers: [] },
+    center: [77.5946, 12.9716],
     zoom: 11,
     pitch: 0,
     bearing: 0,
@@ -65,726 +56,356 @@ const map = new maplibregl.Map({
 //#endregion
 
 //#region Map Controls
-// Navigation controls (zoom, rotation)
-map.addControl(new maplibregl.NavigationControl(), 'top-right');
+    map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
-// Scale control
-map.addControl(new maplibregl.ScaleControl({
-    maxWidth: 200,
-    unit: 'metric'
-}), 'bottom-right');
+    map.addControl(new maplibregl.ScaleControl({
+        maxWidth: 200,
+        unit: 'metric'
+    }), 'bottom-right');
 
-// Geolocate control
-map.addControl(new maplibregl.GeolocateControl({
-    positionOptions: {
-        enableHighAccuracy: true
-    },
-    trackUserLocation: true
-}), 'top-right');
-//#endregion
+    map.addControl(new maplibregl.GeolocateControl({
+        positionOptions: { enableHighAccuracy: true },
+        trackUserLocation: true
+    }), 'top-right');
+
+
 
 //#endregion
 
-//#region Local Data Configuration
+//#region Layer Helpers
 
-const DATA_CONFIG = {
-    forms: {
-        form1: {
-            csvPath: 'data/csv/form-1.csv',
-            mediaPath: 'data/media/form-1/e297082545574dd6b81c8a5d2a37e9c8',
-            name: 'Form 1 - SWD Audit',
-            color: '#007cbf'
-        },
-        form2: {
-            csvPath: 'data/csv/form-2.csv',
-            mediaPath: 'data/media/form-2/2f6e2b31633744ff9cb654350986751f',
-            name: 'Form 2',
-            color: '#e74c3c'
-        }
+/**
+ * Add a GeoJSON source + layer to the map.
+ * @param {string} id        - Unique layer/source id
+ * @param {object|string} data - GeoJSON object or URL string
+ * @param {'line'|'fill'|'circle'} type - Layer type
+ * @param {object} paint     - MapLibre paint properties
+ * @param {object} [layout]  - MapLibre layout properties (optional)
+ * @param {string} [before]  - Insert before this layer id (optional)
+ */
+function addLayer(id, data, type, paint, layout = {}, before = undefined) {
+    if (map.getSource(id)) {
+        map.removeLayer(id);
+        map.removeSource(id);
     }
-};
-//#endregion
 
-//#region Data Loading
+    map.addSource(id, { type: 'geojson', data });
 
-function parseCSV(text) {
-    const lines = text.split(/\r?\n/);
-    if (lines.length < 3) return [];
-
-    // Row 0: short field names (keys), Row 1: verbose labels (skip), Row 2+: data
-    const headers = splitCSVLine(lines[0]);
-    const rows = [];
-
-    for (let i = 2; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (!line) continue;
-        const values = splitCSVLine(line);
-        const obj = {};
-        headers.forEach((key, idx) => {
-            obj[key] = values[idx] !== undefined ? values[idx] : '';
-        });
-        rows.push(obj);
-    }
-    return rows;
+    map.addLayer({ id, type, source: id, paint, layout }, before);
 }
 
-function splitCSVLine(line) {
-    const fields = [];
-    let current = '';
-    let inQuotes = false;
-    for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
-        if (ch === '"') {
-            inQuotes = !inQuotes;
-        } else if (ch === ',' && !inQuotes) {
-            fields.push(current);
-            current = '';
-        } else {
-            current += ch;
-        }
-    }
-    fields.push(current);
-    return fields;
-}
-
-async function loadLocalData(formConfig) {
-    try {
-        const response = await fetch(formConfig.csvPath);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const text = await response.text();
-        const data = parseCSV(text);
-        console.log(`✓ Loaded ${data.length} submissions from ${formConfig.csvPath}`);
-        return data;
-    } catch (error) {
-        console.warn(`⚠ Could not load ${formConfig.csvPath}:`, error.message);
-        return [];
-    }
-}
-
-async function loadAllForms() {
-    console.log('=== LOADING LOCAL DATA ===');
-    const results = {};
-    for (const [formKey, formConfig] of Object.entries(DATA_CONFIG.forms)) {
-        console.log(`Loading ${formConfig.name}...`);
-        const data = await loadLocalData(formConfig);
-        results[formKey] = { data, config: formConfig };
-    }
-    return results;
-}
-
-//#endregion
-
-//#region Data Processing
-
-function csvToGeoJSON(csvData) {
-    const features = csvData.map((row, index) => {
-        const latitude = parseFloat(row.lat);
-        const longitude = parseFloat(row.long);
-
-        if (isNaN(latitude) || isNaN(longitude)) {
-            console.warn(`Row ${index}: Missing or invalid coordinates`);
-            return null;
-        }
-
-        return {
-            type: 'Feature',
-            geometry: {
-                type: 'Point',
-                coordinates: [longitude, latitude]
-            },
-            properties: { ...row }
-        };
-    }).filter(f => f !== null);
-
-    console.log(`✓ Created ${features.length} valid features from ${csvData.length} rows`);
-    return { type: 'FeatureCollection', features };
-}
-
-//#endregion
-
-//#region Map Filter Manager
-
-const _activeFilters = {};   // canvasId → { layerId, value, defaultColor }
-const _chartRegistry = {};   // canvasId → { layerId, fieldName, rawLabels, colors, defaultColor }
-let _activeColorChart = null; // canvasId currently coloring the map
-
-window.MapFilterManager = {
-    // Called by chart.js after each chart is created
-    // filterExprs: optional array of MapLibre expressions per label (used by histograms)
-    registerChart(canvasId, layerId, fieldName, rawLabels, colors, defaultColor, filterExprs = null) {
-        _chartRegistry[canvasId] = { layerId, fieldName, rawLabels, colors, defaultColor, filterExprs };
-    },
-
-    // Per-slice/bar filter (existing)
-    applyFilter(canvasId, layerId, fieldName, rawValue, color, defaultColor) {
-        const prev = _activeFilters[canvasId];
-
-        // Toggle off if the same slice/bar is clicked again
-        if (prev && prev.value === rawValue) {
-            map.setFilter(layerId, null);
-            map.setPaintProperty(layerId, 'circle-color', defaultColor);
-            delete _activeFilters[canvasId];
-            return;
-        }
-
-        // Reset any active filter on the same layer from a different chart
-        for (const [cId, info] of Object.entries(_activeFilters)) {
-            if (info.layerId === layerId) {
-                map.setFilter(layerId, null);
-                map.setPaintProperty(layerId, 'circle-color', info.defaultColor);
-                delete _activeFilters[cId];
-            }
-        }
-
-        // Apply the new filter and recolor
-        map.setFilter(layerId, ['==', ['get', fieldName], rawValue]);
-        map.setPaintProperty(layerId, 'circle-color', color);
-        _activeFilters[canvasId] = { layerId, value: rawValue, defaultColor };
-    },
-
-    // Color all points by chart legend — triggered by panel-header click
-    colorByChart(canvasId) {
-        const reg = _chartRegistry[canvasId];
-        if (!reg) return;
-        const { layerId, fieldName, rawLabels, colors, defaultColor } = reg;
-        const headerEl = document.querySelector(`#${canvasId.replace('chart-', 'panel-')} .panel-header`);
-
-        // Toggle off if this chart is already the active color source
-        if (_activeColorChart === canvasId) {
-            map.setFilter(layerId, null);
-            map.setPaintProperty(layerId, 'circle-color', defaultColor);
-            _activeColorChart = null;
-            if (headerEl) headerEl.classList.remove('color-active');
-            return;
-        }
-
-        // Deactivate any previous color-by on the same layer
-        if (_activeColorChart) {
-            const prev = _chartRegistry[_activeColorChart];
-            const prevHeader = document.querySelector(`#${_activeColorChart.replace('chart-', 'panel-')} .panel-header`);
-            if (prevHeader) prevHeader.classList.remove('color-active');
-            if (prev && prev.layerId === layerId) {
-                map.setPaintProperty(layerId, 'circle-color', prev.defaultColor);
-            }
-        }
-
-        // Clear any active per-slice filter on this layer
-        for (const [cId, info] of Object.entries(_activeFilters)) {
-            if (info.layerId === layerId) {
-                map.setFilter(layerId, null);
-                delete _activeFilters[cId];
-            }
-        }
-
-        // Build MapLibre color expression
-        // Histograms supply per-bin filter expressions → use 'case'
-        // Pie/bar charts supply exact string values → use 'match'
-        let colorExpr;
-        if (reg.filterExprs) {
-            colorExpr = ['case'];
-            reg.filterExprs.forEach((expr, i) => colorExpr.push(expr, colors[i]));
-            colorExpr.push(defaultColor);
-        } else {
-            colorExpr = ['match', ['get', fieldName]];
-            rawLabels.forEach((label, i) => colorExpr.push(label, colors[i]));
-            colorExpr.push(defaultColor);
-        }
-        const matchExpr = colorExpr; // alias for the line below
-
-        map.setFilter(layerId, null);
-        map.setPaintProperty(layerId, 'circle-color', matchExpr);
-        _activeColorChart = canvasId;
-        if (headerEl) headerEl.classList.add('color-active');
-    },
-
-    // Range filter for histogram bars (numeric field binned into [min, max))
-    applyRangeFilter(canvasId, layerId, fieldName, min, max, color, defaultColor) {
-        const prev = _activeFilters[canvasId];
-
-        // Toggle off if same bin clicked again
-        if (prev && prev.rangeMin === min && prev.rangeMax === max) {
-            map.setFilter(layerId, null);
-            map.setPaintProperty(layerId, 'circle-color', defaultColor);
-            delete _activeFilters[canvasId];
-            return;
-        }
-
-        // Reset any active filter on this layer
-        for (const [cId, info] of Object.entries(_activeFilters)) {
-            if (info.layerId === layerId) {
-                map.setFilter(layerId, null);
-                map.setPaintProperty(layerId, 'circle-color', info.defaultColor);
-                delete _activeFilters[cId];
-            }
-        }
-
-        const filterExpr = ['all',
-            ['>=', ['to-number', ['get', fieldName]], min],
-            ['<',  ['to-number', ['get', fieldName]], max]
-        ];
-        map.setFilter(layerId, filterExpr);
-        map.setPaintProperty(layerId, 'circle-color', color);
-        _activeFilters[canvasId] = { layerId, rangeMin: min, rangeMax: max, defaultColor };
-    },
-
-    resetAll() {
-        for (const [cId, info] of Object.entries(_activeFilters)) {
-            if (map.getLayer(info.layerId)) {
-                map.setFilter(info.layerId, null);
-                map.setPaintProperty(info.layerId, 'circle-color', info.defaultColor);
-            }
-            delete _activeFilters[cId];
-        }
-        if (_activeColorChart) {
-            const reg = _chartRegistry[_activeColorChart];
-            const headerEl = document.querySelector(`#${_activeColorChart.replace('chart-', 'panel-')} .panel-header`);
-            if (headerEl) headerEl.classList.remove('color-active');
-            if (reg && map.getLayer(reg.layerId)) {
-                map.setFilter(reg.layerId, null);
-                map.setPaintProperty(reg.layerId, 'circle-color', reg.defaultColor);
-            }
-            _activeColorChart = null;
-        }
-    }
-};
-
-//#endregion
-
-//#region Popup Configuration
-
-const POPUP_SKIP = new Set([
-    '', 'start', 'end', 'lat', 'long', 'alt', 'precision', 'location',
-    '_uuid', '_id', '_submission_time', '_validation_status', '_notes',
-    '_status', '_submitted_by', '__version__', '_tags', 'meta/rootUuid',
-    'formhub/uuid', '_xform_id_string', 'meta/instanceID',
-    // Form 1 section headers / placeholder fields
-    'form1', 'section1', 'section2', 'section3', 'section4', 'outdated',
-]);
-
-const POPUP_LABELS = {
-    _index: 'Index',
-    safety: 'Safety',
-    team_code: 'Team Code',
-    rhs_lhs: 'LHS / RHS',
-    date_time: 'Date & Time',
-    wall_condition: 'Wall Condition',
-    wall_height: 'Wall Height (ft)',
-    wall_material: 'Wall Material',
-    wall_pic: 'Wall Photo',
-    fence: 'Fence Condition',
-    street_pic: 'Street Photo',
-    bridge_type: 'Bridge Type',
-    bridge_condition: 'Bridge Condition',
-    bridge_walkable: 'Bridge Walkable',
-    bridge_pic: 'Bridge Photo',
-    piers_condition: 'Piers Condition',
-    piers_num: 'No. of Piers',
-    piers_pic: 'Piers Photo',
-    elec_condition: 'Electrical Condition',
-    elec_pic: 'Electrical Photo',
-    cables_condition: 'Cables Condition',
-    cables_pic: 'Cables Photo',
-    manholes_condition: 'Manholes Condition',
-    manholes_pic: 'Manholes Photo',
-    inlets: 'Stormwater Inlets',
-    inlets_pic: 'Inlets Photo',
-    unauthorised_inlets: 'Unauthorised Inlets',
-    unauthorised_inlets_pic: 'Unauthorised Inlets Photo',
-    observations: 'Observations',
-    water_stagnant: 'Water Flow',
-    water_contamination: 'Water Contamination',
-    water_colour: 'Water Colour',
-    water_turbidity: 'Water Turbidity',
-    water_smell: 'Water Odour',
-    water_pic: 'Water Photo',
-    sw_inside: 'Solid Waste Inside SWD',
-    sw_inside_type: 'Waste Type (Inside)',
-    sw_inside_source: 'Waste Source (Inside)',
-    sw_inside_pic: 'Waste Inside Photo',
-    sw_outside: 'Solid Waste Outside SWD',
-    sw_outside_type: 'Waste Type (Outside)',
-    sw_outside_source: 'Waste Source (Outside)',
-    sw_outside_pic: 'Waste Outside Photo',
-    sw_clean_up: 'Clean-up Efforts',
-    community_engagement: 'Community Engagement',
-    community_engagement_pic: 'Community Engagement Photo',
-};
-
-function popupFieldLabel(key) {
-    return POPUP_LABELS[key.trim()] ||
-        key.trim().replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
-
-function popupFieldValue(val) {
-    if (!val || val === 'null' || val === 'undefined') return null;
-    return val.trim().replace(/__/g, ' — ').replace(/_/g, ' ');
-}
-
-//#endregion
-
-//#region Layer Management
-
-async function addLayers() {
-    console.log('=== ADDING LAYERS ===');
-
-    // Clear any stale filter state when layers are re-built
-    window.MapFilterManager.resetAll();
-
-    // Load data from local CSV files
-    const allFormsData = await loadAllForms();
-
-    // Process each form
-    for (const [formKey, formResult] of Object.entries(allFormsData)) {
-        const { data, config } = formResult;
-
-        if (data.length === 0) {
-            console.warn(`⚠ No data for ${config.name}`);
-            continue;
-        }
-
-        console.log(`\n--- Processing ${config.name} ---`);
-        console.log(`✓ Loaded ${data.length} submissions`);
-
-        // Convert to GeoJSON using direct lat/long columns
-        const geojsonData = csvToGeoJSON(data);
-
-        if (geojsonData.features.length === 0) {
-            console.warn(`✗ No valid points for ${config.name}`);
-            continue;
-        }
-
-        console.log(`✓ Created ${geojsonData.features.length} points for ${config.name}`);
-
-        // Add source
-        const sourceId = `data-${formKey}`;
-        const layerId = `data-${formKey}-points`;
-
-        if (!map.getSource(sourceId)) {
-            map.addSource(sourceId, {
-                type: 'geojson',
-                data: geojsonData
-            });
-            console.log(`✓ Added source: ${sourceId}`);
-        } else {
-            map.getSource(sourceId).setData(geojsonData);
-            console.log(`✓ Updated source: ${sourceId}`);
-        }
-
-        // Add layer
-        if (!map.getLayer(layerId)) {
-            map.addLayer({
-                id: layerId,
-                type: 'circle',
-                source: sourceId,
-                paint: {
-                    'circle-radius': 5,
-                    'circle-color': config.color,
-                    'circle-stroke-width': 2,
-                    'circle-stroke-color': '#ffffff',
-                    'circle-opacity': 0.8
-                }
-            });
-            console.log(`✓ Added layer: ${layerId}`);
-        }
-
-        // Add popup on click — field/value table with inline images
-        map.on('click', layerId, (e) => {
-            const coordinates = e.features[0].geometry.coordinates.slice();
-            const properties = e.features[0].properties;
-            const uuid = properties._uuid || '';
-            const imageExtRe = /\.(jpg|jpeg|png|gif|webp)$/i;
-
-            const entries = Object.entries(properties).sort(([a], [b]) =>
-                a === '_index' ? -1 : b === '_index' ? 1 : 0
-            );
-            const rows = entries
-                .filter(([key]) => !POPUP_SKIP.has(key.trim()))
-                .map(([key, val]) => {
-                    if (!val || val === 'null' || val === 'undefined') return null;
-                    const label = popupFieldLabel(key);
-                    const trimVal = String(val).trim();
-                    if (imageExtRe.test(trimVal)) {
-                        const src = `${config.mediaPath}/${uuid}/${trimVal}`;
-                        return `<tr>
-                            <td class="popup-label">${label}</td>
-                            <td class="popup-value"><img src="${src}" class="popup-img" onclick="window.open('${src}','_blank')" onerror="this.closest('tr').style.display='none';" /></td>
-                        </tr>`;
-                    }
-                    const display = popupFieldValue(trimVal);
-                    if (!display) return null;
-                    return `<tr>
-                        <td class="popup-label">${label}</td>
-                        <td class="popup-value">${display}</td>
-                    </tr>`;
-                })
-                .filter(Boolean)
-                .join('');
-
-            const popupContent = `<div class="popup-scroll"><table class="popup-table">${rows}</table></div>`;
-
-            new maplibregl.Popup({ closeButton: true, maxWidth: '440px' })
-                .setLngLat(coordinates)
-                .setHTML(popupContent)
-                .addTo(map);
-        });
-
-        /* --- Image carousel (commented out) ---
-        // map.on('click', layerId, (e) => {
-        //   ... slideshow code removed ...
-        // });
-        */
-        
-        // Cursor on hover
-        map.on('mouseenter', layerId, () => {
-            map.getCanvas().style.cursor = 'pointer';
-        });
-        
-        map.on('mouseleave', layerId, () => {
-            map.getCanvas().style.cursor = '';
-        });
-    }
-    
-    // Fit map to show all points from all forms
-    const allBounds = new maplibregl.LngLatBounds();
-    let hasPoints = false;
-
-    for (const [, formResult] of Object.entries(allFormsData)) {
-        const geojsonData = csvToGeoJSON(formResult.data);
-        if (geojsonData.features.length > 0) {
-            hasPoints = true;
-            geojsonData.features.forEach(feature => {
-                allBounds.extend(feature.geometry.coordinates);
-            });
-        }
-    }
-
-    if (hasPoints) {
-        map.fitBounds(allBounds, {
-            padding: 50,
-            maxZoom: 15,
-            duration: 1000
-        });
-        console.log('✓ Map fitted to show all points');
-    } else {
-        console.warn('⚠ No points to display - adding sample data');
-        addSampleData();
-    }
-
-    // Initialize charts with the data
-    if (window.ChartManager) {
-        window.ChartManager.initialize(allFormsData);
-    }
-
-    console.log('=== LAYERS ADDED SUCCESSFULLY ===');
-}
-
-async function addJsonLayers() {
-    console.log('=== LOADING GEOJSON LAYERS ===');
-
-    // Define your GeoJSON layers here
-    // Each layer needs: id, file path, type, and paint properties
-    const layers = [
-        // Example polygon layer
-        // {
-        //     id: 'boundaries',
-        //     file: 'datasets/boundaries.geojson',
-        //     type: 'fill',
-        //     paint: {
-        //         'fill-color': '#088',
-        //         'fill-opacity': 0.5,
-        //         'fill-outline-color': '#000'
-        //     }
-        // },
-
-         {
-             id: 'primary-drains',
-             file: 'data/json/primarydrains.geojson',
-             type: 'line',
-             paint: {
-                'line-color': 'rgba(4, 0, 255, 1)',
-                'line-width': 1
-            }
-        },
-
-        {
-             id: 'secondary-drains',
-             file: 'data/json/secondarydrains.geojson',
-             type: 'line',
-             paint: {
-                'line-color': 'rgba(0, 195, 255, 1)',
-                'line-width': 0.8
-             }
-        },
-        // Example point layer
-        // {
-        //     id: 'sites',
-        //     file: 'datasets/sites.geojson',
-        //     type: 'circle',
-        //     paint: {
-        //         'circle-radius': 6,
-        //         'circle-color': '#B42222',
-        //         'circle-stroke-width': 1,
-        //         'circle-stroke-color': '#fff'
-        //     }
-        // }
-    ];
-
-    for (const layer of layers) {
-        try {
-            const response = await fetch(layer.file);
-            if (!response.ok) throw new Error(`Failed to load ${layer.file}`);
-
-            const geojson = await response.json();
-
-            // Add source
-            if (!map.getSource(layer.id)) {
-                map.addSource(layer.id, {
-                    type: 'geojson',
-                    data: geojson
-                });
-            }
-
-            // Add layer
-            if (!map.getLayer(layer.id)) {
-                map.addLayer({
-                    id: layer.id,
-                    type: layer.type,
-                    source: layer.id,
-                    paint: layer.paint
-                });
-            }
-
-            console.log(`✓ Added layer: ${layer.id}`);
-        } catch (error) {
-            console.error(`✗ Error loading ${layer.id}:`, error);
-        }
-    }
-
-    console.log('=== GEOJSON LAYERS LOADED ===');
-}
-function addSampleData() {
-    console.log('Adding sample data as fallback');
-    
-    const sampleData = {
-        type: 'FeatureCollection',
-        features: [
-            {
-                type: 'Feature',
-                geometry: {
-                    type: 'Point',
-                    coordinates: [77.6033, 12.9800]
-                },
-                properties: {
-                    title: 'Sample Point - Whitefield',
-                    description: 'Example location (No KoboToolbox data available)'
-                }
-            },
-            {
-                type: 'Feature',
-                geometry: {
-                    type: 'Point',
-                    coordinates: [77.5946, 12.9716]
-                },
-                properties: {
-                    title: 'Sample Point - City Center',
-                    description: 'Example location (No KoboToolbox data available)'
-                }
-            }
-        ]
+/**
+ * Add a line layer.
+ * @param {string} id
+ * @param {object|string} data
+ * @param {{color?: string, width?: number, opacity?: number, dasharray?: number[]}} [params]
+ */
+function addLineLayer(id, data, {
+    color = '#0d6aff',
+    width = 2,
+    opacity = 1,
+    dasharray = undefined
+} = {}) {
+    const paint = {
+        'line-color': color,
+        'line-width': width,
+        'line-opacity': opacity,
+        ...(dasharray && { 'line-dasharray': dasharray })
     };
-    
-    if (!map.getSource('sample-data')) {
-        map.addSource('sample-data', {
-            type: 'geojson',
-            data: sampleData
-        });
-    }
+    addLayer(id, data, 'line', paint, { 'line-cap': 'round', 'line-join': 'round' });
+}
 
-    if (!map.getLayer('sample-points')) {
-        map.addLayer({
-            id: 'sample-points',
-            type: 'circle',
-            source: 'sample-data',
-            paint: {
-                'circle-radius': 8,
-                'circle-color': '#ff6b6b',
-                'circle-stroke-width': 2,
-                'circle-stroke-color': '#ffffff'
-            }
-        });
-    }
-    
-    // Add popup for sample data
-    map.on('click', 'sample-points', (e) => {
-        const coordinates = e.features[0].geometry.coordinates.slice();
-        const properties = e.features[0].properties;
-        
-        new maplibregl.Popup()
-            .setLngLat(coordinates)
-            .setHTML(`
-                <div style="font-family: Arial, sans-serif;">
-                    <h3 style="margin: 0 0 10px 0; color: #ff6b6b;">${properties.title}</h3>
-                    <p style="margin: 5px 0;">${properties.description}</p>
-                </div>
-            `)
+/**
+ * Add a polygon (fill) layer.
+ * @param {string} id
+ * @param {object|string} data
+ * @param {{color?: string, opacity?: number, outlineColor?: string}} [params]
+ */
+function addPolygonLayer(id, data, {
+    color = '#0d6aff',
+    opacity = 0.4,
+    outlineColor = '#0d6aff'
+} = {}) {
+    const paint = {
+        'fill-color': color,
+        'fill-opacity': opacity,
+        'fill-outline-color': outlineColor
+    };
+    addLayer(id, data, 'fill', paint);
+}
+
+/**
+ * Add a point (circle) layer.
+ * @param {string} id
+ * @param {object|string} data
+ * @param {{color?: string, radius?: number, opacity?: number, strokeColor?: string, strokeWidth?: number}} [params]
+ */
+function addPointLayer(id, data, {
+    color = '#0d6aff',
+    radius = 6,
+    opacity = 1,
+    strokeColor = '#ffffff',
+    strokeWidth = 1.5
+} = {}) {
+    const paint = {
+        'circle-color': color,
+        'circle-radius': radius,
+        'circle-opacity': opacity,
+        'circle-stroke-color': strokeColor,
+        'circle-stroke-width': strokeWidth
+    };
+    addLayer(id, data, 'circle', paint);
+}
+
+//#endregion
+
+//#region Data Manager
+
+let auditData = [];
+
+async function loadAuditData() {
+    const [f1Text, f2Text] = await Promise.all([
+        fetch('data/csv/form-1.csv').then(r => r.text()),
+        fetch('data/csv/form-2.csv').then(r => r.text())
+    ]);
+
+    const f1 = Papa.parse(f1Text, { header: true, skipEmptyLines: true }).data;
+    const f2 = Papa.parse(f2Text, { header: true, skipEmptyLines: true }).data;
+
+    // form-2 lookup keyed by _index_f1 (references form-1._index)
+    const f2ByIndex = new Map(f2.map(row => [row._index_f1, row]));
+
+    // Joined records — form-1 fields win shared columns; _f2_uuid and _f2_index preserved separately
+    auditData = f1.map(row => {
+        const f2row = f2ByIndex.get(row._index) ?? {};
+        return { ...f2row, ...row,_f2_index: f2row._index, _f2_uuid: f2row._uuid ?? null };
+    });
+
+    // GeoJSON — coordinates always from form-1; _f2_uuid preserved for image paths
+    const geojson = {
+        type: 'FeatureCollection',
+        features: f1
+            .filter(r => r.lat && r.long)
+            .map(r => {
+                const f2row = f2ByIndex.get(r._index) ?? {};
+                return {
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [+r.long, +r.lat] },
+                    properties: { ...f2row, ...r, _f2_uuid: f2row._uuid ?? null, _f2_index: f2row._index ?? null }
+                };
+            })
+    };
+
+    addPointLayer('audit-points', geojson, { color: '#ff6b35', radius: 6, strokeColor: '#fff', strokeWidth: 1.5 });
+
+    // Form-2 records with no matching form-1 entry — plot using form-2 coordinates
+    const f1IndexSet = new Set(f1.map(r => r._index));
+    const unmatchedF2 = f2.filter(r => r.lat && r.long && !f1IndexSet.has(r._index_f1));
+    const geojsonF2 = {
+        type: 'FeatureCollection',
+        features: unmatchedF2.map(r => ({
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: [+r.long, +r.lat] },
+            properties: { ...r, _f2_uuid: r._uuid ?? null, _f2_index: r._index ?? null, _f2_only: true }
+        }))
+    };
+    addPointLayer('audit-points-f2', geojsonF2, { color: '#ff80c0', radius: 6, strokeColor: '#fff', strokeWidth: 1.5 });
+
+    console.log(`✓ Loaded ${auditData.length} audit records (${geojson.features.length} with coordinates, ${geojsonF2.features.length} form-2 only)`);
+}
+
+//#endregion
+
+//#region Layers
+
+function addLayers() {
+    const statusColor = ['match', ['get', 'Status'], 1, '#ff2222', '#0d6aff'];
+    addLineLayer('primarydrains', 'data/json/primarydrains.geojson', { color: statusColor, width: 2 });
+    addLineLayer('secondarydrains', 'data/json/secondarydrains.geojson', { color: statusColor, width: 1.5, opacity: 0.8 });
+}
+
+//#endregion
+
+//#region Interactivity Audit Points
+
+let activePopups = [];
+
+function closeAuditPopups() {
+    if (activePopups.length === 0) return;
+    const toClose = activePopups;
+    activePopups = [];
+    toClose.forEach(p => p.remove());
+}
+
+function imgTag(uuid, filename, formNum) {
+    if (!filename || !uuid) return '';
+    const cleanUuid = uuid.replace('uuid:', '');
+    const src = `data/media/form-${formNum}/images/${cleanUuid}/${filename}`;
+    return `<img src="${src}" onerror="this.style.display='none'" alt="" />`;
+}
+
+function row(label, value) {
+    if (!value) return '';
+    return `<div class="popup-row"><div class="popup-attr">${label}</div><div class="popup-val">${value}</div></div>`;
+}
+
+function imgRow(label, uuid, filename, formNum) {
+    if (!filename || !uuid) return '';
+    const tag = imgTag(uuid, filename, formNum);
+    if (!tag) return '';
+    return `<div class="popup-row"><div class="popup-attr">${label}</div><div class="popup-val popup-val-img">${tag}</div></div>`;
+}
+
+function buildForm1HTML(p) {
+    if (!p._index) return null;
+    const uuid = p._uuid || '';
+    return `<div class="popup-form popup-f1">
+        <div class="popup-header">Form 1 — Structural Audit</div>
+        <div class="popup-subheader">${p._drain || ''} · ${p.team_code || ''} · ${p.rhs_lhs || ''}</div>
+        ${row('Index', p._index)}
+        ${row('Condition of the retaining wall', p.wall_condition)}
+        ${row('Height of retaining wall (approx.)', p.wall_height ? p.wall_height + ' ft' : null)}
+        ${row('Fence on top of retaining wall', p.fence)}
+        ${row('Material of retaining wall', p.wall_material)}
+        ${imgRow('Picture of the retaining wall', uuid, p.wall_pic, 1)}
+        ${imgRow('Photo of the street', uuid, p.street_pic, 1)}
+        ${row('Type of bridge', p.bridge_type)}
+        ${row('Bridge condition', p.bridge_condition)}
+        ${row('Bridge walkable', p.bridge_walkable)}
+        ${imgRow('Picture of the bridge', uuid, p.bridge_pic, 1)}
+        ${row('Does the bridge have piers', p.piers_condition)}
+        ${row('Number of piers', p.piers_num)}
+        ${imgRow('Picture of bridge underside / piers', uuid, p.piers_pic, 1)}
+        ${row('Electricity lines / transformers outside SWD', p.elec_condition)}
+        ${imgRow('Picture of electricity lines', uuid, p.elec_pic, 1)}
+        ${row('Cables or lines crossing the SWD', p.cables_condition)}
+        ${imgRow('Picture of utility lines inside SWD', uuid, p.cables_pic, 1)}
+        ${row('Manholes in the SWD', p.manholes_condition)}
+        ${imgRow('Picture of manhole', uuid, p.manholes_pic, 1)}
+    </div>`;
+}
+
+function buildForm2HTML(p) {
+    if (!p._f2_index) return null;
+    const uuid = p._f2_uuid || '';
+    return `<div class="popup-form popup-f2">
+        <div class="popup-header">Form 2 — Water Quality Audit</div>
+        <div class="popup-subheader">${p._drain || ''} · ${p.team_code || ''} · ${p.rhs_lhs || ''}</div>
+        ${row('Index', p._f2_index)}
+        ${row('Authorised inlets connecting to SWD', p.inlets)}
+        ${imgRow('Picture of stormwater inlets', uuid, p.inlets_pic, 2)}
+        ${row('Unauthorised inlets connecting to SWD', p.unauthorised_inlets)}
+        ${imgRow('icture of unauthorised inlets', uuid, p.unauthorised_inlets_pic, 2)}
+        ${row('Any other observation', p.observations)}
+        ${row('Is the water stagnant or flowing', p.water_stagnant)}
+        ${row('Signs of contamination (visible indicators)', p.water_contamination)}
+        ${row('Water colour', p.water_colour)}
+        ${row('Turbidity', p.water_turbidity)}
+        ${row('Odour (smell)', p.water_smell)}
+        ${imgRow('Picture of water', uuid, p.water_pic, 2)}
+        ${row('Solid waste inside the SWD', p.sw_inside)}
+        ${row('Type of solid waste', p.sw_inside_type)}
+        ${row('Likely source of waste', p.sw_inside_source)}
+        ${imgRow('Picture of waste inside SWD', uuid, p.sw_inside_pic, 2)}
+        ${row('Solid waste outside the SWD', p.sw_outside)}
+        ${row('Type of waste outside', p.sw_outside_type)}
+        ${row('Likely source of waste outside', p.sw_outside_source)}
+        ${imgRow('Picture of waste outside SWD', uuid, p.sw_outside_pic, 2)}
+        ${row('Signs of clean up effort', p.sw_clean_up)}
+        ${row('Signs of community engagement', p.community_engagement)}
+        ${imgRow('Picture of community engagement', uuid, p.community_engagement_pic, 2)}
+    </div>`;
+}
+
+function openAuditPopup(lngLat, properties) {
+    closeAuditPopups();
+
+    const popup = new maplibregl.Popup({
+        anchor: 'bottom',
+        className: 'audit-popup'
+    })
+        .setLngLat(lngLat)
+        .setHTML(`<div class="popup-container">${[buildForm1HTML(properties), buildForm2HTML(properties)].filter(Boolean).join('')}</div>`)
+        .addTo(map);
+
+    popup.on('close', closeAuditPopups);
+    activePopups = [popup];
+}
+
+map.on('click', 'audit-points', (e) => {
+    e.preventDefault();
+    openAuditPopup(e.lngLat, e.features[0].properties);
+});
+
+map.on('mouseenter', 'audit-points', () => { map.getCanvas().style.cursor = 'pointer'; });
+map.on('mouseleave', 'audit-points', () => { map.getCanvas().style.cursor = ''; });
+
+map.on('click', 'audit-points-f2', (e) => {
+    e.preventDefault();
+    openAuditPopup(e.lngLat, e.features[0].properties);
+});
+
+map.on('mouseenter', 'audit-points-f2', () => { map.getCanvas().style.cursor = 'pointer'; });
+map.on('mouseleave', 'audit-points-f2', () => { map.getCanvas().style.cursor = ''; });
+
+//#endregion
+
+//#region Drain Interactivity
+
+/**
+ * Add hover + click popup interactivity to a line layer.
+ * @param {string} layerId
+ * @param {Array<{label: string, key: string}>} attrs  — properties to display in the popup
+ */
+function addLineInteractivity(layerId, attrs) {
+    let popup = null;
+
+    map.on('mouseenter', layerId, () => { map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', layerId, () => { map.getCanvas().style.cursor = ''; if (popup) { popup.remove(); popup = null; } });
+
+    map.on('click', layerId, (e) => {
+        e.preventDefault();
+        const p = e.features[0].properties;
+        const vals = attrs.map(({ key, format, bold }) => {
+            const raw = p[key] ?? '';
+            const display = format ? format(raw) : raw;
+            return `<div class="drain-val${bold ? ' drain-val-bold' : ''}">${display}</div>`;
+        }).join('');
+        if (popup) popup.remove();
+        popup = new maplibregl.Popup({ className: 'drain-popup', anchor: 'bottom' })
+            .setLngLat(e.lngLat)
+            .setHTML(`<div class="drain-popup-inner">${vals}</div>`)
             .addTo(map);
     });
-    
-    map.on('mouseenter', 'sample-points', () => {
-        map.getCanvas().style.cursor = 'pointer';
-    });
-
-    map.on('mouseleave', 'sample-points', () => {
-        map.getCanvas().style.cursor = '';
-    });
 }
 
+addLineInteractivity('primarydrains', [
+    { key: 'Drain num', bold: true },
+    { key: 'Status', format: v => Number(v) === 0 ? 'Visible' : 'Not Visible' }
+]);
 //#endregion
 
-//#region Map Event Handlers
+//#region Map Load
 
-map.on('load', () => {
-    console.log('✓ Map loaded successfully');
-    
-    // Add basemap control
-    const basemapControl = new BasemapControl({ 
-        basemaps: baseLayers, 
-        initialBasemap: "cartoPositron",
-        width: '150px',
-        height: '100px',
-        keepOpen: false
-    });
-    map.addControl(basemapControl, 'top-right');
-    
-    // Add layers after basemap initializes
-    setTimeout(() => {
-        addJsonLayers();
+    map.on('load', () => {
+        console.log('✓ Map loaded');
+
+        //Base Map Control
+        const basemapControl = new BasemapControl({
+            basemaps: baseLayers,
+            initialBasemap: 'cartoPositron',
+            width: '150px',
+            height: '100px',
+            keepOpen: false
+        });
+        map.addControl(basemapControl, 'top-right');
+
         addLayers();
-        
-    }, 100);
-});
+        loadAuditData();
+    });
 
-// Re-add layers when basemap changes
-map.on('style.load', () => {
-    if (map.isStyleLoaded()) {
-        setTimeout(() => {
-            addJsonLayers();
-            addLayers();
-            
-        }, 100);
-    }
-});
-
-// Error handling
-map.on('error', (e) => {
-    console.error('Map error:', e);
-});
-
-// Optional: Log map movements for debugging
-map.on('moveend', () => {
-    const center = map.getCenter();
-    const zoom = map.getZoom();
-    console.log(`Center: [${center.lng.toFixed(4)}, ${center.lat.toFixed(4)}], Zoom: ${zoom.toFixed(2)}`);
-});
+    map.on('error', (e) => {
+        console.error('Map error:', e);
+    });
 
 //#endregion

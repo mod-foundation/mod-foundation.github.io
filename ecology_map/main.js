@@ -5361,7 +5361,7 @@ function resetMap() {
     smoothFlyTo(defaultViewBounds);
 
     // 2️⃣ Make DEM fully visible
-    setOpa('dem', 0.4);
+    setOpa('dem', 0.2);
     toggleLayerOff('hillshade');
 
     // Define groups/layers to stay visible or turn on

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Decoding Stormwater Infrastructure</title>
+        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+
+        <link
+            href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&display=swap"
+            rel="stylesheet"
+        />
+
+        <!-- Shoelace -->
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/light.css"
+        />
+        <script
+            type="module"
+            src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace-autoloader.js"
+        ></script>
+
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Barlow', sans-serif;
+                background: #0d6aff;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            header {
+                text-align: center;
+                padding: 40px 24px 32px;
+            }
+
+            header h2 {
+                font-size: 14px;
+                font-weight: 500;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: rgba(255, 255, 255, 0.7);
+                margin-bottom: 10px;
+            }
+
+            header h3 {
+                font-size: 32px;
+                font-weight: 600;
+                color: white;
+                margin-bottom: 32px;
+            }
+
+            .nav-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                justify-content: center;
+            }
+
+            sl-button::part(base) {
+                font-family: 'Barlow', sans-serif;
+                font-weight: 500;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                background: transparent;
+                color: white;
+                border: 1.5px dotted white;
+                border-radius: 4px;
+                transition: background 0.2s, color 0.2s, border-color 0.2s;
+            }
+
+            sl-button::part(base):hover {
+                background: #82f984;
+                color: white;
+                border-color: #82f984;
+            }
+
+
+        </style>
+    </head>
+    <body>
+        <header>
+            <h2>Building a Resilient Bengaluru</h2>
+            <h3>Decoding Stormwater Infrastructure</h3>
+
+            <nav class="nav-buttons">
+                <sl-button href="ecology_map/index.html" variant="primary" size="large">
+                    Interactive Map
+                </sl-button>
+                <sl-button href="story_map/index.html" variant="default" size="large">
+                    Story Map
+                </sl-button>
+                <sl-button href="audit_dashboard/index.html" variant="default" size="large">
+                    Audit Dashboard
+                </sl-button>
+                <sl-button href="audit_status/index.html" variant="default" size="large">
+                    Audit Status
+                </sl-button>
+                <sl-button href="https://buildingaresilientbengaluru.com/" variant="neutral" size="large">
+                    Main Website
+                </sl-button>
+            </nav>
+        </header>
+    </body>
+</html>
