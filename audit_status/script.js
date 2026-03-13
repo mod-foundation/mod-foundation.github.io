@@ -323,6 +323,7 @@ function addAuditDrainInteractivity(layerId) {
 
     map.on('load', () => {
         console.log('✓ Map loaded');
+        map.resize();
 
         //Base Map Control
         const basemapControl = new BasemapControl({
@@ -361,6 +362,8 @@ function addAuditDrainInteractivity(layerId) {
     map.on('error', (e) => {
         console.error('Map error:', e);
     });
+
+    window.addEventListener('resize', () => map.resize());
 
 //#endregion
 
