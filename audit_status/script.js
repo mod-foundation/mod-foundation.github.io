@@ -63,7 +63,8 @@ const map = new maplibregl.Map({
     pitch: 0,
     bearing: 0,
     minZoom: 5,
-    maxZoom: 18
+    maxZoom: 18,
+    clickTolerance: 15
 });
 //#endregion
 
@@ -178,6 +179,16 @@ function addLayers() {
     addLineLayer('primarydrains', 'data/json/primarydrains.geojson', { color: statusColor, width: 2.5 });
     addLineLayer('secondarydrains', 'data/json/secondarydrains.geojson', { color: statusColor, width: 2.5, opacity: 0.8 });
     addLineLayer('gbaboundary', 'data/json/gba_boundary.geojson', { color: '#ffffff', width: 2, opacity: 0.8 });
+
+    // Invisible wide buffer layers for easier hover/click on drain lines
+    addLayer('primarydrains-buffer', 'data/json/primarydrains.geojson', 'line',
+        { 'line-color': 'transparent', 'line-width': 20, 'line-opacity': 0 },
+        { 'line-cap': 'round', 'line-join': 'round' }
+    );
+    addLayer('secondarydrains-buffer', 'data/json/secondarydrains.geojson', 'line',
+        { 'line-color': 'transparent', 'line-width': 20, 'line-opacity': 0 },
+        { 'line-cap': 'round', 'line-join': 'round' }
+    );
 }
 
 //#endregion
@@ -276,8 +287,12 @@ async function loadAuditAssignments() {
     map.setPaintProperty('primarydrains', 'line-color', auditColor);
     map.setPaintProperty('secondarydrains', 'line-color', auditColor);
 
-    addAuditDrainInteractivity('primarydrains');
-    addAuditDrainInteractivity('secondarydrains');
+    // Keep buffer layers in sync with tagged data for correct popup properties
+    map.getSource('primarydrains-buffer').setData(taggedPri);
+    map.getSource('secondarydrains-buffer').setData(taggedSec);
+
+    addAuditDrainInteractivity('primarydrains-buffer');
+    addAuditDrainInteractivity('secondarydrains-buffer');
 
     const priCount = taggedPri.features.filter(f => f.properties.is_audited).length;
     const secCount = taggedSec.features.filter(f => f.properties.is_audited).length;
