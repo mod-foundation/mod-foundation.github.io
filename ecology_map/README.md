@@ -47,7 +47,7 @@ In July 2025, Mod Foundation in collaboration with Oorvani Foundation won a gran
 
 ### Data
 
-Read through the [README in the datasets folder](https://github.com/mod-foundation/mod-foundation.github.io/tree/main/datasets) for information on sources and access.
+Read through the [README in the datasets folder](https://github.com/mod-foundation/mod-foundation.github.io/tree/main/ecology_map/datasets#readme) for information on sources and access.
   
 
 ## Built With
