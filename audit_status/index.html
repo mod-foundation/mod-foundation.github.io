@@ -25,31 +25,33 @@
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
-        <div id="map-container"></div>
+        <div id="map-wrap">
+            <div id="map-container"></div>
 
-        <div id="legend">
-            <div class="legend-title">SWD Audit Progress</div>
-            <div class="legend-table">
-                <div class="legend-row legend-header">
-                    <span></span>
-                    <span>Status</span>
-                    <span>km</span>
-                </div>
-                <div class="legend-row">
-                    <span class="legend-line" style="background:#7bff00;"></span>
-                    <span>Audit Done</span>
-                    <span>80 km</span>
-                </div>
-                <div class="legend-row">
-                    <span class="legend-line" style="background:#ff47f0;"></span>
-                    <span>Audit In Progress</span>
-                    <span>60 km</span>
+            <div id="legend">
+                <div class="legend-title">SWD Audit Progress</div>
+                <div class="legend-table">
+                    <div class="legend-row legend-header">
+                        <span></span>
+                        <span>Status</span>
+                        <span>km</span>
+                    </div>
+                    <div class="legend-row">
+                        <span class="legend-line" style="background:#7bff00;"></span>
+                        <span>Audit Done</span>
+                        <span>80 km</span>
+                    </div>
+                    <div class="legend-row">
+                        <span class="legend-line" style="background:#ff47f0;"></span>
+                        <span>Audit In Progress</span>
+                        <span>60 km</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div id="search-container">
-            <mapbox-search-box id="search-box"></mapbox-search-box>
+            <div id="search-container">
+                <mapbox-search-box id="search-box"></mapbox-search-box>
+            </div>
         </div>
         <script src="script.js"></script>
     </body>
