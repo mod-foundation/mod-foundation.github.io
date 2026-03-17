@@ -19,9 +19,121 @@
         <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
 
         <link rel="stylesheet" href="styles.css" />
+
+        <!-- Web Awesome -->
+        <script src="https://kit.webawesome.com/12f6b474bd1f41e1.js" crossorigin="anonymous"></script>
     </head>
     <body>
         <div id="map-container"></div>
+
+        <!-- Panel 1: Infrastructure -->
+        <wa-details open id="panel-infrastructure" class="panel-overlay">
+            <span slot="summary"><wa-icon name="city"></wa-icon> Infrastructure</span>
+
+            <wa-details open id="wall-condition">
+                <span slot="summary">Retaining Wall</span>
+                <div class="chart-slot" data-fields="wall_condition">
+                </div>
+            </wa-details>
+
+            <wa-details open>
+                <span slot="summary">Bridge</span>
+                <div class="chart-slot" data-fields="bridge_type, bridge_condition, bridge_walkable">
+                    <span>Chart placeholder — bridge_type · bridge_condition · bridge_walkable</span>
+                </div>
+            </wa-details>
+
+            <wa-details open>
+                <span slot="summary">Piers</span>
+                <div class="chart-slot" data-fields="piers_condition, piers_num">
+                    <span>Chart placeholder — piers_condition · piers_num</span>
+                </div>
+            </wa-details>
+
+            <wa-details open>
+                <span slot="summary">Electrical</span>
+                <div class="chart-slot" data-fields="elec_condition">
+                    <span>Chart placeholder — elec_condition</span>
+                </div>
+            </wa-details>
+
+            <wa-details open>
+                <span slot="summary">Cables &amp; Manholes</span>
+                <div class="chart-slot" data-fields="cables_condition, manholes_condition">
+                    <span>Chart placeholder — cables_condition · manholes_condition</span>
+                </div>
+            </wa-details>
+        </wa-details>
+
+        <!-- Panel 2: Water Quality -->
+        <wa-details open id="panel-water-quality" class="panel-overlay">
+            <span slot="summary"><wa-icon name="droplet"></wa-icon> Water Quality</span>
+
+            <wa-details open>
+                <span slot="summary">Inlets</span>
+                <div class="chart-slot" data-fields="inlets, unauthorised_inlets">
+                    <span>Chart placeholder — inlets · unauthorised_inlets</span>
+                </div>
+            </wa-details>
+
+            <wa-details open>
+                <span slot="summary">Water Flow</span>
+                <div class="chart-slot" data-fields="water_stagnant">
+                    <span>Chart placeholder — water_stagnant</span>
+                </div>
+            </wa-details>
+
+            <wa-details open>
+                <span slot="summary">Contamination</span>
+                <div class="chart-slot" data-fields="water_contamination, water_colour, water_turbidity, water_smell">
+                    <span>Chart placeholder — water_contamination · water_colour · water_turbidity · water_smell</span>
+                </div>
+            </wa-details>
+
+            <wa-details open>
+                <span slot="summary">Solid Waste — Inside</span>
+                <div class="chart-slot" data-fields="sw_inside, sw_inside_type, sw_inside_source">
+                    <span>Chart placeholder — sw_inside · sw_inside_type · sw_inside_source</span>
+                </div>
+            </wa-details>
+
+            <wa-details open>
+                <span slot="summary">Solid Waste — Outside</span>
+                <div class="chart-slot" data-fields="sw_outside, sw_outside_type, sw_outside_source">
+                    <span>Chart placeholder — sw_outside · sw_outside_type · sw_outside_source</span>
+                </div>
+            </wa-details>
+        </wa-details>
+
+        <!-- Panel 3: Community Engagement -->
+        <wa-details open id="panel-community" class="panel-overlay">
+            <span slot="summary"><wa-icon name="people-group"></wa-icon> Community Engagement</span>
+
+            <wa-details open>
+                <span slot="summary">Cleanup Efforts</span>
+                <div class="chart-slot" data-fields="sw_clean_up">
+                    <span>Chart placeholder — sw_clean_up</span>
+                </div>
+            </wa-details>
+
+            <wa-details open>
+                <span slot="summary">Community Participation</span>
+                <div class="chart-slot" data-fields="community_engagement">
+                    <span>Chart placeholder — community_engagement</span>
+                </div>
+            </wa-details>
+
+            <wa-details open>
+                <span slot="summary">Waste Comparison</span>
+                <div class="chart-slot" data-fields="sw_inside, sw_outside">
+                    <span>Chart placeholder — inside vs outside waste</span>
+                </div>
+            </wa-details>
+        </wa-details>
+
+        <!-- Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+        <script src="charts.js"></script>
         <script src="script.js"></script>
     </body>
 </html>

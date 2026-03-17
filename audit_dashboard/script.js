@@ -169,8 +169,8 @@ async function loadAuditData() {
         fetch('data/csv/form-2.csv').then(r => r.text())
     ]);
 
-    const f1 = Papa.parse(f1Text, { header: true, skipEmptyLines: true }).data;
-    const f2 = Papa.parse(f2Text, { header: true, skipEmptyLines: true }).data;
+    const f1 = Papa.parse(f1Text, { header: true, skipEmptyLines: true }).data.slice(1);
+    const f2 = Papa.parse(f2Text, { header: true, skipEmptyLines: true }).data.slice(1);
 
     // form-2 lookup keyed by _index_f1 (references form-1._index)
     const f2ByIndex = new Map(f2.map(row => [row._index_f1, row]));
@@ -212,6 +212,10 @@ async function loadAuditData() {
     addPointLayer('audit-points-f2', geojsonF2, { color: '#ff80c0', radius: 6, strokeColor: '#fff', strokeWidth: 1.5 });
 
     console.log(`✓ Loaded ${auditData.length} audit records (${geojson.features.length} with coordinates, ${geojsonF2.features.length} form-2 only)`);
+
+    renderInfrastructureCharts(auditData);
+    renderWaterQualityCharts(auditData);
+    renderCommunityCharts(auditData);
 }
 
 //#endregion

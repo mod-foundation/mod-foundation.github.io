@@ -227,27 +227,28 @@ function addLineInteractivity(layerId, attrs) {
 //#region Audit Drain Assignment
 
 async function loadAuditAssignments() {
-    const [csvText, priJson, secJson] = await Promise.all([
-        fetch('data/csv/drains_auditing.csv').then(r => r.text()),
+    const [xlsxBuffer, priJson, secJson] = await Promise.all([
+        fetch('data/csv/drains_auditing.xlsx').then(r => r.arrayBuffer()),
         fetch('data/json/primarydrains.geojson').then(r => r.json()),
         fetch('data/json/secondarydrains.geojson').then(r => r.json())
     ]);
 
-    const rows = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
+    const wb = XLSX.read(new Uint8Array(xlsxBuffer), { type: 'array' });
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
 
     // Build lookup maps
     const priMap = new Map(); // numeric id -> {area, name}
-    const secMap = new Map(); // Drain num string -> {area, name}
+    const secMap = new Map(); // numeric id -> {area, name}
 
     rows.forEach(row => {
         const info = { area: (row.area || '').trim(), name: (row.name || '').trim(), status: (row.status || '').trim().toLowerCase() };
         if (row.pri_drain_id) {
-            row.pri_drain_id.split(',').map(s => s.trim()).filter(Boolean)
+            String(row.pri_drain_id).split(',').map(s => s.trim()).filter(Boolean)
                 .forEach(id => priMap.set(Number(id), info));
         }
-        if (row.sec_drain_num) {
-            row.sec_drain_num.split(',').map(s => s.trim()).filter(Boolean)
-                .forEach(num => secMap.set(num, info));
+        if (row.sec_drain_id) {
+            String(row.sec_drain_id).split(',').map(s => s.trim()).filter(Boolean)
+                .forEach(id => secMap.set(Number(id), info));
         }
     });
 
@@ -266,7 +267,7 @@ async function loadAuditAssignments() {
     const taggedSec = {
         ...secJson,
         features: secJson.features.map(f => {
-            const info = secMap.get((f.properties['Drain num'] || '').trim());
+            const info = secMap.get(f.properties.sec_id);
             return info
                 ? { ...f, properties: { ...f.properties, is_audited: true, audit_area: info.area, audit_name: info.name, audit_status: info.status } }
                 : f;
