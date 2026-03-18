@@ -114,7 +114,7 @@ html, body {
     top: 0;
     left: 0;
     bottom: 0;
-    width: 30%;
+    width: 35%;
     padding: 20px;
     background: white;
     border-right: 1px solid rgba(0,0,0,0.1);
@@ -128,7 +128,7 @@ html, body {
 #legend {
     position: absolute;
     top: 36px;
-    left: 32%;
+    left: 37%;
     z-index: 10;
     background: rgba(255,255,255,0.97);
     border-radius: 10px;
@@ -199,7 +199,7 @@ html, body {
 #map-container {
     position: absolute;
     top: 0;
-    left: 30%;
+    left: 35%;
     right: 0;
     bottom: 0;
     border-radius: 25px;
