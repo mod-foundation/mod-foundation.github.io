@@ -440,15 +440,15 @@ html, body {
 }
 
 .team-institute-name {
-    font-size: 12px;
-    font-weight: 400;
+    font-size: 15px;
+    font-weight: 600;
     color: var(--text-secondary);
     letter-spacing: 0.01em;
 }
 
 .team-crew-name {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 400;
     color: var(--primary-grey);
     letter-spacing: 0.01em;
 }
