@@ -246,6 +246,7 @@ async function loadAuditAssignments() {
             name: (row.name || '').trim(),
             status: (row.status || '').trim().toLowerCase(),
             captain: (row.team_captain_name || '').toString().trim(),
+            institute: (row.team_captain_institute || '').toString().trim(),
             crew: (row.team_crew_name || '').toString().trim(),
             imgId: (row.img_id || '').toString().trim()
         };
@@ -265,7 +266,7 @@ async function loadAuditAssignments() {
         features: priJson.features.map(f => {
             const info = priMap.get(f.properties.id);
             return info
-                ? { ...f, properties: { ...f.properties, is_audited: true, audit_area: info.area, audit_name: info.name, audit_status: info.status, audit_captain: info.captain, audit_crew: info.crew, audit_img: info.imgId } }
+                ? { ...f, properties: { ...f.properties, is_audited: true, audit_area: info.area, audit_name: info.name, audit_status: info.status, audit_captain: info.captain, audit_institute: info.institute, audit_crew: info.crew, audit_img: info.imgId } }
                 : f;
         })
     };
@@ -276,7 +277,7 @@ async function loadAuditAssignments() {
         features: secJson.features.map(f => {
             const info = secMap.get(f.properties.sec_id);
             return info
-                ? { ...f, properties: { ...f.properties, is_audited: true, audit_area: info.area, audit_name: info.name, audit_status: info.status, audit_captain: info.captain, audit_crew: info.crew, audit_img: info.imgId } }
+                ? { ...f, properties: { ...f.properties, is_audited: true, audit_area: info.area, audit_name: info.name, audit_status: info.status, audit_captain: info.captain, audit_institute: info.institute, audit_crew: info.crew, audit_img: info.imgId } }
                 : f;
         })
     };
@@ -305,6 +306,8 @@ async function loadAuditAssignments() {
     const priCount = taggedPri.features.filter(f => f.properties.is_audited).length;
     const secCount = taggedSec.features.filter(f => f.properties.is_audited).length;
     console.log(`✓ Audit assignments: ${priCount} primary, ${secCount} secondary drains`);
+    const withInstitute = [...taggedPri.features, ...taggedSec.features].filter(f => f.properties.audit_institute);
+    console.log(`✓ Institute data: ${withInstitute.length} drains, sample:`, withInstitute[0]?.properties?.audit_institute);
 
     // Calculate total length by audit status and update legend
     const allFeatures = [...taggedPri.features, ...taggedSec.features];
@@ -322,9 +325,10 @@ async function loadAuditAssignments() {
 }
 
 function updateTeamPanel(p) {
-    const captain = p.audit_captain || '';
-    const crew    = p.audit_crew    || '';
-    const imgId   = p.audit_img     || '';
+    const captain   = p.audit_captain   || '';
+    const institute = p.audit_institute || '';
+    const crew      = p.audit_crew      || '';
+    const imgId     = p.audit_img       || '';
 
     const el = id => document.getElementById(id);
     const captainRow = el('captain-row');
@@ -334,6 +338,14 @@ function updateTeamPanel(p) {
         if (captain) {
             if (el('team-captain')) el('team-captain').innerHTML = `<span class="team-capt-name">${captain}</span>`;
             if (el('captain-desc')) el('captain-desc').style.display = 'none';
+            if (el('team-institute')) {
+                if (institute) {
+                    el('team-institute').innerHTML = `<span class="team-institute-name">${institute}</span>`;
+                    el('team-institute').style.display = 'block';
+                } else {
+                    el('team-institute').style.display = 'none';
+                }
+            }
             captainRow.style.display = 'flex';
         } else {
             captainRow.style.display = 'none';
@@ -423,8 +435,9 @@ function addAuditDrainInteractivity(layerId) {
         map.on('click', (e) => {
             if (!e.defaultPrevented) {
                 const el = id => document.getElementById(id);
-                if (el('team-captain'))  el('team-captain').innerHTML = '';
-                if (el('crew-name'))     el('crew-name').innerHTML = '';
+                if (el('team-captain'))   el('team-captain').innerHTML = '';
+                if (el('team-institute')) { el('team-institute').innerHTML = ''; el('team-institute').style.display = 'none'; }
+                if (el('crew-name'))      el('crew-name').innerHTML = '';
                 if (el('team-img'))      el('team-img').style.display = 'none';
                 if (el('captain-row'))   el('captain-row').style.display = 'flex';
                 if (el('crew-row'))      el('crew-row').style.display = 'flex';

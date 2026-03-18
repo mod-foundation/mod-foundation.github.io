@@ -439,6 +439,13 @@ html, body {
     letter-spacing: 0.01em;
 }
 
+.team-institute-name {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    letter-spacing: 0.01em;
+}
+
 .team-crew-name {
     font-size: 14px;
     font-weight: 600;
