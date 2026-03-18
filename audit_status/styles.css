@@ -1,3 +1,95 @@
+:root {
+    --sl-color-primary-600: var(--highlight-green); /* Default thumb color */
+    --sl-color-primary-500: var(--highlight-green); /* Hover/active thumb color */
+
+    /* Primary Colors */
+    --primary-blue: #0d6aff;
+    --primary-grey: #403c3f;
+
+    /* Secondary Colors */
+    --blue: #306ef8;
+    --dark-blue: #062390;
+    --darker-blue: #071f78;
+    --sky-blue: #68c2fb;
+    --aqua-blue: #6fe6fd;
+
+    /* Greens */
+    --mint-green: #85fbeb;
+    --lime-green: #7af9b4;
+    --spring-green: #71e68b;
+    --apple-green: #82f984;
+    --grass-green: #6cd46f;
+    --forest-green: #43894d;
+
+    /* Neutral Colors */
+    --bg-white: #ffffff;
+    --bg-light: #f3f4f6;
+    --bg-gray: #e5e7eb;
+    --bg-dark: #1f2937;
+
+    /* Text Colors */
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --text-light: #9ca3af;
+
+    /* Border Colors */
+    --border-light: #e5e7eb;
+    --border-medium: #d1d5db;
+
+    /* Highlight Colors */
+    --highlight-green: #82f984;
+    --highlight-yellow: #f9ea46;
+    --error: #ef4444;
+    --info: #3b82f6;
+
+    /* Opacity variants */
+    --overlay-dark: rgba(0, 0, 0, 0.5);
+    --overlay-light: rgba(255, 255, 255, 0.9);
+}
+
+/* #endregion */
+
+/* #region Fonts -------------------------------------------*/
+
+h2 {
+    color: var(--primary-blue);
+    font-size: 45px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    margin-bottom: 80px;
+}
+
+h3 {
+    color: var(--blue);
+    font-size: 30px;
+    font-family: 'Poppins', sans-serif;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+li {
+    font-size: 13.5px;
+    margin-bottom: 10px;
+}
+ol {
+    padding-left: 25px;
+}
+
+h4 {
+    color: var(--primary-grey);
+    font-size: 16px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    margin-bottom: 10px;
+}
+
+h6 {
+    color: rgb(219, 219, 219);
+    font-size: 14px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 300;
+}
 /* Full-bleed reset for iframe embedding */
 html, body {
     margin: 0;
@@ -16,25 +108,47 @@ html, body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
-/* Legend */
+/* Side Panel — team details only, shown on drain click */
+#side-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 30%;
+    padding: 20px;
+    background: white;
+    border-right: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    overflow: hidden;
+}
+
+/* Legend — floating overlay on the map */
 #legend {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 36px;
+    left: 32%;
     z-index: 10;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-    padding: 22px 26px;
+    background: rgba(255,255,255,0.97);
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    padding: 20px;
     min-width: 220px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.panel-divider {
+    border: none;
+    border-top: 1px solid var(--border-light);
+    margin: 10px 0;
 }
 
 .legend-title {
-    font-size: 18px;
+    color: var(--primary-blue);
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
     font-weight: 700;
-    color: #1a1a1a;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     letter-spacing: 0.01em;
 }
 
@@ -46,21 +160,21 @@ html, body {
 
 .legend-row {
     display: grid;
-    grid-template-columns: 28px 1fr auto;
+    grid-template-columns: 20px 1fr auto;
     align-items: center;
-    gap: 30px;
-    font-size: 15px;
-    color: #333;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-primary);
 }
 
 .legend-header {
-    color: #888;
+    color: var(--text-secondary);
     font-weight: 600;
-    font-size: 14px;
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 6px;
     margin-bottom: 2px;
 }
 
@@ -84,10 +198,9 @@ html, body {
 #map-container {
     position: absolute;
     top: 0;
-    bottom: 0;
-    left: 0;
+    left: 30%;
     right: 0;
-    width: 100%;
+    bottom: 0;
 }
 
 .maplibregl-ctrl-group {
@@ -259,4 +372,80 @@ html, body {
     color: #222;
     font-weight: 400;
     text-align: right;
+}
+
+/* Team role rows (default state) */
+.team-role-desc {
+    color: var(--text-secondary);
+    margin: 2px 0 0;
+    line-height: 1.4;
+}
+
+.team-role-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 50px;
+}
+
+/* Team Panel */
+#team-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#team-captain {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+#team-crew {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#crew-name {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#team-img {
+    width: fill;
+    aspect-ratio: 16 / 9;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.team-label {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--blue);
+}
+
+.team-capt-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--primary-grey);
+    letter-spacing: 0.01em;
+}
+
+.team-crew-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary-grey);
+    letter-spacing: 0.01em;
+}
+
+.team-icon {
+width: 30%;
 }

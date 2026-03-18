@@ -2,8 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>Audit Status
-        </title>
+        <title>Audit Status</title>
         <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
 
         <!-- MapLibre -->
@@ -19,6 +18,9 @@
         <!-- SheetJS -->
         <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 
+        <!-- Web Awesome -->
+        <script src="https://kit.webawesome.com/12f6b474bd1f41e1.js" crossorigin="anonymous"></script>
+
         <!-- Mapbox Search JS -->
         <script id="search-js" defer="" src="https://api.mapbox.com/search-js/v1.5.0/web.js"></script>
 
@@ -26,10 +28,34 @@
     </head>
     <body>
         <div id="map-wrap">
+
+            <div id="side-panel">
+                <h2>Meet our <br>Drain Detectives </h2>
+                <div id="captain-row" class="team-role-row">
+                    <img class="team-icon" src="data/images/team-captain.png" alt="">
+                    <div class="team-role-info">
+                        <h3>Captains</h3>
+                        <h4 class="team-role-desc" id="captain-desc">Citizens who are leading audits in their neighborhood!</h4>
+                        <div id="team-captain"></div>
+                    </div>
+                </div>
+                <div id="crew-row" class="team-role-row">
+                    <img class="team-icon" src="data/images/team-crew.png" alt="">
+                    <div class="team-role-info">
+                        <h3>Crew</h3>
+                        <h4 class="team-role-desc" id="crew-desc">Citizens who have volunteered in guided and individual audits</h4>
+                        <div id="crew-name"></div>
+                    </div>
+                </div>
+
+                <div id="team-img" style="display:none;"></div>
+            </div>
+
             <div id="map-container"></div>
 
             <div id="legend">
                 <div class="legend-title">SWD Audit Progress</div>
+                <hr class="panel-divider" />
                 <div class="legend-table">
                     <div class="legend-row legend-header">
                         <span></span>

@@ -241,7 +241,14 @@ async function loadAuditAssignments() {
     const secMap = new Map(); // numeric id -> {area, name}
 
     rows.forEach(row => {
-        const info = { area: (row.area || '').trim(), name: (row.name || '').trim(), status: (row.status || '').trim().toLowerCase() };
+        const info = {
+            area: (row.area || '').trim(),
+            name: (row.name || '').trim(),
+            status: (row.status || '').trim().toLowerCase(),
+            captain: (row.team_captain_name || '').toString().trim(),
+            crew: (row.team_crew_name || '').toString().trim(),
+            imgId: (row.img_id || '').toString().trim()
+        };
         if (row.pri_drain_id) {
             String(row.pri_drain_id).split(',').map(s => s.trim()).filter(Boolean)
                 .forEach(id => priMap.set(Number(id), info));
@@ -258,7 +265,7 @@ async function loadAuditAssignments() {
         features: priJson.features.map(f => {
             const info = priMap.get(f.properties.id);
             return info
-                ? { ...f, properties: { ...f.properties, is_audited: true, audit_area: info.area, audit_name: info.name, audit_status: info.status } }
+                ? { ...f, properties: { ...f.properties, is_audited: true, audit_area: info.area, audit_name: info.name, audit_status: info.status, audit_captain: info.captain, audit_crew: info.crew, audit_img: info.imgId } }
                 : f;
         })
     };
@@ -269,7 +276,7 @@ async function loadAuditAssignments() {
         features: secJson.features.map(f => {
             const info = secMap.get(f.properties.sec_id);
             return info
-                ? { ...f, properties: { ...f.properties, is_audited: true, audit_area: info.area, audit_name: info.name, audit_status: info.status } }
+                ? { ...f, properties: { ...f.properties, is_audited: true, audit_area: info.area, audit_name: info.name, audit_status: info.status, audit_captain: info.captain, audit_crew: info.crew, audit_img: info.imgId } }
                 : f;
         })
     };
@@ -314,6 +321,35 @@ async function loadAuditAssignments() {
         inpKm > 0 ? `${inpKm.toFixed(1)} km` : '—';
 }
 
+function updateTeamPanel(p) {
+    const captain = p.audit_captain || '';
+    const crew    = p.audit_crew    || '';
+    const imgId   = p.audit_img     || '';
+
+    const captainRow = document.getElementById('captain-row');
+    const crewRow    = document.getElementById('crew-row');
+
+    if (captain) {
+        document.getElementById('team-captain').innerHTML = `<span class="team-capt-name">${captain}</span>`;
+        document.getElementById('captain-desc').style.display = 'none';
+        captainRow.style.display = 'flex';
+    } else {
+        captainRow.style.display = 'none';
+    }
+
+    if (crew) {
+        document.getElementById('crew-name').innerHTML = `<span class="team-crew-name">${crew}</span>`;
+        document.getElementById('crew-desc').style.display = 'none';
+        crewRow.style.display = 'flex';
+    } else {
+        crewRow.style.display = 'none';
+    }
+
+    document.getElementById('team-img').style.backgroundImage = imgId
+        ? `url('data/images/${imgId}.jpeg')`
+        : 'none';
+}
+
 function addAuditDrainInteractivity(layerId) {
     let popup = null;
 
@@ -344,6 +380,15 @@ function addAuditDrainInteractivity(layerId) {
             .setLngLat(e.lngLat)
             .setHTML(`<div class="adp-inner"><div class="${headerClass}">${drainNum}</div>${rows}</div>`)
             .addTo(map);
+
+        if (s === 'done') {
+            updateTeamPanel(p);
+            document.getElementById('team-img').style.display = 'block';
+        } else {
+            document.getElementById('team-captain').innerHTML = '';
+            document.getElementById('crew-name').innerHTML = '';
+            document.getElementById('team-img').style.display = 'none';
+        }
     });
 }
 
@@ -367,6 +412,19 @@ function addAuditDrainInteractivity(layerId) {
 
         addLayers();
         loadAuditAssignments();
+
+        // Clear team details when clicking empty map area
+        map.on('click', (e) => {
+            if (!e.defaultPrevented) {
+                document.getElementById('team-captain').innerHTML = '';
+                document.getElementById('crew-name').innerHTML = '';
+                document.getElementById('team-img').style.display = 'none';
+                document.getElementById('captain-row').style.display = 'flex';
+                document.getElementById('crew-row').style.display = 'flex';
+                document.getElementById('captain-desc').style.display = '';
+                document.getElementById('crew-desc').style.display = '';
+            }
+        });
 
         // Dark overlay for satellite basemap
         map.addSource('dark-overlay-src', {
