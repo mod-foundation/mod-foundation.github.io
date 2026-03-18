@@ -326,28 +326,34 @@ function updateTeamPanel(p) {
     const crew    = p.audit_crew    || '';
     const imgId   = p.audit_img     || '';
 
-    const captainRow = document.getElementById('captain-row');
-    const crewRow    = document.getElementById('crew-row');
+    const el = id => document.getElementById(id);
+    const captainRow = el('captain-row');
+    const crewRow    = el('crew-row');
 
-    if (captain) {
-        document.getElementById('team-captain').innerHTML = `<span class="team-capt-name">${captain}</span>`;
-        document.getElementById('captain-desc').style.display = 'none';
-        captainRow.style.display = 'flex';
-    } else {
-        captainRow.style.display = 'none';
+    if (captainRow) {
+        if (captain) {
+            if (el('team-captain')) el('team-captain').innerHTML = `<span class="team-capt-name">${captain}</span>`;
+            if (el('captain-desc')) el('captain-desc').style.display = 'none';
+            captainRow.style.display = 'flex';
+        } else {
+            captainRow.style.display = 'none';
+        }
     }
 
-    if (crew) {
-        document.getElementById('crew-name').innerHTML = `<span class="team-crew-name">${crew}</span>`;
-        document.getElementById('crew-desc').style.display = 'none';
-        crewRow.style.display = 'flex';
-    } else {
-        crewRow.style.display = 'none';
+    if (crewRow) {
+        if (crew) {
+            if (el('crew-name')) el('crew-name').innerHTML = `<span class="team-crew-name">${crew}</span>`;
+            if (el('crew-desc')) el('crew-desc').style.display = 'none';
+            crewRow.style.display = 'flex';
+        } else {
+            crewRow.style.display = 'none';
+        }
     }
 
-    document.getElementById('team-img').style.backgroundImage = imgId
-        ? `url('data/images/${imgId}.jpeg')`
-        : 'none';
+    if (el('team-img')) {
+        el('team-img').style.backgroundImage = imgId ? `url('data/images/${imgId}.jpeg')` : 'none';
+        el('team-img').style.display = imgId ? 'block' : 'none';
+    }
 }
 
 function addAuditDrainInteractivity(layerId) {
@@ -416,13 +422,14 @@ function addAuditDrainInteractivity(layerId) {
         // Clear team details when clicking empty map area
         map.on('click', (e) => {
             if (!e.defaultPrevented) {
-                document.getElementById('team-captain').innerHTML = '';
-                document.getElementById('crew-name').innerHTML = '';
-                document.getElementById('team-img').style.display = 'none';
-                document.getElementById('captain-row').style.display = 'flex';
-                document.getElementById('crew-row').style.display = 'flex';
-                document.getElementById('captain-desc').style.display = '';
-                document.getElementById('crew-desc').style.display = '';
+                const el = id => document.getElementById(id);
+                if (el('team-captain'))  el('team-captain').innerHTML = '';
+                if (el('crew-name'))     el('crew-name').innerHTML = '';
+                if (el('team-img'))      el('team-img').style.display = 'none';
+                if (el('captain-row'))   el('captain-row').style.display = 'flex';
+                if (el('crew-row'))      el('crew-row').style.display = 'flex';
+                if (el('captain-desc'))  el('captain-desc').style.display = '';
+                if (el('crew-desc'))     el('crew-desc').style.display = '';
             }
         });
 
