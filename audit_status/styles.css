@@ -458,3 +458,168 @@ html, body {
 .team-icon {
 width: 30%;
 }
+
+/* ============================================================
+   RESPONSIVE — Tablet (768px–1024px)
+   ============================================================ */
+@media (max-width: 1024px) and (min-width: 768px) {
+    #side-panel {
+        width: 42%;
+        padding: 14px;
+    }
+
+    #map-container {
+        left: 42%;
+    }
+
+    #legend {
+        left: 44%;
+        padding: 14px;
+        min-width: 190px;
+    }
+
+    #search-container {
+        width: 220px;
+        right: 40px;
+    }
+
+    .team-role-row {
+        margin-bottom: 24px;
+    }
+
+    h3 {
+        font-size: 22px;
+    }
+
+    h4 {
+        font-size: 14px;
+    }
+
+    .team-icon {
+        width: 25%;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE — Mobile (< 768px)
+   ============================================================ */
+@media (max-width: 767px) {
+    /* Map fills top 55% of screen */
+    #map-container {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 46%;
+        border-radius: 0 0 18px 18px;
+    }
+
+    /* Side panel slides up from bottom as a drawer */
+    #side-panel {
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 46%;
+        border-right: none;
+        border-top: 2px solid var(--border-light);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        align-items: start;
+        gap: 10px;
+        padding: 12px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /* Each team block in its grid cell */
+    #captain-row {
+        grid-column: 1;
+        grid-row: 1;
+        flex-direction: column;
+        margin-bottom: 0;
+        gap: 6px;
+        min-width: 0;
+    }
+
+    #crew-row {
+        grid-column: 2;
+        grid-row: 1;
+        flex-direction: column;
+        margin-bottom: 0;
+        gap: 6px;
+        min-width: 0;
+    }
+
+    /* Image spans full width below team blocks */
+    #team-img {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        width: 100%;
+        aspect-ratio: 16 / 7;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    /* Legend repositioned to top-left of map area */
+    #legend {
+        top: 8px;
+        left: 8px;
+        padding: 10px 12px;
+        min-width: 160px;
+        font-size: 12px;
+    }
+
+    .legend-title {
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .legend-row {
+        font-size: 11px;
+        gap: 6px;
+    }
+
+    /* Search bar narrower, away from legend */
+    #search-container {
+        top: 8px;
+        right: 8px;
+        width: calc(50% - 16px);
+        max-width: 200px;
+    }
+
+    /* Typography scale-down */
+    h3 {
+        font-size: 16px;
+        margin-bottom: 4px;
+    }
+
+    h4 {
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    .team-role-desc {
+        display: none;
+    }
+
+    .team-icon {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+    }
+
+    .team-label {
+        font-size: 14px;
+    }
+
+    .team-capt-name,
+    .team-institute-name {
+        font-size: 13px;
+    }
+
+    .team-crew-name {
+        font-size: 11px;
+    }
+}
