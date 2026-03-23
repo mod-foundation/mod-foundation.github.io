@@ -175,7 +175,7 @@ function addPointLayer(id, data, {
 //#region Layers
 
 function addLayers() {
-    const statusColor = ['match', ['get', 'Status'], 1, '#0d6aff81', '#0dbaffff'];
+    const statusColor = ['match', ['get', 'Status'], 1, '#ffaa0dc7', '#0dbaffff'];
     addLineLayer('primarydrains', 'data/json/primarydrains.geojson', { color: statusColor, width: 2.5 });
     addLineLayer('secondarydrains', 'data/json/secondarydrains.geojson', { color: statusColor, width: 2.5, opacity: 0.8 });
     addLineLayer('gbaboundary', 'data/json/gba_boundary.geojson', { color: '#ffffff', width: 2, opacity: 0.8 });
@@ -286,7 +286,7 @@ async function loadAuditAssignments() {
     map.getSource('secondarydrains').setData(taggedSec);
 
     // Colour by audit status; fall back to drain visibility colour for unassigned
-    const drainColor = ['match', ['get', 'Status'], 1, '#0defff63', '#0df7ff96'];
+    const drainColor = ['match', ['get', 'Status'], 1, '#ffaa0d81', '#0df7ff96'];
     const auditColor = [
         'case',
         ['==', ['get', 'audit_status'], 'done'],        '#00ff0dff',
