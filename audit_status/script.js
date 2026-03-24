@@ -475,6 +475,32 @@ function addAuditDrainInteractivity(layerId) {
 
 //#endregion
 
+//#region Panel Toggle
+
+const sidePanel    = document.getElementById('side-panel');
+const mapContainer = document.getElementById('map-container');
+const legend       = document.getElementById('legend');
+const panelClose   = document.getElementById('panel-close');
+const panelToggle  = document.getElementById('panel-toggle');
+
+panelClose.addEventListener('click', () => {
+    sidePanel.classList.add('closed');
+    mapContainer.classList.add('panel-closed');
+    legend.classList.add('panel-closed');
+    panelToggle.style.display = 'flex';
+    setTimeout(() => map.resize(), 310);
+});
+
+panelToggle.addEventListener('click', () => {
+    sidePanel.classList.remove('closed');
+    mapContainer.classList.remove('panel-closed');
+    legend.classList.remove('panel-closed');
+    panelToggle.style.display = 'none';
+    setTimeout(() => map.resize(), 310);
+});
+
+//#endregion
+
 //#region Search
 
 let searchMarker = null;

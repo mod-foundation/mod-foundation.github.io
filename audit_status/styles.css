@@ -122,6 +122,66 @@ html, body {
     flex-direction: column;
     z-index: 10;
     overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+#side-panel.closed {
+    transform: translateX(-100%);
+}
+
+/* Close button inside panel */
+#panel-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: var(--bg-light);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 11;
+    transition: background 0.2s;
+}
+
+#panel-close:hover {
+    background: var(--bg-gray);
+    color: var(--text-primary);
+}
+
+/* Reopen toggle — shown on left edge when panel is closed */
+#panel-toggle {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 52px;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    background: white;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--primary-blue);
+    align-items: center;
+    justify-content: center;
+    z-index: 11;
+    transition: background 0.2s;
+}
+
+#panel-toggle:hover {
+    background: var(--bg-light);
+}
+
+/* Mobile hint — hidden on desktop */
+#mobile-hint {
+    display: none;
 }
 
 /* Legend — floating overlay on the map */
@@ -135,6 +195,11 @@ html, body {
     box-shadow: 0 2px 12px rgba(0,0,0,0.15);
     padding: 20px;
     min-width: 220px;
+    transition: left 0.3s ease;
+}
+
+#legend.panel-closed {
+    left: 48px;
 }
 
 .panel-divider {
@@ -203,6 +268,12 @@ html, body {
     right: 0;
     bottom: 0;
     border-radius: 25px;
+    transition: left 0.3s ease;
+}
+
+#map-container.panel-closed {
+    left: 0;
+    border-radius: 0;
 }
 
 .maplibregl-ctrl-group {
@@ -504,71 +575,53 @@ width: 30%;
    RESPONSIVE — Mobile (< 768px)
    ============================================================ */
 @media (max-width: 767px) {
-    /* Map fills top 55% of screen */
+    /* Side panel hidden on mobile */
+    #side-panel {
+        display: none !important;
+    }
+
+    /* Map fills full screen */
     #map-container {
         top: 0;
-        left: 0;
+        left: 0 !important;
         right: 0;
-        bottom: 46%;
-        border-radius: 0 0 18px 18px;
-    }
-
-    /* Side panel slides up from bottom as a drawer */
-    #side-panel {
-        top: auto;
         bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        height: 46%;
-        border-right: none;
-        border-top: 2px solid var(--border-light);
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto;
-        align-items: start;
-        gap: 10px;
-        padding: 12px;
-        overflow-y: auto;
-        overflow-x: hidden;
+        border-radius: 0 !important;
+        transition: none;
     }
 
-    /* Each team block in its grid cell */
-    #captain-row {
-        grid-column: 1;
-        grid-row: 1;
-        flex-direction: column;
-        margin-bottom: 0;
-        gap: 6px;
-        min-width: 0;
+    /* Hide panel toggle button on mobile */
+    #panel-toggle {
+        display: none !important;
     }
 
-    #crew-row {
-        grid-column: 2;
-        grid-row: 1;
-        flex-direction: column;
-        margin-bottom: 0;
-        gap: 6px;
-        min-width: 0;
+    /* Mobile hint pill */
+    #mobile-hint {
+        display: block;
+        position: absolute;
+        bottom: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255,255,255,0.92);
+        color: var(--text-secondary);
+        font-size: 12px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        padding: 7px 14px;
+        border-radius: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        white-space: nowrap;
+        z-index: 10;
+        pointer-events: none;
     }
 
-    /* Image spans full width below team blocks */
-    #team-img {
-        grid-column: 1 / -1;
-        grid-row: 2;
-        width: 100%;
-        aspect-ratio: 16 / 7;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-
-    /* Legend repositioned to top-left of map area */
+    /* Legend repositioned to top-left */
     #legend {
         top: 8px;
-        left: 8px;
+        left: 8px !important;
         padding: 10px 12px;
         min-width: 160px;
         font-size: 12px;
+        transition: none;
     }
 
     .legend-title {
@@ -581,45 +634,11 @@ width: 30%;
         gap: 6px;
     }
 
-    /* Search bar narrower, away from legend */
+    /* Search bar narrower */
     #search-container {
         top: 8px;
         right: 8px;
         width: calc(50% - 16px);
         max-width: 200px;
-    }
-
-    /* Typography scale-down */
-    h3 {
-        font-size: 16px;
-        margin-bottom: 4px;
-    }
-
-    h4 {
-        font-size: 12px;
-        margin-bottom: 4px;
-    }
-
-    .team-role-desc {
-        display: none;
-    }
-
-    .team-icon {
-        width: 40px;
-        height: 40px;
-        object-fit: contain;
-    }
-
-    .team-label {
-        font-size: 14px;
-    }
-
-    .team-capt-name,
-    .team-institute-name {
-        font-size: 13px;
-    }
-
-    .team-crew-name {
-        font-size: 11px;
     }
 }
