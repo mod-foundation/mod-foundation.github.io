@@ -490,7 +490,7 @@ html, body {
 }
 
 #team-img {
-    width: fill;
+    width: 100%;
     aspect-ratio: 16 / 9;
     background-size: cover;
     background-position: center;
