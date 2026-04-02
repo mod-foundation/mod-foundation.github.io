@@ -401,9 +401,8 @@ function addAuditDrainInteractivity(layerId) {
             .setHTML(`<div class="adp-inner"><div class="${headerClass}">${drainNum}</div>${rows}</div>`)
             .addTo(map);
 
-        if (s === 'done') {
+        if (s === 'done' || s === 'in progress') {
             updateTeamPanel(p);
-            document.getElementById('team-img').style.display = 'block';
         } else {
             document.getElementById('team-captain').innerHTML = '';
             document.getElementById('crew-name').innerHTML = '';
