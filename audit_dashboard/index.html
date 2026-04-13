@@ -22,6 +22,9 @@
 
         <!-- Web Awesome -->
         <script src="https://kit.webawesome.com/12f6b474bd1f41e1.js" crossorigin="anonymous"></script>
+
+        <!-- Mapbox Search JS (for search-container) -->
+        <script id="search-js" defer src="https://api.mapbox.com/search-js/v1.0.0/web.js"></script>
     </head>
     <body>
         <div id="map-container"></div>
@@ -130,7 +133,10 @@
                 </div>
             </wa-details>
         </wa-details>
-
+        
+        <div id="search-container">
+                <mapbox-search-box id="search-box"></mapbox-search-box>
+        </div>
         <!-- Chart.js -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
         <script src="charts.js"></script>

@@ -415,3 +415,26 @@ addLineInteractivity('primarydrains', [
     });
 
 //#endregion
+
+//#region Search
+
+let searchMarker = null;
+
+window.addEventListener('load', () => {
+    const searchBox = document.getElementById('search-box');
+    searchBox.accessToken = 'pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A';
+    searchBox.options = {
+        types: 'address,poi',
+        proximity: [77.5946, 12.9716]
+    };
+    searchBox.addEventListener('retrieve', e => {
+        const coords = e.detail.features[0].geometry.coordinates;
+        map.flyTo({ center: coords, zoom: 15 });
+        if (searchMarker) searchMarker.remove();
+        searchMarker = new maplibregl.Marker({ color: '#ff0000ff' })
+            .setLngLat(coords)
+            .addTo(map);
+    });
+});
+
+//#endregion

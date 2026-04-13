@@ -4,6 +4,16 @@
     box-sizing: border-box;
 }
 
+/* Search */
+#search-container {
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    z-index: 10;
+    width: 300px;
+
+}
+
 /* Overlay Panels — shared card appearance */
 .panel-overlay {
     position: fixed;
@@ -183,7 +193,7 @@ body {
 
 /* Audit Popups */
 .audit-popup {
-    max-width: 620px;
+    max-width: 900px;
 }
 
 .audit-popup .maplibregl-popup-content {
