@@ -221,6 +221,18 @@ async function loadAuditData() {
     addPointLayer('audit-points-f2', geojsonF2, { color: validatedColorF2, radius: 6, strokeColor: '#fff', strokeWidth: 1.5 });
     map.setFilter('audit-points-f2', ['!=', ['get', '_validation_status'], 'no']);
 
+    // Highlight ring — sits behind audit points, moved to the active point on click
+    addLayer('audit-point-highlight',
+        { type: 'FeatureCollection', features: [] },
+        'circle',
+        {
+            'circle-radius': 13,
+            'circle-color': 'rgba(255,255,255,0.2)',
+            'circle-stroke-color': '#f80cf8ff',
+            'circle-stroke-width': 3
+        }
+    );
+
     const f3Raw = Papa.parse(f3Text, { header: true, skipEmptyLines: true, transformHeader: h => h.trim() }).data;
     communityData = f3Raw.map(row => ({
         team_code:        row['1.2 Team code']?.trim(),
@@ -251,6 +263,12 @@ async function loadAuditData() {
         fields: ['_drain', '_secondarydrain'],
         insertAfter: '#team-filter',
     });
+
+    const defaultFeature = geojson.features.find(f => f.properties._index === '20');
+    if (defaultFeature) {
+        updatePanels(defaultFeature.properties);
+        setHighlight(defaultFeature);
+    }
 }
 
 //#endregion
@@ -262,25 +280,6 @@ function addLayers() {
     addLineLayer('primarydrains', 'data/json/primarydrains.geojson', { color: statusColor, width: 2 });
     addLineLayer('secondarydrains', 'data/json/secondarydrains.geojson', { color: statusColor, width: 1.5, opacity: 0.8 });
 
-    addLayer('typology', 'data/json/typology.geojson', 'line', {
-        'line-color': [
-            'match', ['get', 'typology_code'],
-            't1',  '#FF0000',
-            't2',  '#ff7900',
-            't4',  '#db3ee9',
-            't5',  '#4ed84e',
-            't6',  '#F1C40F',
-            't7',  '#7D3C98',
-            't8',  '#27AE60',
-            't9',  '#BA4A00',
-            't10', '#10611e',
-            't11', '#2C3E50',
-            't12', '#efc700',
-            '#999999'
-        ],
-        'line-opacity': 1,
-        'line-width': 6
-    }, { 'line-cap': 'round', 'line-join': 'round' });
 }
 
 //#endregion
@@ -350,9 +349,6 @@ addLineInteractivity('primarydrains', [
 
 let searchMarker = null;
 
-document.getElementById('typology-switch').addEventListener('change', (e) => {
-    map.setLayoutProperty('typology', 'visibility', e.target.checked ? 'visible' : 'none');
-});
 
 function makeFilterDropdown({ id, placeholder, fields, insertAfter, el: existingEl }) {
     const sel = existingEl || (() => {
@@ -535,7 +531,7 @@ const PANEL_CONFIG = {
         },
     },
     'cat-utilities': {
-        defaultField: 'manholes_condition',
+        defaultField: 'elec_condition',
         renderFn: () => renderInfrastructureCharts(getFilteredAuditData()),
         fieldPicMap: {
             elec_condition:     [{ picField: 'elec_pic',     uuidField: '_uuid', form: 1 }],
@@ -704,8 +700,12 @@ function updatePanels(props) {
     }
 }
 
-map.on('click', 'audit-points',     (e) => { e.preventDefault(); updatePanels(e.features[0].properties); });
-map.on('click', 'audit-points-f2',  (e) => { e.preventDefault(); updatePanels(e.features[0].properties); });
+function setHighlight(feature) {
+    map.getSource('audit-point-highlight').setData({ type: 'FeatureCollection', features: [feature] });
+}
+
+map.on('click', 'audit-points',    (e) => { e.preventDefault(); updatePanels(e.features[0].properties); setHighlight(e.features[0]); });
+map.on('click', 'audit-points-f2', (e) => { e.preventDefault(); updatePanels(e.features[0].properties); setHighlight(e.features[0]); });
 map.on('mouseenter', 'audit-points',    () => { map.getCanvas().style.cursor = 'pointer'; });
 map.on('mouseleave', 'audit-points',    () => { map.getCanvas().style.cursor = ''; });
 map.on('mouseenter', 'audit-points-f2', () => { map.getCanvas().style.cursor = 'pointer'; });

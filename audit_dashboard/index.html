@@ -29,7 +29,6 @@
     <body>
         <div id="map-container">
             <div id="search-container">
-                <wa-switch id="typology-switch" checked size="small">Typology</wa-switch>
                 <wa-select id="team-filter" size="small" with-clear placeholder="Team" class="team-filter-select"></wa-select>
                 <wa-button id="reset-filters-btn" size="small" appearance="outlined" style="display:none" title="Reset all chart filters">
                     <wa-icon slot="prefix" name="rotate-left"></wa-icon>
@@ -81,7 +80,7 @@
                         <img class="panel-pic-img" src="" alt="" />
                         <div class="panel-attrs">
                             <div class="attr-row">
-                                <wa-select class="attr-select" value="manholes_condition" size="small" hoist>
+                                <wa-select class="attr-select" value="elec_condition" size="small" hoist>
                                     <wa-option value="elec_condition">Electrical</wa-option>
                                     <wa-option value="cables_condition">Cables</wa-option>
                                     <wa-option value="manholes_condition">Manholes</wa-option>
@@ -91,8 +90,8 @@
                         </div>
                     </div>
                     <div class="chart-wrapper">
-                        <div class="chart-title">Manholes</div>
-                        <div class="chart-slot" data-chart="Manholes"></div>
+                        <div class="chart-title">Electrical</div>
+                        <div class="chart-slot" data-chart="Electrical"></div>
                     </div>
                 </div>
             </div>
