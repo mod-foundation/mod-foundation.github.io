@@ -12,7 +12,7 @@ body {
         "panel-1   map      panel-2"   1fr
         "panel-1   stats    panel-2"   90px
         / max-content   1fr   max-content;
-    height: 100vh;
+    height: 100%;
     overflow: hidden;
 }
 /* #endregion */
