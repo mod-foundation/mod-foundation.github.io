@@ -38,9 +38,13 @@ function _resolveContainer(container) {
     const byId = document.getElementById(idStr);
     if (byId) return byId.querySelector('.chart-slot') || byId;
 
+    // data-chart attribute lookup
+    const byAttr = document.querySelector(`.chart-slot[data-chart="${raw}"]`);
+    if (byAttr) return byAttr;
+
     // Label lookup: match [slot="summary"] text inside nested wa-details
     const label = raw.toLowerCase();
-    for (const details of document.querySelectorAll('wa-details wa-details')) {
+    for (const details of document.querySelectorAll('wa-details')) {
         const summary = details.querySelector('[slot="summary"]');
         if (summary && summary.textContent.trim().toLowerCase() === label) {
             return details.querySelector('.chart-slot');
@@ -95,9 +99,8 @@ function _countValues(data, field) {
 function _resolveColors(rawKeys, colors) {
     return rawKeys.map((key, i) => {
         if (!colors) return _FALLBACK_PALETTE[i % _FALLBACK_PALETTE.length];
-        const match = Object.keys(colors).find(
-            k => k.toLowerCase() === String(key).toLowerCase()
-        );
+        const lk = String(key).toLowerCase();
+        const match = Object.keys(colors).find(k => lk === k.toLowerCase() || lk.includes(k.toLowerCase()));
         return match ? colors[match] : _FALLBACK_PALETTE[i % _FALLBACK_PALETTE.length];
     });
 }
@@ -111,14 +114,45 @@ function _resolveColors(rawKeys, colors) {
  * @param {object|undefined} labelMap   e.g. { 'yes': 'Present', 'no': 'Absent' }
  * @returns {string[]}
  */
+function _wrapLegendText(text, maxChars = 18) {
+    const words = String(text).split(' ');
+    const lines = [];
+    let line = '';
+    for (const word of words) {
+        const candidate = line ? `${line} ${word}` : word;
+        if (candidate.length > maxChars && line) {
+            lines.push(line);
+            line = word;
+        } else {
+            line = candidate;
+        }
+    }
+    if (line) lines.push(line);
+    return lines.length === 1 ? lines[0] : lines;
+}
+
 function _resolveLabels(rawKeys, labelMap) {
     if (!labelMap) return rawKeys;
     return rawKeys.map(k => {
-        const match = Object.keys(labelMap).find(
-            m => m.toLowerCase() === String(k).toLowerCase()
-        );
+        const lk = String(k).toLowerCase();
+        const match = Object.keys(labelMap).find(m => lk === m.toLowerCase() || lk.includes(m.toLowerCase()));
         return match ? labelMap[match] : k;
     });
+}
+
+function _filterIgnored(rawKeys, ignore) {
+    if (!ignore) return rawKeys;
+    const list = (Array.isArray(ignore) ? ignore : [ignore]).map(v => String(v).toLowerCase());
+    return rawKeys.filter(k => !list.includes(String(k).toLowerCase()));
+}
+
+function _setChartFilter(field, visibleRawKeys, allRawKeys) {
+    if (visibleRawKeys.length === allRawKeys.length) {
+        delete window._chartFilters[field];
+    } else {
+        window._chartFilters[field] = new Set(visibleRawKeys);
+    }
+    if (typeof window._applyChartFilters === 'function') window._applyChartFilters();
 }
 
 
@@ -136,12 +170,13 @@ function _resolveLabels(rawKeys, labelMap) {
  * @param {string}      [opts.title]     Chart title
  * @param {boolean}     [opts.donut]     Render as donut instead of pie (default: false)
  */
-function makePieChart({ container, data, field, colors, labels: labelMap, title, donut = false }) {
+function makePieChart({ container, data, field, colors, labels: labelMap, title, donut = false, ignore, interactive = true }) {
+    if (window._chartFilters?.[field]) return;
     const el = _resolveContainer(container);
     if (!el) return;
     const canvas = _createCanvas(el);
     const counts = _countValues(data, field);
-    const rawKeys = Object.keys(counts);
+    const rawKeys = _filterIgnored(Object.keys(counts), ignore);
     const labels = _resolveLabels(rawKeys, labelMap);
     const values = rawKeys.map(k => counts[k]);
     const bgColors = _resolveColors(rawKeys, colors);
@@ -159,15 +194,51 @@ function makePieChart({ container, data, field, colors, labels: labelMap, title,
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
-                title:  title ? { display: true, text: title, font: { size: 13 } } : { display: false },
-                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
-                tooltip: { callbacks: {
-                    label: ctx => ` ${ctx.label}: ${ctx.parsed} (${
-                        Math.round(ctx.parsed / values.reduce((a,b) => a+b, 0) * 100)
-                    }%)`,
-                }},
+                title:    { display: false },
+                //subtitle: { display: !!title, text: title, align: 'start', position: 'bottom', font: { size: 13 }, padding: { top: 12 } },
+                legend: {
+                    position: 'top',
+                    align: 'start',
+                    labels: {
+                        boxWidth: 10,
+                        font: { size: 10 },
+                        generateLabels(chart) {
+                            return Chart.overrides.pie.plugins.legend.labels.generateLabels(chart)
+                                .map(item => ({ ...item, text: _wrapLegendText(item.text) }));
+                        },
+                    },
+                    ...(interactive && {
+                        onClick(e, legendItem, legend) {
+                            const chart = legend.chart;
+                            const idx = legendItem.index;
+                            const wasVisible = chart.getDataVisibility(idx);
+                            chart.toggleDataVisibility(idx);
+                            chart.update();
+                            const visible = rawKeys.filter((_, i) => i === idx ? !wasVisible : chart.getDataVisibility(i));
+                            _setChartFilter(field, visible, rawKeys);
+                        },
+                    }),
+                },
+                tooltip: {
+                callbacks: {
+                    label: ctx => `${Math.round(ctx.parsed / values.reduce((a,b) => a+b, 0) * 100)}%`,
+                    title: () => ''
+                }
+                },
             },
+            ...(interactive && {
+                onClick(e, elements, chart) {
+                    if (!elements.length) return;
+                    const idx = elements[0].index;
+                    const wasVisible = chart.getDataVisibility(idx);
+                    chart.toggleDataVisibility(idx);
+                    chart.update();
+                    const visible = rawKeys.filter((_, i) => i === idx ? !wasVisible : chart.getDataVisibility(i));
+                    _setChartFilter(field, visible, rawKeys);
+                },
+            }),
         },
     });
     canvas._chartInstance = chart;
@@ -185,12 +256,13 @@ function makePieChart({ container, data, field, colors, labels: labelMap, title,
  * @param {string}      [opts.title]      Chart title
  * @param {boolean}     [opts.horizontal] Flip to horizontal bars (default: false)
  */
-function makeBarChart({ container, data, field, colors, labels: labelMap, title, horizontal = false }) {
+function makeBarChart({ container, data, field, colors, labels: labelMap, title, horizontal = false, ignore, interactive = true }) {
+    if (window._chartFilters?.[field]) return;
     const el = _resolveContainer(container);
     if (!el) return;
     const canvas = _createCanvas(el);
     const counts = _countValues(data, field);
-    const rawKeys = Object.keys(counts);
+    const rawKeys = _filterIgnored(Object.keys(counts), ignore);
     const labels = _resolveLabels(rawKeys, labelMap);
     const values = rawKeys.map(k => counts[k]);
     const bgColors = _resolveColors(rawKeys, colors);
@@ -209,16 +281,33 @@ function makeBarChart({ container, data, field, colors, labels: labelMap, title,
         options: {
             indexAxis: horizontal ? 'y' : 'x',
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
-                title:  title ? { display: true, text: title, font: { size: 13 } } : { display: false },
+                title:    { display: false },
+                subtitle: { display: !!title, text: title, align: 'start', position : 'bottom', font: { size: 13 }, padding: { top: 12 } },
                 legend: { display: false },
             },
             scales: {
                 x: { grid: { display: horizontal  }, ticks: { font: { size: 11 } } },
                 y: { grid: { display: !horizontal, color: '#f0f0f0' }, beginAtZero: true, ticks: { font: { size: 11 } } },
             },
+            ...(interactive && {
+                onClick(e, elements, chart) {
+                    if (!elements.length) return;
+                    const idx = elements[0].index;
+                    const key = rawKeys[idx];
+                    if (chart._hiddenKeys.has(key)) chart._hiddenKeys.delete(key);
+                    else chart._hiddenKeys.add(key);
+                    chart.data.datasets[0].backgroundColor = rawKeys.map((k, i) =>
+                        chart._hiddenKeys.has(k) ? 'rgba(180,180,180,0.35)' : bgColors[i]
+                    );
+                    chart.update();
+                    _setChartFilter(field, rawKeys.filter(k => !chart._hiddenKeys.has(k)), rawKeys);
+                },
+            }),
         },
     });
+    chart._hiddenKeys = new Set();
     canvas._chartInstance = chart;
 }
 
@@ -233,7 +322,7 @@ function makeBarChart({ container, data, field, colors, labels: labelMap, title,
  * @param {string}        [opts.title]    Chart title
  * @param {number}        [opts.bins]     Number of buckets (default: 10)
  */
-function makeHistogram({ container, data, field, color = '#4a90d9', title, bins = 10 }) {
+function makeHistogram({ container, data, field, color = '#4a90d9', title, bins = 10, fixedMin, step }) {
     const el = _resolveContainer(container);
     if (!el) return;
     const canvas = _createCanvas(el);
@@ -243,18 +332,25 @@ function makeHistogram({ container, data, field, color = '#4a90d9', title, bins 
 
     if (values.length === 0) return;
 
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    const binSize = (max - min) / bins || 1;
+    let min, binSize, numBins;
+    if (fixedMin !== undefined && step !== undefined) {
+        min = fixedMin;
+        binSize = step;
+        numBins = Math.max(1, Math.ceil((Math.max(...values) - min) / step));
+    } else {
+        min = Math.min(...values);
+        binSize = (Math.max(...values) - min) / bins || 1;
+        numBins = bins;
+    }
 
-    const buckets = Array.from({ length: bins }, (_, i) => ({
-        label: `${(min + i * binSize).toFixed(1)}–${(min + (i + 1) * binSize).toFixed(1)}`,
+    const buckets = Array.from({ length: numBins }, (_, i) => ({
+        label: `${min + i * binSize}–${min + (i + 1) * binSize}`,
         count: 0,
     }));
 
     for (const v of values) {
-        const idx = Math.min(Math.floor((v - min) / binSize), bins - 1);
-        buckets[idx].count++;
+        const idx = Math.min(Math.floor((v - min) / binSize), numBins - 1);
+        if (idx >= 0) buckets[idx].count++;
     }
 
     const chart = new Chart(canvas, {
@@ -271,13 +367,15 @@ function makeHistogram({ container, data, field, color = '#4a90d9', title, bins 
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
-                title:  title ? { display: true, text: title, font: { size: 13 } } : { display: false },
+                title:    { display: false },
+                subtitle: { display: !!title, text: title, align: 'start', position: 'bottom', font: { size: 13 }, padding: { top: 12 } },
                 legend: { display: false },
             },
             scales: {
-                x: { grid: { display: false }, ticks: { maxRotation: 45, font: { size: 10 } } },
-                y: { beginAtZero: true, grid: { color: '#f0f0f0' }, ticks: { font: { size: 11 } } },
+                x: { beginAtZero: false,grid: { display: false }, ticks: { stepSize: 1, precision: 0, maxRotation: 90, font: { size: 10 } } },
+                y: { beginAtZero: false, grid: { color: '#f0f0f0' }, ticks: { stepSize: 1, precision: 0, font: { size: 11 } } },
             },
         },
     });
@@ -291,42 +389,61 @@ function makeHistogram({ container, data, field, color = '#4a90d9', title, bins 
 //  `data` should be the array of merged records from your data loader.
 // ═══════════════════════════════════════════════════════════════════════════
 
+window._chartFilters = {};
+
 // #region Infrastructure ──────────────────────────────────────────────────────
 
-const WALL_CONDITION_COLORS  = { 'good': '#4caf50', 'fair': '#ffb300', 'poor': '#ef5350', 'critical': '#9c27b0'};
-const WALL_CONDITION_LABELS  = { 'intact': 'Intact', 'fair': 'Fair', 'poor': 'Poor', 'critical': 'Critical' };
+const WALL_CONDITION_COLORS  = { 'intact': '#4caf50', 'broken': '#ffb300', 'exist': '#ef5350', 'critical': '#9c27b0'};
+const WALL_CONDITION_LABELS  = { 'intact': 'Intact', 'broken': 'Broken', 'exist': 'Does Not Exist', 'critical': 'Critical' };
 
-const WALL_MATERIAL_COLORS   = { /* 'concrete': '#78909c', 'brick': '#8d6e63', 'stone': '#aaa' */ };
-const WALL_MATERIAL_LABELS   = { /* 'concrete': 'Concrete', 'brick': 'Brick', 'stone': 'Stone' */ };
+const WALL_MATERIAL_COLORS   = {'concrete': '#b6b6b6', 'stone': '#644438ff', 'both': '#ffb300'};
+const WALL_MATERIAL_LABELS   = { 'concrete': 'Reinforced Cement Concrete (RCC)', 'stone': 'Solid Stone Masonry (SSM)', 'Both': 'Both RCC & SSM', 'Not': 'Not Applicable'};
 
-const BRIDGE_TYPE_COLORS     = { /* 'concrete': '#4a90d9', 'steel': '#78909c', 'timber': '#8d6e63' */ };
-const BRIDGE_TYPE_LABELS     = { /* 'concrete': 'Concrete', 'steel': 'Steel', 'timber': 'Timber' */ };
+const FENCE_COLORS           = { 'only on sides': '#ffb300', 'sides and top': '#ef5350', 'no': '#4caf50'};
+const FENCE_LABELS           = { 'only on sides': 'Yes, Sides', 'sides and top': 'Yes, Sides & Top', 'no': 'No Fence' };
 
-const BRIDGE_CONDITION_COLORS = { /* 'good': '#4caf50', 'fair': '#ffb300', 'poor': '#ef5350' */ };
-const BRIDGE_CONDITION_LABELS = { /* 'good': 'Good', 'fair': 'Fair', 'poor': 'Poor' */ };
+const BRIDGE_TYPE_COLORS     = { 'vehicular': '#4a90d9', 'pedestrian': '#ffb300', 'not': '#b6b6b6' };
+const BRIDGE_TYPE_LABELS     = { 'vehicular': 'Vehicular', 'pedestrian': 'Pedestrian', 'not': 'No Bridge' };
 
-const PIERS_CONDITION_COLORS = { /* 'good': '#4caf50', 'fair': '#ffb300', 'poor': '#ef5350' */ };
-const PIERS_CONDITION_LABELS = { /* 'good': 'Good', 'fair': 'Fair', 'poor': 'Poor' */ };
+const BRIDGE_CONDITION_COLORS = { 'intact': '#4caf50', 'path': '#e97d7bff', 'wall': '#ef5350', 'not': '#b6b6b6' };
+const BRIDGE_CONDITION_LABELS = { 'intact': 'Intact', 'wall': 'Broken wall', 'path': 'Broken path', 'not': 'No Bridge' };
 
-const ELEC_CONDITION_COLORS  = { /* 'good': '#4caf50', 'fair': '#ffb300', 'poor': '#ef5350' */ };
-const ELEC_CONDITION_LABELS  = { /* 'good': 'Good', 'fair': 'Fair', 'poor': 'Poor' */ };
+const BRIDGE_WALKABLE_COLORS  = { 'clear': '#4caf50', 'parking': '#e97d7bff', 'solid': '#ef5350' , 'not': '#b6b6b6'};
+const BRIDGE_WALKABLE_LABELS  = { 'clear': 'Clear Path', 'parking': 'Obstructed Path (Parking)' , 'solid': 'Obstructed Path (Solid Waste)', 'not': 'No Bridge' };
 
-const CABLES_CONDITION_COLORS = { /* 'good': '#4caf50', 'fair': '#ffb300', 'poor': '#ef5350' */ };
-const CABLES_CONDITION_LABELS = { /* 'good': 'Good', 'fair': 'Fair', 'poor': 'Poor' */ };
+const PIERS_CONDITION_COLORS = { 'yes': '#ef5350', 'not': '#b6b6b6', 'no': '#4caf50',};
+const PIERS_CONDITION_LABELS = { 'yes': 'Yes', 'applicable': 'No Bridge', 'no': 'No', };
 
-const MANHOLES_CONDITION_COLORS = { /* 'good': '#4caf50', 'fair': '#ffb300', 'poor': '#ef5350' */ };
-const MANHOLES_CONDITION_LABELS = { /* 'good': 'Good', 'fair': 'Fair', 'poor': 'Poor' */ };
+const PIERS_NUM_COLORS = { 'not': '#b6b6b6' };
+const PIERS_NUM_LABELS = { 'not': 'No Bridge'};
+
+const ELEC_CONDITION_COLORS  = { 'no': '#4caf50', 'yes': '#ef5350'};
+const ELEC_CONDITION_LABELS  = { 'no': 'No', 'yes': 'Yes'};
+
+const CABLES_CONDITION_COLORS = {'cannot':'#b6b6b6' ,'no': '#4caf50', 'yes': '#ef5350'};
+const CABLES_CONDITION_LABELS = { 'cannot':'Cannot See','no': 'No', 'yes': 'Yes' };
+
+const MANHOLES_CONDITION_COLORS = { 'cannot':'#b6b6b6','no': '#4caf50', 'yes': '#ef5350',};
+const MANHOLES_CONDITION_LABELS = { 'cannot':'Cannot See','no': 'No', 'yes': 'Yes' };
 
 function renderInfrastructureCharts(data) {
-    makePieChart({ container: 'Retaining Wall',
-                   data, field: 'wall_condition',
-                   colors: WALL_CONDITION_COLORS, labels: WALL_CONDITION_LABELS,
-                   title: 'Wall Condition' });
+    // Retaining Wall
+    makePieChart({ container: 'Wall Condition', data, field: 'wall_condition', colors: WALL_CONDITION_COLORS,  labels: WALL_CONDITION_LABELS,  title: 'Wall Condition'  });
+    makePieChart({ container: 'Fence',          data, field: 'fence',          colors: FENCE_COLORS,           labels: FENCE_LABELS,           title: 'Fence on Wall'   });
+    makePieChart({ container: 'Wall Material',  data, field: 'wall_material',  colors: WALL_MATERIAL_COLORS,   labels: WALL_MATERIAL_LABELS,   title: 'Wall Material'   });
+    makeHistogram({ container: 'Wall Height (feet)',   data, field: 'wall_height',    title: 'Height of the wall from the ground (road,etc)', fixedMin: 0, step: 1 });
 
-    makeBarChart({ container: 'Bridge',            data, field: 'bridge_type',      colors: BRIDGE_TYPE_COLORS,      labels: BRIDGE_TYPE_LABELS,      title: 'Bridge Type'          });
-    makePieChart({ container: 'Piers',             data, field: 'piers_condition',  colors: PIERS_CONDITION_COLORS,  labels: PIERS_CONDITION_LABELS,  title: 'Piers Condition'      });
-    makeBarChart({ container: 'Electrical',        data, field: 'elec_condition',   colors: ELEC_CONDITION_COLORS,   labels: ELEC_CONDITION_LABELS,   title: 'Electrical Condition' });
-    makeBarChart({ container: 'Cables & Manholes', data, field: 'cables_condition', colors: CABLES_CONDITION_COLORS, labels: CABLES_CONDITION_LABELS, title: 'Cables Condition'     });
+    // Bridge
+    makePieChart({ container: 'Bridge Type',      data, field: 'bridge_type',      colors: BRIDGE_TYPE_COLORS,       labels: BRIDGE_TYPE_LABELS,       title: 'Bridge Type',        ignore:'Not applicable ' });
+    makePieChart({ container: 'Bridge Condition', data, field: 'bridge_condition', colors: BRIDGE_CONDITION_COLORS,  labels: BRIDGE_CONDITION_LABELS,  title: 'Bridge Condition',   ignore:'Not applicable' });
+    makePieChart({ container: 'Walkable',         data, field: 'bridge_walkable',  colors: BRIDGE_WALKABLE_COLORS,   labels: BRIDGE_WALKABLE_LABELS,   title: 'Walkable',           ignore:'Not applicable' });
+    makePieChart({  container: 'Piers Condition', data, field: 'piers_condition',  colors: PIERS_CONDITION_COLORS,   labels: PIERS_CONDITION_LABELS,   title: 'Piers Condition',    ignore:'Not applicable' });                
+    makeBarChart({  container: 'Piers Count',     data, field: 'piers_num',        colors: PIERS_NUM_COLORS,         labels: PIERS_NUM_LABELS,   title: 'Number of Piers',          ignore:'Not applicable' });
+
+    // Utilities                          
+    makePieChart({  container: 'Electrical',      data, field: 'elec_condition',     colors: ELEC_CONDITION_COLORS,     labels: ELEC_CONDITION_LABELS,     title: 'Electricity lines outside the Drain'      });
+    makePieChart({  container: 'Cables',          data, field: 'cables_condition',   colors: CABLES_CONDITION_COLORS,   labels: CABLES_CONDITION_LABELS,   title: 'Cables or lines crossing the Drain'          });
+    makePieChart({  container: 'Manholes',        data, field: 'manholes_condition', colors: MANHOLES_CONDITION_COLORS, labels: MANHOLES_CONDITION_LABELS, title: 'Manholes inside the Drain'        });
 }
 
 // #endregion Infrastructure
@@ -334,39 +451,52 @@ function renderInfrastructureCharts(data) {
 
 // #region Water Quality ────────────────────────────────────────────────────────
 
-const INLETS_COLORS              = { /* 'yes': '#4a90d9', 'no': '#e0e0e0' */ };
-const INLETS_LABELS              = { /* 'yes': 'Present', 'no': 'None' */ };
+const INLETS_COLORS              = {'cannot':'#b6b6b6' ,'no': '#4caf50', 'yes': '#ffb300'};
+const INLETS_LABELS              = { 'cannot':'Cannot See','no': 'No', 'yes': 'Yes' };
 
-const UNAUTHORISED_INLETS_COLORS = { /* 'yes': '#ef5350', 'no': '#4caf50' */ };
-const UNAUTHORISED_INLETS_LABELS = { /* 'yes': 'Unauthorised', 'no': 'Authorised' */ };
+const UNAUTHORISED_INLETS_COLORS = {'cannot':'#b6b6b6' ,'no': '#4caf50', 'yes': '#ef5350'};
+const UNAUTHORISED_INLETS_LABELS = { 'cannot':'Cannot See','no': 'No', 'yes': 'Yes' };
 
-const WATER_STAGNANT_COLORS      = { /* 'flowing': '#4a90d9', 'stagnant': '#e8a838' */ };
-const WATER_STAGNANT_LABELS      = { /* 'flowing': 'Flowing', 'stagnant': 'Stagnant' */ };
+const WATER_STAGNANT_COLORS      = { 'flowing': '#4a90d9', 'stagnant': '#e8a838' ,'cannot':'#b6b6b6' };
+const WATER_STAGNANT_LABELS      = { 'flowing': 'Flowing', 'stagnant': 'Stagnant','cannot':'Cannot See'};
 
-const WATER_CONTAMINATION_COLORS = { /* 'none': '#4caf50', 'low': '#ffb300', 'medium': '#ef5350', 'high': '#9c27b0' */ };
-const WATER_CONTAMINATION_LABELS = { /* 'none': 'None', 'low': 'Low', 'medium': 'Medium', 'high': 'High' */ };
+const WATER_CONTAMINATION_COLORS = { 'black': '#546e7a', 'clear': '#b3e5fc', 'solid': '#8d6e63', 'froth': '#4caf50', 'cannot': '#b6b6b6' };
+const WATER_CONTAMINATION_LABELS = { 'black': 'Black/ Grey', 'clear': 'Clear', 'solid': 'Particles/Oily Film', 'froth': 'Froth/ Foam', 'cannot': 'Cannot See' };
 
-const WATER_COLOUR_COLORS        = { 'clear': '#b3e5fc', 'brown': '#8d6e63', 'green': '#4caf50', 'grey': '#90a4ae' };
+const WATER_COLOUR_COLORS        = { 'clear': '#b3e5fc', 'black': '#546e7a', 'green': '#4caf50', 'cannot': '#b6b6b6', 'other': '#8c5ec9ff' , 'milky': '#90a4ae', 'yellow': '#ffb300'};
 const WATER_COLOUR_LABELS        = { /* 'clear': 'Clear', 'brown': 'Brown', 'green': 'Green', 'grey': 'Grey' */ };
 
-const WATER_TURBIDITY_COLORS     = { /* 'clear': '#b3e5fc', 'slightly turbid': '#e8a838', 'turbid': '#ef5350' */ };
+const WATER_TURBIDITY_COLORS     = { 'clear': '#b3e5fc', 'Cloudy': '#e8a838', 'Opaque': '#ef5350','cannot': '#b6b6b6' };
 const WATER_TURBIDITY_LABELS     = { /* 'clear': 'Clear', 'slightly turbid': 'Slightly Turbid', 'turbid': 'Turbid' */ };
 
-const WATER_SMELL_COLORS         = { /* 'none': '#4caf50', 'mild': '#ffb300', 'strong': '#ef5350' */ };
-const WATER_SMELL_LABELS         = { /* 'none': 'None', 'mild': 'Mild', 'strong': 'Strong' */ };
+const WATER_SMELL_COLORS         = {'cannot': '#b6b6b6' , 'No Odour': '#4caf50', 'Less Odour': '#ffb300', 'unable': '#ef5350','necessarily': '#ee9795ff'};
+const WATER_SMELL_LABELS         = { 'cannot': 'Cannot See', 'no odour': 'No Odour', 'Less Odour': 'Less','unable': 'Strong - Sewage','necessarily':'Strong-Not Sewage' };
 
-const SW_INSIDE_COLORS           = { /* 'yes': '#ef5350', 'no': '#4caf50' */ };
-const SW_INSIDE_LABELS           = { /* 'yes': 'Present', 'no': 'None' */ };
+const SW_INSIDE_COLORS           = { 'cannot':'#b6b6b6','yes': '#ef5350', 'no': '#4caf50'};
+const SW_INSIDE_LABELS           = { 'cannot':'Cannot See','yes': 'Yes', 'no': 'No' };
 
-const SW_OUTSIDE_COLORS          = { /* 'yes': '#ef5350', 'no': '#4caf50' */ };
-const SW_OUTSIDE_LABELS          = { /* 'yes': 'Present', 'no': 'None' */ };
+const SW_INSIDE_TYPE_COLORS      = { 'cannot': '#b6b6b6' ,'household': '#4a90d9', 'mixed': '#ffb300', 'no': '#b6b6b6', 'commercial': '#ef5350', 'debris': '#9c6ee0' };
+const SW_INSIDE_TYPE_LABELS      = { 'cannot':'Cannot See', 'household': 'Household', 'mixed': 'Mixed', 'no': 'No Waste', 'commercial': 'Commercial', 'debris': 'Debris' };
+
+const SW_OUTSIDE_COLORS          = { 'yes': '#ef5350', 'no': '#4caf50'};
+const SW_OUTSIDE_LABELS          = { 'yes': 'Yes', 'no': 'No' };
+
+const SW_OUTSIDE_TYPE_COLORS     = { 'cannot': '#b6b6b6' ,'household': '#4a90d9', 'mixed': '#ffb300', 'no': '#b6b6b6', 'commercial': '#ef5350', 'debris': '#9c6ee0' };
+const SW_OUTSIDE_TYPE_LABELS     = { 'cannot':'Cannot See','household': 'Household', 'mixed': 'Mixed', 'no': 'No Waste', 'commercial': 'Commercial', 'debris': 'Debris' };
 
 function renderWaterQualityCharts(data) {
-    makeBarChart({ container: 'Inlets',                data, field: 'inlets',              colors: INLETS_COLORS,              labels: INLETS_LABELS,              title: 'Inlets'                  });
-    makePieChart({ container: 'Water Flow',            data, field: 'water_stagnant',      colors: WATER_STAGNANT_COLORS,      labels: WATER_STAGNANT_LABELS,      title: 'Water Flow'              });
-    makeBarChart({ container: 'Contamination',         data, field: 'water_contamination', colors: WATER_CONTAMINATION_COLORS, labels: WATER_CONTAMINATION_LABELS, title: 'Contamination'           });
-    makePieChart({ container: 'Solid Waste — Inside',  data, field: 'sw_inside',           colors: SW_INSIDE_COLORS,           labels: SW_INSIDE_LABELS,           title: 'Solid Waste (Inside)'    });
-    makePieChart({ container: 'Solid Waste — Outside', data, field: 'sw_outside',          colors: SW_OUTSIDE_COLORS,          labels: SW_OUTSIDE_LABELS,          title: 'Solid Waste (Outside)'   });
+    makePieChart({ container: 'Authorised Inlets',           data, field: 'inlets',              colors: INLETS_COLORS,              labels: INLETS_LABELS,              });
+    makePieChart({ container: 'Unauthorised Inlets',         data, field: 'unauthorised_inlets', colors: UNAUTHORISED_INLETS_COLORS, labels: UNAUTHORISED_INLETS_LABELS, });
+    makePieChart({ container: 'Water Flow',                  data, field: 'water_stagnant',      colors: WATER_STAGNANT_COLORS,      labels: WATER_STAGNANT_LABELS,      });
+    makePieChart({ container: 'Water Contamination',         data, field: 'water_contamination', colors: WATER_CONTAMINATION_COLORS, labels: WATER_CONTAMINATION_LABELS, });
+    makePieChart({ container: 'Water Colour',                data, field: 'water_colour',        colors: WATER_COLOUR_COLORS,        labels: WATER_COLOUR_LABELS,        });
+    makePieChart({ container: 'Water Turbidity',             data, field: 'water_turbidity',     colors: WATER_TURBIDITY_COLORS,     labels: WATER_TURBIDITY_LABELS,     });
+    makePieChart({ container: 'Water Smell',                 data, field: 'water_smell',         colors: WATER_SMELL_COLORS,         labels: WATER_SMELL_LABELS,         });
+    makePieChart({ container: 'Solid Waste Inside',          data, field: 'sw_inside',           colors: SW_INSIDE_COLORS,           labels: SW_INSIDE_LABELS,           });
+    makePieChart({ container: 'Solid Waste Inside - Type',   data, field: 'sw_inside_type',      colors: SW_INSIDE_TYPE_COLORS,      labels: SW_INSIDE_TYPE_LABELS,      });
+    makePieChart({ container: 'Solid Waste Outside',         data, field: 'sw_outside',          colors: SW_OUTSIDE_COLORS,          labels: SW_OUTSIDE_LABELS,          });
+    makePieChart({ container: 'Solid Waste Outside - Type',  data, field: 'sw_outside_type',     colors: SW_OUTSIDE_TYPE_COLORS,     labels: SW_OUTSIDE_TYPE_LABELS,     });
+
 }
 
 // #endregion Water Quality
@@ -380,10 +510,83 @@ const SW_CLEAN_UP_LABELS          = { /* 'yes': 'Active', 'no': 'None' */ };
 const COMMUNITY_ENGAGEMENT_COLORS = { /* 'high': '#4caf50', 'medium': '#ffb300', 'low': '#ef5350', 'none': '#e0e0e0' */ };
 const COMMUNITY_ENGAGEMENT_LABELS = { /* 'high': 'High', 'medium': 'Medium', 'low': 'Low', 'none': 'None' */ };
 
-function renderCommunityCharts(data) {
-    makePieChart({ container: 'Cleanup Efforts',         data, field: 'sw_clean_up',         colors: SW_CLEAN_UP_COLORS,          labels: SW_CLEAN_UP_LABELS,          title: 'Cleanup Efforts'           });
-    makeBarChart({ container: 'Community Participation', data, field: 'community_engagement', colors: COMMUNITY_ENGAGEMENT_COLORS, labels: COMMUNITY_ENGAGEMENT_LABELS, title: 'Community Participation'   });
-    makeBarChart({ container: 'Waste Comparison',        data, field: 'sw_inside',            colors: SW_INSIDE_COLORS,            labels: SW_INSIDE_LABELS,            title: 'Waste — Inside vs Outside' });
+const FLOOD_HISTORY_COLORS   = { 'cannot': '#b6b6b6', 'yes': '#ef5350', 'no': '#4caf50',  };
+const FLOOD_HISTORY_LABELS   = { 'cannot': 'Cannot Find Info', 'yes': 'Yes', 'no': 'No',  };
+
+const FLOOD_HEIGHT_COLORS    = { 'does not': '#4caf50', 'upto': '#ffb300', '2-5': '#e8a838', '6-10': '#ef5350', 'more': '#9c27b0' };
+const FLOOD_HEIGHT_LABELS    = { 'does not': 'Does Not Flood', 'upto': 'Up to 1 inch', '2-5': '2–5 inches', '6-10': '6–10 inches', 'more': 'More than 10 inches' };
+
+const DESILTING_COLORS       = { 'every 6': '#4caf50', 'once': '#ffb300', 'do not': '#90a4ae', 'cannot': '#b6b6b6' };
+const DESILTING_LABELS       = { 'every 6': 'Every 6 Months', 'once': 'Once a Year', 'do not': 'Do Not Know', 'cannot': 'Cannot Find Info' };
+
+const LAST_CLEANED_COLORS    = { '2-6': '#ffb300', 'more': '#ef5350', 'cannot': '#b6b6b6' };
+const LAST_CLEANED_LABELS    = { '2-6': '2–6 Months Ago', 'more': 'More than 6 Months', 'cannot': 'Cannot Find Info' };
+
+const DRAIN_MAINTAINER_COLORS = { 'no one': '#ef5350', 'do not': '#90a4ae', 'cannot': '#b6b6b6' };
+const DRAIN_MAINTAINER_LABELS = {} ;
+
+function _splitSpaceValues(data, field) {
+    const out = [];
+    for (const row of data) {
+        const val = String(row[field] ?? '').trim();
+        if (!val || /not applicable/i.test(val)) { out.push(row); continue; }
+        for (const token of val.split(/\s+/)) out.push({ ...row, [field]: token });
+    }
+    return out;
+}
+
+function renderCommunityCharts(data, communityData = []) {
+    const engData = _splitSpaceValues(data, 'community_engagement');
+    makeBarChart({ container: 'Community Participation', data: engData, field: 'community_engagement', colors: COMMUNITY_ENGAGEMENT_COLORS, labels: COMMUNITY_ENGAGEMENT_LABELS, ignore: 'Not Applicable' });
+
+    //makePieChart({ container: 'Flood History',    data: communityData, field: 'flood_history',    colors: FLOOD_HISTORY_COLORS,    labels: FLOOD_HISTORY_LABELS,    interactive: false });
+    //makeBarChart({ container: 'Flood Height',     data: communityData, field: 'flood_height',     colors: FLOOD_HEIGHT_COLORS,     labels: FLOOD_HEIGHT_LABELS,     interactive: false });
+   // makePieChart({ container: 'Desilting',        data: communityData, field: 'desilting',        colors: DESILTING_COLORS,        labels: DESILTING_LABELS,        interactive: false });
+   // makePieChart({ container: 'Last Cleaned',     data: communityData, field: 'last_cleaned',     colors: LAST_CLEANED_COLORS,     labels: LAST_CLEANED_LABELS,     interactive: false });
+    //makeBarChart({ container: 'Drain Maintainer', data: communityData, field: 'drain_maintainer', colors: DRAIN_MAINTAINER_COLORS, labels: DRAIN_MAINTAINER_LABELS, interactive: false });
 }
 
 // #endregion Community Engagement
+
+
+// ─── Badge colour lookup ──────────────────────────────────────────────────────
+
+const _FIELD_COLORS = {
+    wall_condition:       WALL_CONDITION_COLORS,
+    wall_material:        WALL_MATERIAL_COLORS,
+    wall_height:          null,
+    fence:                FENCE_COLORS,
+    bridge_type:          BRIDGE_TYPE_COLORS,
+    bridge_condition:     BRIDGE_CONDITION_COLORS,
+    bridge_walkable:      BRIDGE_WALKABLE_COLORS,
+    piers_condition:      PIERS_CONDITION_COLORS,
+    piers_num:            PIERS_NUM_COLORS,
+    elec_condition:       ELEC_CONDITION_COLORS,
+    cables_condition:     CABLES_CONDITION_COLORS,
+    manholes_condition:   MANHOLES_CONDITION_COLORS,
+    inlets:               INLETS_COLORS,
+    unauthorised_inlets:  UNAUTHORISED_INLETS_COLORS,
+    water_stagnant:       WATER_STAGNANT_COLORS,
+    water_contamination:  WATER_CONTAMINATION_COLORS,
+    water_colour:         WATER_COLOUR_COLORS,
+    water_turbidity:      WATER_TURBIDITY_COLORS,
+    water_smell:          WATER_SMELL_COLORS,
+    sw_inside:            SW_INSIDE_COLORS,
+    sw_inside_type:       SW_INSIDE_TYPE_COLORS,
+    sw_outside:           SW_OUTSIDE_COLORS,
+    sw_outside_type:      SW_OUTSIDE_TYPE_COLORS,
+    community_engagement: COMMUNITY_ENGAGEMENT_COLORS,
+};
+
+/**
+ * Returns the chart colour for a given field + raw CSV value, or null if unknown.
+ * Uses the same case-insensitive partial-match logic as _resolveColors.
+ */
+function getValueColor(field, value) {
+    const colors = _FIELD_COLORS[field];
+    if (!colors || !value || value === '—') return null;
+    const lk = String(value).toLowerCase();
+    const match = Object.keys(colors).find(k => lk === k.toLowerCase() || lk.includes(k.toLowerCase()));
+    return match ? colors[match] : null;
+}
+window.getValueColor = getValueColor;
