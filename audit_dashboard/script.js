@@ -508,7 +508,7 @@ window.addEventListener('load', () => {
 
 function buildImgSrc(filename, uuid, formNum) {
     if (!filename || !uuid) return null;
-    return `data/media_compressed/form-${formNum}/images/${uuid.replace('uuid:', '')}/${filename}`;
+    return `https://pub-4d67c97c1d2843adbeffa3b98cd45d19.r2.dev/form-${formNum}/images/${uuid.replace('uuid:', '')}/${filename}`;
 }
 
 // fieldPicMap: field key → ordered list of pic candidates (first non-null src wins)
@@ -681,6 +681,8 @@ function initPanelDropdownListeners() {
 
 initPanelDropdownListeners();
 
+const auditPopup = new maplibregl.Popup({ className: 'audit-popup', maxWidth: '320px' });
+
 function updatePanels(props) {
     _lastAuditProps = props;
     const idText = [props._drain, props._index].filter(Boolean).join(' · ');
@@ -704,8 +706,30 @@ function setHighlight(feature) {
     map.getSource('audit-point-highlight').setData({ type: 'FeatureCollection', features: [feature] });
 }
 
-map.on('click', 'audit-points',    (e) => { e.preventDefault(); updatePanels(e.features[0].properties); setHighlight(e.features[0]); });
-map.on('click', 'audit-points-f2', (e) => { e.preventDefault(); updatePanels(e.features[0].properties); setHighlight(e.features[0]); });
+map.on('click', 'audit-points', (e) => {
+    e.preventDefault();
+    const feat = e.features[0];
+    updatePanels(feat.properties);
+    setHighlight(feat);
+    const obs = feat.properties.observations;
+    if (obs && obs.trim()) {
+        auditPopup.setLngLat(feat.geometry.coordinates.slice()).setText(obs).addTo(map);
+    } else {
+        auditPopup.remove();
+    }
+});
+map.on('click', 'audit-points-f2', (e) => {
+    e.preventDefault();
+    const feat = e.features[0];
+    updatePanels(feat.properties);
+    setHighlight(feat);
+    const obs = feat.properties.observations;
+    if (obs && obs.trim()) {
+        auditPopup.setLngLat(feat.geometry.coordinates.slice()).setText(obs).addTo(map);
+    } else {
+        auditPopup.remove();
+    }
+});
 map.on('mouseenter', 'audit-points',    () => { map.getCanvas().style.cursor = 'pointer'; });
 map.on('mouseleave', 'audit-points',    () => { map.getCanvas().style.cursor = ''; });
 map.on('mouseenter', 'audit-points-f2', () => { map.getCanvas().style.cursor = 'pointer'; });

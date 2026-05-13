@@ -340,20 +340,14 @@ body {
 /* #endregion */
 
 /* #region Audit Popups */
-.audit-popup {
-    max-width: 900px;
-}
-
 .audit-popup .maplibregl-popup-content {
-    padding: 0;
+    padding: 10px 14px;
     border-radius: 8px;
-    overflow: hidden;
-    width: 620px;
-    max-height: 45vh;
-    overflow-y: auto;
     font-family: 'Barlow', sans-serif;
     font-size: 13px;
+    line-height: 1.5;
     color: #333;
+    max-width: 280px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
 }
 
