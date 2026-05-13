@@ -5,7 +5,7 @@
     box-sizing: border-box;
 }
 
-body {
+body{
     font-family: 'Barlow', sans-serif;
     display: grid;
     grid-template:
@@ -173,12 +173,11 @@ body {
             display: flex;
             flex-direction: column;
             height: 100%;
-            padding: 20px;
-            gap: 12px;
             overflow: clip;         /* clip without scroll container — keeps overflow-x unaffected */
             box-sizing: border-box;
             width: fit-content;
             --pic-width: min(200px, 24vh);
+            border: 3px solid #0d6aff;
             
         }
 
@@ -188,12 +187,11 @@ body {
             display: flex;
             flex-direction: column;
             height: 100%;
-            padding: 20px;
-            gap: 12px;
             overflow: clip;
             box-sizing: border-box;
             width: fit-content;
             --pic-width: min(200px, 24vh);
+            border: 3px solid #0d6aff;
         }
 
         #stats {
@@ -204,6 +202,7 @@ body {
             gap: 10px;
             padding: 10px 16px;
             background: #edf0f5;
+            border-bottom: 3px solid #0d6aff;
         }
 
         .stats-category {
@@ -250,21 +249,23 @@ body {
             display: flex;
             flex-direction: column;
             flex: 1;
-            gap: 8px;
             min-height: 0;
             width: fit-content;
         }
 
         .panel-header {
+            padding: 10px 20px;
+            background-color: #0d6aff;
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 24px;
-            width: fit-content;
+            width: fill;
             flex-shrink: 0;         /* header never squishes */
         }
 
         .panel-content {
+            padding: 10px 20px;
             display: flex;
             flex-direction: row;
             align-items: stretch;
@@ -291,7 +292,7 @@ body {
             font-weight: 600;
             font-size: 13px;
             letter-spacing: 0.04em;
-            color: #5E5E5E;
+            color: #ffffff;
         }
  
         .panel-id {
@@ -300,7 +301,7 @@ body {
             font-weight: 400;
             font-size: 11px;
             letter-spacing: 0.04em;
-            color: #AFAFAF;
+            color: #a2e9ff;
         }
  
         
@@ -580,25 +581,29 @@ body {
 
     body {
         grid-template:
-            "title    title    title"    50px
+
             "panel-1  map      panel-2"  1fr
+            "panel-1   title    panel-2"    40px
             "panel-1  stats    panel-2"  80px
             / max-content   1fr   max-content;
     }
 
     #panel-1, #panel-2 {
-        padding: 16px;
-        gap: 10px;
-        --pic-width: min(160px, 20vh);
+        --pic-width: min(150px, 20vh);
     }
 
-    .category-panel { gap: 6px; }
-    .panel-header   { gap: 18px; }
-    .panel-content  { gap: 10px; }
+    .panel-header   { gap: 18px;             padding: 10px 10px;}
+    .panel-content  { gap: 10px;             padding: 10px 10px;}
     .chart-wrapper  { width: 140px; gap: 4px; }
     .chart-slot     { width: 140px; }
 
     .audit-popup .maplibregl-popup-content { width: 500px; }
+
+    .stats-value    { font-size: 15px; }
+
+   
+    .team-filter-select { min-width: 80px; }
+    .team-filter-select { max-width: 160px; }
 }
 
 
@@ -608,21 +613,20 @@ body {
 
     body {
         grid-template:
-            "title    title    title"    45px
             "panel-1  map      panel-2"  1fr
+            "panel-1   title    panel-2"    45px
             "panel-1  stats    panel-2"  70px
             / max-content   1fr   max-content;
     }
 
     #panel-1, #panel-2 {
-        padding: 12px;
-        gap: 8px;
+
         --pic-width: min(110px, 17vh);
     }
 
-    .category-panel { gap: 5px; }
-    .panel-header   { gap: 14px; }
-    .panel-content  { gap: 8px; }
+
+    .panel-header   { gap: 14px; padding: 5px 5px;}
+    .panel-content  { gap: 8px; padding: 5px 5px;}
     .chart-wrapper  { width: 110px; gap: 4px; }
     .chart-slot     { width: 110px; }
 
@@ -632,9 +636,14 @@ body {
 
     #stats          { padding: 6px 12px; gap: 8px; }
     .stats-category { padding: 6px 12px; }
-    .stats-value    { font-size: 20px; }
+    .stats-value    { font-size: 15px; }
 
     .audit-popup .maplibregl-popup-content { width: 400px; }
+
+     #search-container { right: 40px; gap: 6px; }
+    .team-filter-select { min-width: 70px; }
+    .team-filter-select { max-width: 160px; }
+    mapbox-search-box { max-width: 160px; }
 }
 
 

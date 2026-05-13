@@ -27,238 +27,240 @@
         <script id="search-js" defer src="https://api.mapbox.com/search-js/v1.0.0/web.js"></script>
     </head>
     <body>
-        <div id="dashboard-title">
-            <span class="dashboard-title-main">Stormwater Drain Audit Dashboard</span>
-            <span class="dashboard-subtitle">Building a Resilient Bengaluru</span>
-        </div>
-
-        <div id="map-container">
-            <div id="search-container">
-                <wa-select id="team-filter" size="small" with-clear placeholder="Team" class="team-filter-select"></wa-select>
-                <wa-button id="reset-filters-btn" size="small" appearance="outlined" style="display:none" title="Reset all chart filters">
-                    <wa-icon slot="prefix" name="rotate-left"></wa-icon>
-                    Reset Filters
-                </wa-button>
-                <mapbox-search-box id="search-box"></mapbox-search-box>
+            <div id="dashboard-title">
+                <span class="dashboard-title-main">Stormwater Drain Audit Dashboard</span>
+                <span class="dashboard-subtitle">Building a Resilient Bengaluru</span>
             </div>
-        </div>
 
-        <!-- Panel 1: Infrastructure -->
-        <div id="panel-1">
-
-            <!-- Retaining Wall -->
-            <div class="category-panel" id="cat-retaining-wall">
-                <div class="panel-header">
-                    <div class="panel-title">Retaining Wall</div>
-                    <div class="panel-id">—</div>
+            <div id="map-container">
+                <div id="search-container">
+                    <wa-select id="team-filter" size="small" with-clear placeholder="Team" class="team-filter-select"></wa-select>
+                    <wa-button id="reset-filters-btn" size="small" appearance="outlined" style="display:none" title="Reset all chart filters">
+                        <wa-icon slot="prefix" name="rotate-left"></wa-icon>
+                        Reset Filters
+                    </wa-button>
+                    <mapbox-search-box id="search-box"></mapbox-search-box>
                 </div>
-                <div class="panel-content">
-                    <div class="panel-pic">
-                        <img class="panel-pic-img" src="" alt="" />
-                        <div class="panel-attrs">
-                            <div class="attr-row">
-                                <wa-select class="attr-select" value="wall_condition" size="small" hoist>
-                                    <wa-option value="wall_condition">Wall Condition</wa-option>
-                                    <wa-option value="wall_height">Wall Height</wa-option>
-                                    <wa-option value="fence">Fence</wa-option>
-                                    <wa-option value="wall_material">Wall Material</wa-option>
-                                </wa-select>
-                                <div class="attr-badge">—</div>
+            </div>
+
+            <!-- Panel 1: Infrastructure -->
+            <div id="panel-1">
+
+                <!-- Retaining Wall -->
+                <div class="category-panel" id="cat-retaining-wall">
+                    <div class="panel-header">
+                        <div class="panel-title">Retaining Wall</div>
+                        <div class="panel-id">—</div>
+                    </div>
+                    <div class="panel-content">
+                        <div class="panel-pic">
+                            <img class="panel-pic-img" src="" alt="" />
+                            <div class="panel-attrs">
+                                <div class="attr-row">
+                                    <wa-select class="attr-select" value="wall_condition" size="small" hoist>
+                                        <wa-option value="wall_condition">Wall Condition</wa-option>
+                                        <wa-option value="wall_height">Wall Height</wa-option>
+                                        <wa-option value="fence">Fence</wa-option>
+                                        <wa-option value="wall_material">Wall Material</wa-option>
+                                    </wa-select>
+                                    <div class="attr-badge">—</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="chart-wrapper">
-                        <div class="chart-title">Wall Condition</div>
-                        <div class="chart-slot" data-chart="Wall Condition"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Utilities -->
-            <div class="category-panel" id="cat-utilities">
-                <div class="panel-header">
-                    <div class="panel-title">Utilities</div>
-                    <div class="panel-id">—</div>
-                </div>
-                <div class="panel-content">
-                    <div class="panel-pic">
-                        <img class="panel-pic-img" src="" alt="" />
-                        <div class="panel-attrs">
-                            <div class="attr-row">
-                                <wa-select class="attr-select" value="elec_condition" size="small" hoist>
-                                    <wa-option value="elec_condition">Electrical</wa-option>
-                                    <wa-option value="cables_condition">Cables</wa-option>
-                                    <wa-option value="manholes_condition">Manholes</wa-option>
-                                </wa-select>
-                                <div class="attr-badge">—</div>
-                            </div>
+                        <div class="chart-wrapper">
+                            <div class="chart-title">Wall Condition</div>
+                            <div class="chart-slot" data-chart="Wall Condition"></div>
                         </div>
                     </div>
-                    <div class="chart-wrapper">
-                        <div class="chart-title">Electrical</div>
-                        <div class="chart-slot" data-chart="Electrical"></div>
-                    </div>
                 </div>
-            </div>
 
-            <!-- Bridge -->
-            <div class="category-panel" id="cat-bridge">
-                <div class="panel-header">
-                    <div class="panel-title">Bridge</div>
-                    <div class="panel-id">—</div>
-                </div>
-                <div class="panel-content">
-                    <div class="panel-pic">
-                        <img class="panel-pic-img" src="" alt="" />
-                        <div class="panel-attrs">
-                            <div class="attr-row">
-                                <wa-select class="attr-select" value="bridge_condition" size="small" hoist>
-                                    <wa-option value="bridge_type">Bridge Type</wa-option>
-                                    <wa-option value="bridge_condition">Bridge Condition</wa-option>
-                                    <wa-option value="bridge_walkable">Walkable</wa-option>
-                                    <wa-option value="piers_condition">Piers Condition</wa-option>
-                                    <wa-option value="piers_num">Piers Count</wa-option>
-                                </wa-select>
-                                <div class="attr-badge">—</div>
+                <!-- Utilities -->
+                <div class="category-panel" id="cat-utilities">
+                    <div class="panel-header">
+                        <div class="panel-title">Utilities</div>
+                        <div class="panel-id">—</div>
+                    </div>
+                    <div class="panel-content">
+                        <div class="panel-pic">
+                            <img class="panel-pic-img" src="" alt="" />
+                            <div class="panel-attrs">
+                                <div class="attr-row">
+                                    <wa-select class="attr-select" value="elec_condition" size="small" hoist>
+                                        <wa-option value="elec_condition">Electrical</wa-option>
+                                        <wa-option value="cables_condition">Cables</wa-option>
+                                        <wa-option value="manholes_condition">Manholes</wa-option>
+                                    </wa-select>
+                                    <div class="attr-badge">—</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="chart-wrapper">
-                        <div class="chart-title">Bridge Condition</div>
-                        <div class="chart-slot" data-chart="Bridge Condition"></div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-
-        <!-- Panel 2: Water Quality & Community -->
-        <div id="panel-2">
-
-            <!-- Water Quality -->
-            <div class="category-panel" id="cat-water-quality">
-                <div class="panel-header">
-                    <div class="panel-title">Water Quality</div>
-                    <div class="panel-id">—</div>
-                </div>
-                <div class="panel-content">
-                    <div class="panel-pic">
-                        <img class="panel-pic-img" src="" alt="" />
-                        <div class="panel-attrs">
-                            <div class="attr-row">
-                                <wa-select class="attr-select" value="water_contamination" size="small" hoist>
-                                    <wa-option value="inlets">Authorised Inlets</wa-option>
-                                    <wa-option value="unauthorised_inlets">Unauthorised Inlets</wa-option>
-                                    <wa-option value="water_stagnant">Water Flow</wa-option>
-                                    <wa-option value="water_contamination">Water Contamination</wa-option>
-                                    <wa-option value="water_colour">Water Colour</wa-option>
-                                    <wa-option value="water_turbidity">Turbidity</wa-option>
-                                    <wa-option value="water_smell">Water Smell</wa-option>
-                                </wa-select>
-                                <div class="attr-badge">—</div>
-                            </div>
+                        <div class="chart-wrapper">
+                            <div class="chart-title">Electrical</div>
+                            <div class="chart-slot" data-chart="Electrical"></div>
                         </div>
                     </div>
-                    <div class="chart-wrapper">
-                        <div class="chart-title">Water Contamination</div>
-                        <div class="chart-slot" data-chart="Water Contamination"></div>
-                    </div>
                 </div>
-            </div>
 
-            <!-- Solid Waste -->
-            <div class="category-panel" id="cat-solid-waste">
-                <div class="panel-header">
-                    <div class="panel-title">Solid Waste</div>
-                    <div class="panel-id">—</div>
-                </div>
-                <div class="panel-content">
-                    <div class="panel-pic">
-                        <img class="panel-pic-img" src="" alt="" />
-                        <div class="panel-attrs">
-                            <div class="attr-row">
-                                <wa-select class="attr-select" value="sw_inside" size="small" hoist>
-                                    <wa-option value="sw_inside">Waste Inside</wa-option>
-                                    <wa-option value="sw_inside_type">Inside Type</wa-option>
-                                    <wa-option value="sw_inside_source">Inside Source</wa-option>
-                                    <wa-option value="sw_outside">Waste Outside</wa-option>
-                                    <wa-option value="sw_outside_type">Outside Type</wa-option>
-                                    <wa-option value="sw_outside_source">Outside Source</wa-option>
-                                </wa-select>
-                                <div class="attr-badge">—</div>
+                <!-- Bridge -->
+                <div class="category-panel" id="cat-bridge">
+                    <div class="panel-header">
+                        <div class="panel-title">Bridge</div>
+                        <div class="panel-id">—</div>
+                    </div>
+                    <div class="panel-content">
+                        <div class="panel-pic">
+                            <img class="panel-pic-img" src="" alt="" />
+                            <div class="panel-attrs">
+                                <div class="attr-row">
+                                    <wa-select class="attr-select" value="bridge_condition" size="small" hoist>
+                                        <wa-option value="bridge_type">Bridge Type</wa-option>
+                                        <wa-option value="bridge_condition">Bridge Condition</wa-option>
+                                        <wa-option value="bridge_walkable">Walkable</wa-option>
+                                        <wa-option value="piers_condition">Piers Condition</wa-option>
+                                        <wa-option value="piers_num">Piers Count</wa-option>
+                                    </wa-select>
+                                    <div class="attr-badge">—</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="chart-wrapper">
-                        <div class="chart-title">Solid Waste Inside</div>
-                        <div class="chart-slot" data-chart="Solid Waste Inside"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Street -->
-            <div class="category-panel" id="cat-street">
-                <div class="panel-header">
-                    <div class="panel-title">Street</div>
-                    <div class="panel-id">—</div>
-                </div>
-                <div class="panel-content">
-                    <div class="panel-pic">
-                        <img class="panel-pic-img" src="" alt="" />
-                        <div class="panel-attrs">
-                            <div class="attr-row">
-                                <wa-select class="attr-select" value="community_engagement" size="small" hoist>
-                                    <wa-option value="community_engagement">Community Engagement</wa-option>
-                                </wa-select>
-                                <div class="attr-badge">—</div>
-                            </div>
+                        <div class="chart-wrapper">
+                            <div class="chart-title">Bridge Condition</div>
+                            <div class="chart-slot" data-chart="Bridge Condition"></div>
                         </div>
                     </div>
-                    <div class="chart-wrapper">
-                        <div class="chart-title">Community Participation</div>
-                        <div class="chart-slot" data-chart="Community Participation"></div>
+                </div>
+
+            </div>
+
+
+            <!-- Panel 2: Water Quality & Community -->
+            <div id="panel-2">
+
+                <!-- Water Quality -->
+                <div class="category-panel" id="cat-water-quality">
+                    <div class="panel-header">
+                        <div class="panel-title">Water Quality</div>
+                        <div class="panel-id">—</div>
+                    </div>
+                    <div class="panel-content">
+                        <div class="panel-pic">
+                            <img class="panel-pic-img" src="" alt="" />
+                            <div class="panel-attrs">
+                                <div class="attr-row">
+                                    <wa-select class="attr-select" value="water_contamination" size="small" hoist>
+                                        <wa-option value="inlets">Authorised Inlets</wa-option>
+                                        <wa-option value="unauthorised_inlets">Unauthorised Inlets</wa-option>
+                                        <wa-option value="water_stagnant">Water Flow</wa-option>
+                                        <wa-option value="water_contamination">Water Contamination</wa-option>
+                                        <wa-option value="water_colour">Water Colour</wa-option>
+                                        <wa-option value="water_turbidity">Turbidity</wa-option>
+                                        <wa-option value="water_smell">Water Smell</wa-option>
+                                    </wa-select>
+                                    <div class="attr-badge">—</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <div class="chart-title">Water Contamination</div>
+                            <div class="chart-slot" data-chart="Water Contamination"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-        </div>
-
-        <div id="stats">
-            <div class="stats-category">
-                <div class="stats-label-row">
-                    <wa-icon name="user-group" class="stats-icon"></wa-icon>
-                    <span class="stats-title">Citizen Auditors</span>
+                <!-- Solid Waste -->
+                <div class="category-panel" id="cat-solid-waste">
+                    <div class="panel-header">
+                        <div class="panel-title">Solid Waste</div>
+                        <div class="panel-id">—</div>
+                    </div>
+                    <div class="panel-content">
+                        <div class="panel-pic">
+                            <img class="panel-pic-img" src="" alt="" />
+                            <div class="panel-attrs">
+                                <div class="attr-row">
+                                    <wa-select class="attr-select" value="sw_inside" size="small" hoist>
+                                        <wa-option value="sw_inside">Waste Inside</wa-option>
+                                        <wa-option value="sw_inside_type">Inside Type</wa-option>
+                                        <wa-option value="sw_inside_source">Inside Source</wa-option>
+                                        <wa-option value="sw_outside">Waste Outside</wa-option>
+                                        <wa-option value="sw_outside_type">Outside Type</wa-option>
+                                        <wa-option value="sw_outside_source">Outside Source</wa-option>
+                                    </wa-select>
+                                    <div class="attr-badge">—</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <div class="chart-title">Solid Waste Inside</div>
+                            <div class="chart-slot" data-chart="Solid Waste Inside"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="stats-value">200</div>
-            </div>
-            <div class="stats-category">
-                <div class="stats-label-row">
-                    <wa-icon name="route" class="stats-icon"></wa-icon>
-                    <span class="stats-title">Drain KM Audited</span>
+
+                <!-- Street -->
+                <div class="category-panel" id="cat-street">
+                    <div class="panel-header">
+                        <div class="panel-title">Street</div>
+                        <div class="panel-id">—</div>
+                    </div>
+                    <div class="panel-content">
+                        <div class="panel-pic">
+                            <img class="panel-pic-img" src="" alt="" />
+                            <div class="panel-attrs">
+                                <div class="attr-row">
+                                    <wa-select class="attr-select" value="community_engagement" size="small" hoist>
+                                        <wa-option value="community_engagement">Community Engagement</wa-option>
+                                    </wa-select>
+                                    <div class="attr-badge">—</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <div class="chart-title">Community Participation</div>
+                            <div class="chart-slot" data-chart="Community Participation"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="stats-value">30.7 km</div>
+
             </div>
-            <div class="stats-category">
-                <div class="stats-label-row">
-                    <wa-icon name="house" class="stats-icon"></wa-icon>
-                    <span class="stats-title">Residents Engaged</span>
+
+            <div id="stats">
+                <div class="stats-category">
+                    <div class="stats-label-row">
+                        <wa-icon name="user-group" class="stats-icon"></wa-icon>
+                        <span class="stats-title">Citizen Auditors</span>
+                    </div>
+                    <div class="stats-value">200</div>
                 </div>
-                <div class="stats-value">215</div>
+                <div class="stats-category">
+                    <div class="stats-label-row">
+                        <wa-icon name="route" class="stats-icon"></wa-icon>
+                        <span class="stats-title">Drain KM Audited</span>
+                    </div>
+                    <div class="stats-value">30.7 km</div>
+                </div>
+                <div class="stats-category">
+                    <div class="stats-label-row">
+                        <wa-icon name="house" class="stats-icon"></wa-icon>
+                        <span class="stats-title">Residents Engaged</span>
+                    </div>
+                    <div class="stats-value">215</div>
+                </div>
             </div>
-        </div>
 
 
-        <!-- Desktop overlay (shown on screens narrower than 1024px) -->
-        <div id="desktop-overlay">
-            <div class="overlay-inner">
-                <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#AFAFAF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
-                </svg>
-                <p class="overlay-title">Open on a larger screen</p>
-                <p class="overlay-body">This dashboard is designed for desktop and laptop displays.<br>Please rotate your device or switch to a wider screen.</p>
+            <!-- Desktop overlay (shown on screens narrower than 1024px) -->
+            <div id="desktop-overlay">
+                <div class="overlay-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#AFAFAF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+                    </svg>
+                    <p class="overlay-title">Open on a larger screen</p>
+                    <p class="overlay-body">This dashboard is designed for desktop and laptop displays.<br>Please rotate your device or switch to a wider screen.</p>
+                </div>
             </div>
-        </div>
+        
+
 
         <!-- Chart.js -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
