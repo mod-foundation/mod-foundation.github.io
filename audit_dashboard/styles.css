@@ -176,7 +176,7 @@ body{
             overflow: clip;         /* clip without scroll container — keeps overflow-x unaffected */
             box-sizing: border-box;
             width: fit-content;
-            --pic-width: min(200px, calc((100vh - 300px) / 4));
+            --pic-width: min(200px, calc((100vh - 200px) / 4));
             border: 3px solid #0d6aff;
 
         }
@@ -190,7 +190,7 @@ body{
             overflow: clip;
             box-sizing: border-box;
             width: fit-content;
-            --pic-width: min(200px, calc((100vh - 300px) / 4));
+            --pic-width: min(200px, calc((100vh - 200px) / 4));
             border: 3px solid #0d6aff;
         }
 
@@ -589,7 +589,7 @@ body{
     }
 
     #panel-1, #panel-2 {
-        --pic-width: min(150px, calc((100vh - 280px) / 4));
+        --pic-width: min(150px, calc((100vh - 200px) / 4));
     }
 
     .panel-header   { gap: 18px;             padding: 10px 10px;}
@@ -609,7 +609,7 @@ body{
 
 /* ─── Responsive: tablet landscape / small laptop 1024–1279px ───────────── */
 
-@media (min-width: 1024px) and (max-width: 1279px) {
+@media (min-width: 1025px) and (max-width: 1279px) {
 
     body {
         grid-template:
@@ -620,7 +620,7 @@ body{
     }
 
     #panel-1, #panel-2 {
-        --pic-width: min(110px, calc((100vh - 250px) / 4));
+        --pic-width: min(110px, calc((100vh - 200px) / 4));
     }
 
 
@@ -646,7 +646,7 @@ body{
 }
 
 
-/* ─── Responsive: short viewport (max-height 750px) ─────────────────────── */
+/* ─── Responsive: short viewport (700–750px) — compress rows ────────────── */
 
 @media (max-height: 750px) {
     body {
@@ -668,7 +668,7 @@ body{
 
 /* ─── Smaller than 1024px — show overlay, hide dashboard ────────────────── */
 
-@media (max-width: 1023px) {
+@media (max-width: 1024px) {
     #desktop-overlay                       { display: flex; }
     body > *:not(#desktop-overlay)         { visibility: hidden; }
 }
