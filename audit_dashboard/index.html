@@ -27,6 +27,11 @@
         <script id="search-js" defer src="https://api.mapbox.com/search-js/v1.0.0/web.js"></script>
     </head>
     <body>
+        <div id="dashboard-title">
+            <span class="dashboard-title-main">Stormwater Drain Audit Dashboard</span>
+            <span class="dashboard-subtitle">Building a Resilient Bengaluru</span>
+        </div>
+
         <div id="map-container">
             <div id="search-container">
                 <wa-select id="team-filter" size="small" with-clear placeholder="Team" class="team-filter-select"></wa-select>
@@ -221,15 +226,24 @@
 
         <div id="stats">
             <div class="stats-category">
-                <div class="stats-title">Citizen Auditors</div>
+                <div class="stats-label-row">
+                    <wa-icon name="user-group" class="stats-icon"></wa-icon>
+                    <span class="stats-title">Citizen Auditors</span>
+                </div>
                 <div class="stats-value">200</div>
             </div>
             <div class="stats-category">
-                <div class="stats-title">Drain KM Audited</div>
-                <div class="stats-value">30.7 KM</div>
+                <div class="stats-label-row">
+                    <wa-icon name="route" class="stats-icon"></wa-icon>
+                    <span class="stats-title">Drain KM Audited</span>
+                </div>
+                <div class="stats-value">30.7 km</div>
             </div>
             <div class="stats-category">
-                <div class="stats-title">Residents Engaged</div>
+                <div class="stats-label-row">
+                    <wa-icon name="house" class="stats-icon"></wa-icon>
+                    <span class="stats-title">Residents Engaged</span>
+                </div>
                 <div class="stats-value">215</div>
             </div>
         </div>
