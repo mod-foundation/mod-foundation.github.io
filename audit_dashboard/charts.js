@@ -539,11 +539,11 @@ function renderCommunityCharts(data, communityData = []) {
     const engData = _splitSpaceValues(data, 'community_engagement');
     makeBarChart({ container: 'Community Participation', data: engData, field: 'community_engagement', colors: COMMUNITY_ENGAGEMENT_COLORS, labels: COMMUNITY_ENGAGEMENT_LABELS, ignore: 'Not Applicable' });
 
-    //makePieChart({ container: 'Flood History',    data: communityData, field: 'flood_history',    colors: FLOOD_HISTORY_COLORS,    labels: FLOOD_HISTORY_LABELS,    interactive: false });
-    //makeBarChart({ container: 'Flood Height',     data: communityData, field: 'flood_height',     colors: FLOOD_HEIGHT_COLORS,     labels: FLOOD_HEIGHT_LABELS,     interactive: false });
-   // makePieChart({ container: 'Desilting',        data: communityData, field: 'desilting',        colors: DESILTING_COLORS,        labels: DESILTING_LABELS,        interactive: false });
-   // makePieChart({ container: 'Last Cleaned',     data: communityData, field: 'last_cleaned',     colors: LAST_CLEANED_COLORS,     labels: LAST_CLEANED_LABELS,     interactive: false });
-    //makeBarChart({ container: 'Drain Maintainer', data: communityData, field: 'drain_maintainer', colors: DRAIN_MAINTAINER_COLORS, labels: DRAIN_MAINTAINER_LABELS, interactive: false });
+    makePieChart({ container: 'Flood History',    data: communityData, field: 'flood_history',    colors: FLOOD_HISTORY_COLORS,    labels: FLOOD_HISTORY_LABELS,    interactive: false });
+    makeBarChart({ container: 'Flood Height',     data: communityData, field: 'flood_height',     colors: FLOOD_HEIGHT_COLORS,     labels: FLOOD_HEIGHT_LABELS,     interactive: false });
+    makePieChart({ container: 'Desilting',        data: communityData, field: 'desilting',        colors: DESILTING_COLORS,        labels: DESILTING_LABELS,        interactive: false });
+    makePieChart({ container: 'Last Cleaned',     data: communityData, field: 'last_cleaned',     colors: LAST_CLEANED_COLORS,     labels: LAST_CLEANED_LABELS,     interactive: false });
+    makeBarChart({ container: 'Drain Maintainer', data: communityData, field: 'drain_maintainer', colors: DRAIN_MAINTAINER_COLORS, labels: DRAIN_MAINTAINER_LABELS, interactive: false });
 }
 
 // #endregion Community Engagement

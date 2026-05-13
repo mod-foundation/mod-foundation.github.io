@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Community Awareness Dashboard</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <!-- Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
+
+        <!-- Papa Parse -->
+        <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+
+        <!-- Web Awesome -->
+        <script src="https://kit.webawesome.com/12f6b474bd1f41e1.js" crossorigin="anonymous"></script>
+
+        <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+
+            body {
+                font-family: 'Barlow', sans-serif;
+                display: flex;
+                flex-direction: column;
+                height: fit-content;
+                overflow: hidden;
+                background: #f4f6f9;
+            }
+
+            #dashboard-title {
+                flex-shrink: 0;
+                background-color: #0d6aff;
+                color: white;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 24px;
+                height: 50px;
+            }
+
+            .dashboard-title-main {
+                text-transform: uppercase;
+                font-weight: 600;
+                font-size: 14px;
+                letter-spacing: 0.05em;
+            }
+
+            .dashboard-subtitle {
+                font-size: 12px;
+                font-weight: 400;
+                opacity: 0.85;
+            }
+
+            #charts-grid {
+                flex: 1;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+                padding: 24px;
+                justify-content: center;
+                align-content: start;
+                overflow: auto;
+            }
+
+            .chart-card {
+                background: #ffffff;
+                border-radius: 10px;
+                border: 1px solid #e2e5eb;
+                box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+                padding: 16px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                width: 300px;
+            }
+
+            .chart-card-title {
+                font-size: 11px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: #6b7280;
+            }
+
+            .chart-slot {
+                width: 100%;
+                height: 220px;
+                position: relative;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="dashboard-title">
+            <span class="dashboard-title-main">Community Awareness Stats</span>
+            <span class="dashboard-subtitle">Building a Resilient Bengaluru</span>
+        </div>
+
+        <div id="charts-grid">
+            <div class="chart-card">
+                <div class="chart-card-title">Flood History</div>
+                <div class="chart-slot" data-chart="Flood History"></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-card-title">Flood Height</div>
+                <div class="chart-slot" data-chart="Flood Height"></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-card-title">Desilting</div>
+                <div class="chart-slot" data-chart="Desilting"></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-card-title">Last Cleaned</div>
+                <div class="chart-slot" data-chart="Last Cleaned"></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-card-title">Drain Maintainer</div>
+                <div class="chart-slot" data-chart="Drain Maintainer"></div>
+            </div>
+        </div>
+
+        <!-- Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+        <script src="charts.js"></script>
+        <script>
+            let allCommunityData = [];
+
+            function renderFiltered(filterState) {
+                const filtered = allCommunityData.filter(row => {
+                    for (const { fields, values } of Object.values(filterState)) {
+                        if (values.length && !fields.some(f => values.includes(row[f]))) return false;
+                    }
+                    return true;
+                });
+                renderCommunityCharts([], filtered);
+            }
+
+            (async function () {
+                const text = await fetch('data/csv/form-3.csv').then(r => r.text());
+                const raw = Papa.parse(text, {
+                    header: true,
+                    skipEmptyLines: true,
+                    transformHeader: h => h.trim(),
+                }).data;
+
+                // row 0 is KoboToolbox sub-header (long question text) - skip it
+                allCommunityData = raw.slice(1).map(row => ({
+                    team_code:        row['team_code']?.trim(),
+                    _drain:           row['_drain']?.trim(),
+                    flood_history:    row['flood_history']?.trim(),
+                    flood_height:     row['flood_height']?.trim(),
+                    desilting:        row['desiliting']?.trim(),
+                    last_cleaned:     row['last_cleaned']?.trim(),
+                    drain_maintainer: row['maintenance']?.trim(),
+                })).filter(r => r.flood_history);
+
+                renderCommunityCharts([], allCommunityData);
+
+                // listen for filter changes broadcast from the audit dashboard iframe
+                const bc = new BroadcastChannel('audit-filters');
+                bc.onmessage = ({ data }) => renderFiltered(data);
+            })();
+        </script>
+    </body>
+</html>

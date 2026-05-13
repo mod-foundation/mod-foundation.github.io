@@ -165,6 +165,7 @@ function addPointLayer(id, data, {
 
 let auditData = [];
 let communityData = [];
+const _filterBroadcast = new BroadcastChannel('audit-filters');
 
 async function loadAuditData() {
     const [f1Text, f2Text, f3Text] = await Promise.all([
@@ -234,15 +235,16 @@ async function loadAuditData() {
     );
 
     const f3Raw = Papa.parse(f3Text, { header: true, skipEmptyLines: true, transformHeader: h => h.trim() }).data;
-    communityData = f3Raw.map(row => ({
-        team_code:        row['1.2 Team code']?.trim(),
+    // f3Raw[0] is KoboToolbox's sub-header row (long question text) — skip it
+    communityData = f3Raw.slice(1).map(row => ({
+        team_code:        row['team_code']?.trim(),
         _drain:           row['_drain']?.trim(),
         _secondarydrain:  row['_secondarydrain']?.trim(),
-        flood_history:    row['2.1 Does the drain have a history of flooding?']?.trim(),
-        flood_height:     row['2.2 During heavy rain, approx. height of water that flows on the road?']?.trim(),
-        desilting:        row['2.3 Does desilting happen often?']?.trim(),
-        last_cleaned:     row['2.4 When was this SWD last cleaned?']?.trim(),
-        drain_maintainer: row['2.5 Does the local community know who maintains the drain?']?.trim(),
+        flood_history:    row['flood_history']?.trim(),
+        flood_height:     row['flood_height']?.trim(),
+        desilting:        row['desiliting']?.trim(),    // CSV col is 'desiliting'
+        last_cleaned:     row['last_cleaned']?.trim(),
+        drain_maintainer: row['maintenance']?.trim(),   // CSV col is 'maintenance'
         _uuid:            row['_uuid'],
         _validation_status: row['_validation_status'],
     })).filter(r => r._drain);
@@ -475,6 +477,12 @@ function buildAndApplyFilter() {
 
     const resetBtn = document.getElementById('reset-filters-btn');
     if (resetBtn) resetBtn.style.display = Object.keys(window._chartFilters || {}).length ? '' : 'none';
+
+    const filterState = {};
+    for (const [id, def] of Object.entries(window._dropdownFilters || {})) {
+        filterState[id] = { fields: def.fields, values: [...def.values] };
+    }
+    _filterBroadcast.postMessage(filterState);
 }
 
 function resetAllChartFilters() {
