@@ -402,19 +402,19 @@ const WALL_MATERIAL_LABELS   = { 'concrete': 'Reinforced Cement Concrete (RCC)',
 const FENCE_COLORS           = { 'only on sides': '#ffb300', 'sides and top': '#ef5350', 'no': '#4caf50'};
 const FENCE_LABELS           = { 'only on sides': 'Yes, Sides', 'sides and top': 'Yes, Sides & Top', 'no': 'No Fence' };
 
-const BRIDGE_TYPE_COLORS     = { 'vehicular': '#4a90d9', 'pedestrian': '#ffb300', 'not': '#b6b6b6' };
+const BRIDGE_TYPE_COLORS     = { 'vehicular': '#4a90d9', 'pedestrian': '#ffb300', 'not': '#b6b6b638' };
 const BRIDGE_TYPE_LABELS     = { 'vehicular': 'Vehicular', 'pedestrian': 'Pedestrian', 'not': 'No Bridge' };
 
-const BRIDGE_CONDITION_COLORS = { 'intact': '#4caf50', 'path': '#e97d7bff', 'wall': '#ef5350', 'not': '#b6b6b6' };
+const BRIDGE_CONDITION_COLORS = { 'intact': '#4caf50', 'path': '#e97d7bff', 'wall': '#ef5350', 'not': '#b6b6b638' };
 const BRIDGE_CONDITION_LABELS = { 'intact': 'Intact', 'wall': 'Broken wall', 'path': 'Broken path', 'not': 'No Bridge' };
 
-const BRIDGE_WALKABLE_COLORS  = { 'clear': '#4caf50', 'parking': '#e97d7bff', 'solid': '#ef5350' , 'not': '#b6b6b6'};
+const BRIDGE_WALKABLE_COLORS  = { 'clear': '#4caf50', 'parking': '#e97d7bff', 'solid': '#ef5350' , 'not': '#b6b6b638'};
 const BRIDGE_WALKABLE_LABELS  = { 'clear': 'Clear Path', 'parking': 'Obstructed Path (Parking)' , 'solid': 'Obstructed Path (Solid Waste)', 'not': 'No Bridge' };
 
-const PIERS_CONDITION_COLORS = { 'yes': '#ef5350', 'not': '#b6b6b6', 'no': '#4caf50',};
+const PIERS_CONDITION_COLORS = { 'yes': '#ef5350', 'not': '#b6b6b638', 'no': '#4caf50',};
 const PIERS_CONDITION_LABELS = { 'yes': 'Yes', 'applicable': 'No Bridge', 'no': 'No', };
 
-const PIERS_NUM_COLORS = { 'not': '#b6b6b6' };
+const PIERS_NUM_COLORS = { 'not': '#b6b6b638' };
 const PIERS_NUM_LABELS = { 'not': 'No Bridge'};
 
 const ELEC_CONDITION_COLORS  = { 'no': '#4caf50', 'yes': '#ef5350'};
@@ -507,7 +507,7 @@ function renderWaterQualityCharts(data) {
 const SW_CLEAN_UP_COLORS          = { /* 'yes': '#4caf50', 'no': '#ef5350' */ };
 const SW_CLEAN_UP_LABELS          = { /* 'yes': 'Active', 'no': 'None' */ };
 
-const COMMUNITY_ENGAGEMENT_COLORS = { /* 'high': '#4caf50', 'medium': '#ffb300', 'low': '#ef5350', 'none': '#e0e0e0' */ };
+const COMMUNITY_ENGAGEMENT_COLORS = { 'Plants': '#197a1cff','Park': '#4caf50', 'Murals': '#ffb300', 'Poster': '#ef5350', 'Idols': '#9c27b0','Benches': '#29dab3ff','Gym': '#ef50c7ff','not': '#b6b6b6b4','Cattle': '#e8a838'};
 const COMMUNITY_ENGAGEMENT_LABELS = { /* 'high': 'High', 'medium': 'Medium', 'low': 'Low', 'none': 'None' */ };
 
 const FLOOD_HISTORY_COLORS   = { 'cannot': '#b6b6b6', 'yes': '#ef5350', 'no': '#4caf50',  };
@@ -537,7 +537,7 @@ function _splitSpaceValues(data, field) {
 
 function renderCommunityCharts(data, communityData = []) {
     const engData = _splitSpaceValues(data, 'community_engagement');
-    makeBarChart({ container: 'Community Participation', data: engData, field: 'community_engagement', colors: COMMUNITY_ENGAGEMENT_COLORS, labels: COMMUNITY_ENGAGEMENT_LABELS, ignore: 'Not Applicable' });
+    makeBarChart({ container: 'Community Engagement', data: engData, field: 'community_engagement', colors: COMMUNITY_ENGAGEMENT_COLORS, labels: COMMUNITY_ENGAGEMENT_LABELS, ignore: 'Not Applicable' });
 
     makePieChart({ container: 'Flood History',    data: communityData, field: 'flood_history',    colors: FLOOD_HISTORY_COLORS,    labels: FLOOD_HISTORY_LABELS,    interactive: false });
     makeBarChart({ container: 'Flood Height',     data: communityData, field: 'flood_height',     colors: FLOOD_HEIGHT_COLORS,     labels: FLOOD_HEIGHT_LABELS,     interactive: false });

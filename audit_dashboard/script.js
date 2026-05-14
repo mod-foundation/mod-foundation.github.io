@@ -203,7 +203,7 @@ async function loadAuditData() {
 
     // Green if _validation_status = yes, otherwise orange
     const validatedColor = ['case', ['==', ['get', '_validation_status'], 'yes'], '#00c853', '#ff6b35'];
-    addPointLayer('audit-points', geojson, { color: validatedColor, radius: 6, strokeColor: '#fff', strokeWidth: 1.5 });
+    addPointLayer('audit-points', geojson, { color: validatedColor, radius: 6, strokeColor: '#ffffff3f', strokeWidth: 1.5 });
     map.setFilter('audit-points', ['!=', ['get', '_validation_status'], 'no']);
 
     // Form-2 records with no matching form-1 entry — plot using form-2 coordinates
@@ -219,7 +219,7 @@ async function loadAuditData() {
     };
     // Green if _validation_status = yes, otherwise pink
     const validatedColorF2 = ['case', ['==', ['get', '_validation_status'], 'yes'], '#00c853', '#ff80c0'];
-    addPointLayer('audit-points-f2', geojsonF2, { color: validatedColorF2, radius: 6, strokeColor: '#fff', strokeWidth: 1.5 });
+    addPointLayer('audit-points-f2', geojsonF2, { color: validatedColorF2, radius: 6, strokeColor: '#ffffff67', strokeWidth: 1.5 });
     map.setFilter('audit-points-f2', ['!=', ['get', '_validation_status'], 'no']);
 
     // Highlight ring — sits behind audit points, moved to the active point on click
@@ -258,7 +258,9 @@ async function loadAuditData() {
     renderWaterQualityCharts(auditData);
     renderCommunityCharts(auditData, communityData);
 
-    makeFilterDropdown({ id: 'team-filter', fields: ['team_code'], el: teamSelect });
+    makeFilterDropdown({ 
+        id: 'team-filter', 
+        fields: ['team_name'], el: teamSelect });
     makeFilterDropdown({
         id: 'drain-filter',
         placeholder: 'Drain',
@@ -271,6 +273,8 @@ async function loadAuditData() {
         updatePanels(defaultFeature.properties);
         setHighlight(defaultFeature);
     }
+
+    applyAttributeColor('water_colour');
 }
 
 //#endregion
@@ -278,7 +282,7 @@ async function loadAuditData() {
 //#region Layers
 
 function addLayers() {
-    const statusColor = ['match', ['get', 'Status'], 1, '#ff2222', '#0d6aff'];
+    const statusColor = ['match', ['get', 'Status'], 1, '#ff222267', '#0d6aff'];
     addLineLayer('primarydrains', 'data/json/primarydrains.geojson', { color: statusColor, width: 2 });
     addLineLayer('secondarydrains', 'data/json/secondarydrains.geojson', { color: statusColor, width: 1.5, opacity: 0.8 });
 
@@ -317,6 +321,12 @@ function addLineInteractivity(layerId, attrs) {
 }
 
 addLineInteractivity('primarydrains', [
+    { key: 'Drain num', bold: true },
+    { key: 'Status', format: v => Number(v) === 0 ? 'Visible' : 'Not Visible' }
+]);
+
+
+addLineInteractivity('secondarydrains', [
     { key: 'Drain num', bold: true },
     { key: 'Status', format: v => Number(v) === 0 ? 'Visible' : 'Not Visible' }
 ]);
@@ -432,7 +442,14 @@ function getFilteredAuditData() {
             if (values.size > 0 && !fields.some(f => values.has(row[f]))) return false;
         }
         for (const [field, keys] of Object.entries(window._chartFilters || {})) {
-            if (keys && keys.size > 0 && !keys.has(row[field])) return false;
+            if (keys && keys.size > 0) {
+                if (MULTI_SELECT_FIELDS.has(field)) {
+                    const tokens = new Set(String(row[field] ?? '').split(/\s+/).filter(Boolean));
+                    if (![...keys].some(k => tokens.has(k))) return false;
+                } else {
+                    if (!keys.has(row[field])) return false;
+                }
+            }
         }
         return true;
     });
@@ -462,7 +479,14 @@ function buildAndApplyFilter() {
     }
     for (const [field, keys] of Object.entries(window._chartFilters || {})) {
         if (keys && keys.size > 0) {
-            parts.push(['in', ['get', field], ['literal', [...keys]]]);
+            if (MULTI_SELECT_FIELDS.has(field)) {
+                // Pad haystack and each needle with spaces so 'poster' won't match 'poster_murals'
+                parts.push(['any', ...[...keys].map(k =>
+                    ['in', ` ${k} `, ['concat', ' ', ['get', field], ' ']]
+                )]);
+            } else {
+                parts.push(['in', ['get', field], ['literal', [...keys]]]);
+            }
         }
     }
     const filter = parts.length === 1 ? parts[0] : ['all', ...parts];
@@ -492,6 +516,42 @@ function resetAllChartFilters() {
 
 document.getElementById('reset-filters-btn')?.addEventListener('click', resetAllChartFilters);
 
+// Fields whose CSV values are space-separated multi-select tokens (KoboToolbox style)
+const MULTI_SELECT_FIELDS = new Set(['community_engagement']);
+
+let _activeColorField = 'water_contamination';
+
+function applyAttributeColor(field = _activeColorField) {
+    _activeColorField = field;
+    const fallback = '#63b4ffff';
+    let expr;
+    if (MULTI_SELECT_FIELDS.has(field)) {
+        // Explode multi-value strings to get unique tokens, then colour by first match
+        const unique = [...new Set(
+            auditData.flatMap(r => String(r[field] ?? '').split(/\s+/).filter(Boolean))
+        )];
+        if (!unique.length) {
+            expr = fallback;
+        } else {
+            const pairs = unique.flatMap(val => [
+                ['in', ` ${val} `, ['concat', ' ', ['get', field], ' ']],
+                getValueColor(field, val) || fallback
+            ]);
+            expr = ['case', ...pairs, fallback];
+        }
+    } else {
+        const unique = [...new Set(auditData.map(r => r[field]).filter(v => v != null && v !== ''))];
+        if (!unique.length) {
+            expr = fallback;
+        } else {
+            const pairs = unique.flatMap(val => [val, getValueColor(field, val) || fallback]);
+            expr = ['match', ['get', field], ...pairs, fallback];
+        }
+    }
+    if (map.getLayer('audit-points'))    map.setPaintProperty('audit-points',    'circle-color', expr);
+    if (map.getLayer('audit-points-f2')) map.setPaintProperty('audit-points-f2', 'circle-color', expr);
+}
+
 
 window.addEventListener('load', () => {
     const searchBox = document.getElementById('search-box');
@@ -517,6 +577,7 @@ window.addEventListener('load', () => {
 function buildImgSrc(filename, uuid, formNum) {
     if (!filename || !uuid) return null;
     return `https://pub-4d67c97c1d2843adbeffa3b98cd45d19.r2.dev/form-${formNum}/images/${uuid.replace('uuid:', '')}/${filename}`;
+    //return `data/media/form-${formNum}/images/${uuid.replace('uuid:', '')}/${filename}`;
 }
 
 // fieldPicMap: field key → ordered list of pic candidates (first non-null src wins)
@@ -629,6 +690,7 @@ const PANEL_CONFIG = {
 
 let _lastAuditProps = null;
 const _activeField = {};
+const _picGeneration = {};
 
 function _updatePic(el, catId, props) {
     const config = PANEL_CONFIG[catId];
@@ -641,9 +703,12 @@ function _updatePic(el, catId, props) {
         src = buildImgSrc(props[p.picField], props[p.uuidField], p.form);
         if (src) break;
     }
-    img.src = src || '';
-    img.style.display = src ? 'block' : 'none';
-    img.onerror = () => { img.style.display = 'none'; };
+    const gen = (_picGeneration[catId] = (_picGeneration[catId] || 0) + 1);
+    img.style.display = 'none';
+    if (!src) { img.src = ''; return; }
+    img.onerror = () => { if (_picGeneration[catId] === gen) img.style.display = 'none'; };
+    img.onload  = () => { if (_picGeneration[catId] === gen) img.style.display = 'block'; };
+    img.src = src;
 }
 
 function _updateChart(el, catId) {
@@ -683,6 +748,7 @@ function initPanelDropdownListeners() {
             if (badge) _applyBadge(badge, field, (_lastAuditProps && _lastAuditProps[field]) || '—');
             if (_lastAuditProps) _updatePic(el, catId, _lastAuditProps);
             _updateChart(el, catId);
+            applyAttributeColor(field);
         });
     }
 }

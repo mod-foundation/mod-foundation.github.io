@@ -73,6 +73,7 @@ body{
     border-radius: 6px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.18);
     min-width: 90px;
+    max-width: 160px;
 }
 /* #endregion */
 
@@ -176,7 +177,7 @@ body{
             overflow: clip;         /* clip without scroll container — keeps overflow-x unaffected */
             box-sizing: border-box;
             width: fit-content;
-            --pic-width: min(200px, calc((100vh - 200px) / 4));
+            --pic-width: min(250px, calc((100vh - 180px) / 4));
             border: 3px solid #0d6aff;
 
         }
@@ -190,7 +191,7 @@ body{
             overflow: clip;
             box-sizing: border-box;
             width: fit-content;
-            --pic-width: min(200px, calc((100vh - 200px) / 4));
+           --pic-width: min(250px, calc((100vh - 180px) / 4));
             border: 3px solid #0d6aff;
         }
 
@@ -283,6 +284,8 @@ body{
             align-self: flex-start;
             box-sizing: border-box;
             overflow: hidden;
+            background-color: #acabab6c;
+            border-radius: 2%;
         }
  
  
@@ -589,11 +592,11 @@ body{
     }
 
     #panel-1, #panel-2 {
-        --pic-width: min(150px, calc((100vh - 200px) / 4));
+        --pic-width: min(150px, calc((100vh - 160px) / 4));
     }
 
-    .panel-header   { gap: 18px;             padding: 10px 10px;}
-    .panel-content  { gap: 10px;             padding: 10px 10px;}
+    .panel-header   { gap: 18px;             padding: 8px 8px;}
+    .panel-content  { gap: 10px;             padding: 8px 8px;}
     .chart-wrapper  { width: 140px; gap: 4px; }
     .chart-slot     { width: 140px; }
 
@@ -620,7 +623,7 @@ body{
     }
 
     #panel-1, #panel-2 {
-        --pic-width: min(110px, calc((100vh - 200px) / 4));
+        --pic-width: min(150px, calc((100vh - 120px) / 4));
     }
 
 
@@ -648,7 +651,7 @@ body{
 
 /* ─── Responsive: short viewport (700–750px) — compress rows ────────────── */
 
-@media (max-height: 750px) {
+@media (max-height: 600px) {
     body {
         grid-template:
             "panel-1  map      panel-2"  1fr
@@ -661,8 +664,8 @@ body{
     .stats-category { padding: 5px 12px; }
     .stats-value    { font-size: 18px; }
 
-    .panel-header   { padding: 6px 10px; }
-    .panel-content  { padding: 6px 10px; gap: 8px; }
+    .panel-header   { padding: 5px 5px; }
+    .panel-content  { padding: 5px 5px; gap: 8px; }
 }
 
 
