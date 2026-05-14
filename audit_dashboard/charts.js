@@ -396,7 +396,7 @@ window._chartFilters = {};
 const WALL_CONDITION_COLORS  = { 'intact': '#4caf50', 'broken': '#ffb300', 'exist': '#ef5350', 'critical': '#9c27b0'};
 const WALL_CONDITION_LABELS  = { 'intact': 'Intact', 'broken': 'Broken', 'exist': 'Does Not Exist', 'critical': 'Critical' };
 
-const WALL_MATERIAL_COLORS   = {'concrete': '#b6b6b6', 'stone': '#644438ff', 'both': '#ffb300'};
+const WALL_MATERIAL_COLORS   = {'concrete': '#b6b6b6', 'stone': '#644438ff', 'both': '#ffb300', 'not': '#ef5350'};
 const WALL_MATERIAL_LABELS   = { 'concrete': 'Reinforced Cement Concrete (RCC)', 'stone': 'Solid Stone Masonry (SSM)', 'Both': 'Both RCC & SSM', 'Not': 'Not Applicable'};
 
 const FENCE_COLORS           = { 'only on sides': '#ffb300', 'sides and top': '#ef5350', 'no': '#4caf50'};
@@ -507,7 +507,7 @@ function renderWaterQualityCharts(data) {
 const SW_CLEAN_UP_COLORS          = { /* 'yes': '#4caf50', 'no': '#ef5350' */ };
 const SW_CLEAN_UP_LABELS          = { /* 'yes': 'Active', 'no': 'None' */ };
 
-const COMMUNITY_ENGAGEMENT_COLORS = { 'Plants': '#197a1cff','Park': '#4caf50', 'Murals': '#ffb300', 'Poster': '#ef5350', 'Idols': '#9c27b0','Benches': '#29dab3ff','Gym': '#ef50c7ff','not': '#b6b6b6b4','Cattle': '#e8a838'};
+const COMMUNITY_ENGAGEMENT_COLORS = { 'Trees': '#0d520fff', 'Plants': '#319e35ff','Park': '#7caf4cff', 'Murals': '#ffb300', 'Poster': '#ef5350', 'Idols': '#9c27b0','Benches': '#29dab3ff','Gym': '#ef50c7ff','not': '#b6b6b657','Cattle': '#e8a838','null': '#b6b6b6b4',};
 const COMMUNITY_ENGAGEMENT_LABELS = { /* 'high': 'High', 'medium': 'Medium', 'low': 'Low', 'none': 'None' */ };
 
 const FLOOD_HISTORY_COLORS   = { 'cannot': '#b6b6b6', 'yes': '#ef5350', 'no': '#4caf50',  };

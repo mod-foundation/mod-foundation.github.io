@@ -332,9 +332,271 @@ addLineInteractivity('secondarydrains', [
 ]);
 //#endregion
 
+//#region Upload Control
+
+class UploadControl {
+    constructor() {
+        this._layers = [];
+    }
+
+    onAdd(map) {
+        this._map = map;
+        this._container = document.createElement('div');
+        this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group upload-ctrl';
+        this._container.innerHTML = `
+            <button class="upload-toggle-btn" title="Upload KML layers">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+            </button>
+            <div class="upload-panel" style="display:none">
+                <div class="upload-panel-header">
+                    <span>Uploaded Layers</span>
+                    <span class="upload-count">0 / 5</span>
+                </div>
+                <label class="upload-browse-label">
+                    <input type="file" class="upload-file-input" accept=".kml" style="display:none">
+                    + Upload KML
+                </label>
+                <div class="upload-layer-list"></div>
+            </div>
+        `;
+        this._container.querySelector('.upload-toggle-btn')
+            .addEventListener('click', () => this._togglePanel());
+        this._container.querySelector('.upload-file-input')
+            .addEventListener('change', e => { this._handleFile(e.target.files[0]); e.target.value = ''; });
+        return this._container;
+    }
+
+    onRemove() {
+        this._container.parentNode.removeChild(this._container);
+        this._map = undefined;
+    }
+
+    _togglePanel() {
+        const panel = this._container.querySelector('.upload-panel');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+
+    _handleFile(file) {
+        if (!file) return;
+        if (this._layers.length >= 5) {
+            alert('Maximum 5 layers can be uploaded. Remove a layer first.');
+            return;
+        }
+        if (!file.name.toLowerCase().endsWith('.kml')) {
+            alert('Only .kml files are supported.');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = e => {
+            try {
+                const parser = new DOMParser();
+                const kmlDoc = parser.parseFromString(e.target.result, 'text/xml');
+                if (kmlDoc.querySelector('parsererror')) throw new Error('Invalid KML');
+                const geojson = toGeoJSON.kml(kmlDoc);
+                if (!geojson.features?.length) throw new Error('No features found in file');
+                this._addLayer(geojson, file.name);
+            } catch (err) {
+                alert('Could not read KML file: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    _addLayer(geojson, filename) {
+        const id = 'upload-' + Date.now();
+        const color = '#e05c2a';
+        const opacity = 0.8;
+        const sublayers = [];
+
+        const types = new Set(geojson.features.map(f => f.geometry?.type).filter(Boolean));
+        const hasPolygon = types.has('Polygon') || types.has('MultiPolygon');
+        const hasLine    = types.has('LineString') || types.has('MultiLineString');
+        const hasPoint   = types.has('Point') || types.has('MultiPoint');
+
+        this._map.addSource(id, { type: 'geojson', data: geojson });
+
+        if (hasPolygon) {
+            const fillId = id + '-fill';
+            this._map.addLayer({
+                id: fillId, type: 'fill', source: id,
+                filter: ['match', ['geometry-type'], ['Polygon', 'MultiPolygon'], true, false],
+                paint: { 'fill-color': color, 'fill-opacity': opacity * 0.4 }
+            }, 'primarydrains');
+            const outlineId = id + '-outline';
+            this._map.addLayer({
+                id: outlineId, type: 'line', source: id,
+                filter: ['match', ['geometry-type'], ['Polygon', 'MultiPolygon'], true, false],
+                paint: { 'line-color': color, 'line-width': 2, 'line-opacity': opacity }
+            }, 'primarydrains');
+            sublayers.push(fillId, outlineId);
+        }
+        if (hasLine) {
+            const lineId = id + '-line';
+            this._map.addLayer({
+                id: lineId, type: 'line', source: id,
+                filter: ['match', ['geometry-type'], ['LineString', 'MultiLineString'], true, false],
+                paint: { 'line-color': color, 'line-width': 3, 'line-opacity': opacity }
+            }, 'primarydrains');
+            sublayers.push(lineId);
+        }
+        if (hasPoint) {
+            const pointId = id + '-point';
+            this._map.addLayer({
+                id: pointId, type: 'circle', source: id,
+                filter: ['match', ['geometry-type'], ['Point', 'MultiPoint'], true, false],
+                paint: { 'circle-color': color, 'circle-radius': 6, 'circle-opacity': opacity, 'circle-stroke-color': '#fff', 'circle-stroke-width': 1.5 }
+            }, 'primarydrains');
+            sublayers.push(pointId);
+        }
+
+        this._layers.push({ id, filename, sublayers, color, opacity });
+        this._renderList();
+    }
+
+    _removeLayer(id) {
+        const entry = this._layers.find(l => l.id === id);
+        if (!entry) return;
+        entry.sublayers.forEach(sl => { if (this._map.getLayer(sl)) this._map.removeLayer(sl); });
+        if (this._map.getSource(id)) this._map.removeSource(id);
+        this._layers = this._layers.filter(l => l.id !== id);
+        this._renderList();
+    }
+
+    _setColor(id, color) {
+        const entry = this._layers.find(l => l.id === id);
+        if (!entry) return;
+        entry.color = color;
+        entry.sublayers.forEach(sl => {
+            if (!this._map.getLayer(sl)) return;
+            const type = this._map.getLayer(sl).type;
+            if (type === 'fill')   this._map.setPaintProperty(sl, 'fill-color', color);
+            if (type === 'line')   this._map.setPaintProperty(sl, 'line-color', color);
+            if (type === 'circle') this._map.setPaintProperty(sl, 'circle-color', color);
+        });
+    }
+
+    _setOpacity(id, opacity) {
+        const entry = this._layers.find(l => l.id === id);
+        if (!entry) return;
+        entry.opacity = opacity;
+        entry.sublayers.forEach(sl => {
+            if (!this._map.getLayer(sl)) return;
+            const type = this._map.getLayer(sl).type;
+            if (type === 'fill')   this._map.setPaintProperty(sl, 'fill-opacity', opacity * 0.4);
+            if (type === 'line')   this._map.setPaintProperty(sl, 'line-opacity', opacity);
+            if (type === 'circle') this._map.setPaintProperty(sl, 'circle-opacity', opacity);
+        });
+    }
+
+    _renderList() {
+        const list  = this._container.querySelector('.upload-layer-list');
+        const count = this._container.querySelector('.upload-count');
+        const label = this._container.querySelector('.upload-browse-label');
+
+        count.textContent = `${this._layers.length} / 5`;
+        label.style.opacity = this._layers.length >= 5 ? '0.4' : '1';
+        label.style.pointerEvents = this._layers.length >= 5 ? 'none' : '';
+
+        list.innerHTML = this._layers.map(l => `
+            <div class="upload-layer-item" data-id="${l.id}">
+                <div class="upload-layer-name" title="${l.filename}">${l.filename}</div>
+                <div class="upload-layer-controls">
+                    <label class="upload-ctrl-label">Colour
+                        <input type="color" class="upload-color" value="${l.color}">
+                    </label>
+                    <label class="upload-ctrl-label">Opacity
+                        <input type="range" class="upload-opacity" min="0" max="1" step="0.05" value="${l.opacity}">
+                    </label>
+                    <button class="upload-remove-btn" title="Remove layer">&times;</button>
+                </div>
+            </div>
+        `).join('');
+
+        list.querySelectorAll('.upload-color').forEach(input => {
+            const id = input.closest('[data-id]').dataset.id;
+            input.addEventListener('input', e => this._setColor(id, e.target.value));
+        });
+        list.querySelectorAll('.upload-opacity').forEach(input => {
+            const id = input.closest('[data-id]').dataset.id;
+            input.addEventListener('input', e => this._setOpacity(id, parseFloat(e.target.value)));
+        });
+        list.querySelectorAll('.upload-remove-btn').forEach(btn => {
+            const id = btn.closest('[data-id]').dataset.id;
+            btn.addEventListener('click', () => this._removeLayer(id));
+        });
+    }
+}
+
+class DownloadControl {
+    onAdd(map) {
+        this._map = map;
+        this._container = document.createElement('div');
+        this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group download-ctrl';
+        this._container.innerHTML = `
+            <button class="download-toggle-btn" title="Download data">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+            </button>
+            <div class="download-panel" style="display:none">
+                <div class="download-panel-header">Download Data</div>
+                <a class="download-link" href="data/csv/form-1.csv" download="form-1.csv">
+                    <span class="download-link-icon">&#8675;</span>
+                    <span>
+                        <span class="download-link-name">Form 1 Audit Data</span>
+                        <span class="download-link-meta">CSV</span>
+                    </span>
+                </a>
+                <a class="download-link" href="data/csv/form-2.csv" download="form-2.csv">
+                    <span class="download-link-icon">&#8675;</span>
+                    <span>
+                        <span class="download-link-name">Form 2 Audit Data</span>
+                        <span class="download-link-meta">CSV</span>
+                    </span>
+                </a>
+                <a class="download-link" href="data/json/primarydrains.geojson" download="primarydrains.geojson">
+                    <span class="download-link-icon">&#8675;</span>
+                    <span>
+                        <span class="download-link-name">Primary Drains</span>
+                        <span class="download-link-meta">GeoJSON</span>
+                    </span>
+                </a>
+                <a class="download-link" href="data/json/secondarydrains.geojson" download="secondarydrains.geojson">
+                    <span class="download-link-icon">&#8675;</span>
+                    <span>
+                        <span class="download-link-name">Secondary Drains</span>
+                        <span class="download-link-meta">GeoJSON</span>
+                    </span>
+                </a>
+            </div>
+        `;
+        this._container.querySelector('.download-toggle-btn')
+            .addEventListener('click', () => {
+                const panel = this._container.querySelector('.download-panel');
+                panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            });
+        return this._container;
+    }
+
+    onRemove() {
+        this._container.parentNode.removeChild(this._container);
+        this._map = undefined;
+    }
+}
+
+//#endregion
+
 //#region Map Load
 
-    map.on('load', () => {
+    map.on('load', async () => {
         console.log('✓ Map loaded');
 
         //Base Map Control
@@ -348,7 +610,20 @@ addLineInteractivity('secondarydrains', [
         map.addControl(basemapControl, 'top-right');
 
         addLayers();
-        loadAuditData();
+        await loadAuditData();
+
+        const layerLegend = new LayerManager({
+            layers: [
+                { id: 'primarydrains',   name: 'Primary Drains',   visible: true },
+                { id: 'secondarydrains', name: 'Secondary Drains', visible: true },
+                { id: 'audit-points',    name: 'Audit Points',     visible: true },
+            ],
+            position: 'bottom-left',
+            collapsed: true,
+        });
+        map.addControl(layerLegend, 'bottom-left');
+        map.addControl(new UploadControl(), 'top-left');
+        map.addControl(new DownloadControl(), 'top-left');
     });
 
     map.on('error', (e) => {
@@ -523,7 +798,7 @@ let _activeColorField = 'water_contamination';
 
 function applyAttributeColor(field = _activeColorField) {
     _activeColorField = field;
-    const fallback = '#63b4ffff';
+    const fallback = '#b6b6b6b4';
     let expr;
     if (MULTI_SELECT_FIELDS.has(field)) {
         // Explode multi-value strings to get unique tokens, then colour by first match
