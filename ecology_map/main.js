@@ -137,6 +137,11 @@ const layerConfig = {
     floodhotspots: {
         label: 'Flood Hotspots',
         layers: ['flood-hotspots']
+    },
+
+    sewerlines: {
+        label: 'BWSSB Sewer lines',
+        layers: ['sewer-300-more','sewer-300-less']
     }
 };
 
@@ -233,7 +238,8 @@ const hideLayers = resolveLayers({
         'tanks1900',
         'typologyanalysis',
         'existingtanks',
-        'floodhotspots'
+        'floodhotspots',
+        'sewerlines'
     ]
 });
 
@@ -332,7 +338,7 @@ function generateLegend() {
         {
             label: 'Drains',
             isGroup: true,
-            children: ['primarydrains', 'secondarydrains', 'floodhotspots']
+            children: ['primarydrains', 'secondarydrains']
         },
         {
             label: 'Tanks',
@@ -343,6 +349,11 @@ function generateLegend() {
             label: 'Flood Hotspots',
             isGroup: true,
             children: ['floodhotspots']
+        },
+        {
+            label: 'BWSSB Sewer lines',
+            isGroup: true,
+            children: ['sewerlines']
         },
         {
             label: 'Valleys',
@@ -666,6 +677,7 @@ function getType(id) {
     if (id === 'gba-wards') return 'Ward';
     if (id === 'parks') return 'Park';
     if (id === 'flood-hotspots') return 'Flood Hotspot';
+    if (id === 'sewer-300-more') return 'BWSSB lines more than 300mm dia';
     if (id.includes('uploaded-layer')) return 'Uploaded Layer';
     return 'Feature';
 }
@@ -4155,6 +4167,27 @@ function downloadMapSnapshot() {
 //#region layerData
 
 function addLayers() {
+    //sewer lines
+    if (!map.getSource('sewer-300-more-source')) {
+        map.addSource('sewer-300-more-source', {
+            type: 'vector',
+            url: 'mapbox://mod-foundation.1amoo88p'
+        });
+    }
+    if (!map.getLayer('sewer-300-more')) {
+        map.addLayer({
+            id: 'sewer-300-more',
+            type: 'line',
+            source: 'sewer-300-more-source',
+            'source-layer': 'Layers_BWSSB_SEWERLINE',
+            paint: {
+                'line-color': '#ff00f2',
+                'line-opacity': 1,
+                'line-width':2
+            }
+        });
+    }
+
     // Add existing lakes layer
     map.addSource('lakes-existing-source', {
         type: 'vector',
@@ -5243,6 +5276,41 @@ function handleFloodHotspotsDetail() {
     panelHandle(keepGroups.groups);
 }
 
+function handleSewageDetail() {
+    console.log('💧 Handling Sewage Detail');
+
+    // Clear any pending timeouts from other panels
+    clearAllPanelTimeouts();
+
+    // 1️⃣ Fly to the valley view
+    smoothFlyTo(defaultViewBounds);
+
+    // 2️⃣ Make DEM fully visible
+    setOpa('dem', 0.3);
+    setOpa('wards', 0.4);
+    toggleLayerOff('hillshade');
+
+    // Define groups/layers to stay visible or turn on (same as handleSecondaryDetail + flood hotspots)
+    const keepGroups = {
+        groups: [
+            'dem',
+            'valleys',
+            'tanks',
+            'sewerlines',
+            'primarydrains',
+            'secondarydrains',
+            'subvalleys',
+            'wards',
+            'losttanks',
+            'valleylabels',
+            'greens',
+            ...alwaysVisible
+        ]
+    };
+    setOpa('greens', 0.4);
+    panelHandle(keepGroups.groups);
+}
+
 function handleTypologyDetail() {
     console.log('🏔 Handling Typology Detail');
 
@@ -6292,6 +6360,11 @@ document.querySelectorAll('#panel sl-details').forEach(detail => {
 
         if (selectedId === 'flood-hotspots-detail') {
             handleFloodHotspotsDetail();
+            return;
+        }
+
+        if (selectedId === 'sewage-detail') {
+            handleSewageDetail();
             return;
         }
 
