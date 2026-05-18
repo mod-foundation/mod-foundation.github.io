@@ -74,6 +74,31 @@ const map = new maplibregl.Map({
 
 //#endregion
 
+//#region Pin Image
+// FA location-dot (solid) rendered to ImageData via an off-screen canvas
+function loadFAPin(color = '#82f984', height = 42) {
+    const w = Math.round(height * 384 / 512);
+    const h = height;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="${w}" height="${h}" overflow="visible">
+        <path fill="${color}"  d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/>
+    </svg>`;
+    return new Promise(resolve => {
+        const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+        const img = new Image(w, h);
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            URL.revokeObjectURL(url);
+            resolve(ctx.getImageData(0, 0, w, h));
+        };
+        img.src = url;
+    });
+}
+//#endregion
+
 //#region Layer Helpers
 
 /**
@@ -222,15 +247,17 @@ async function loadAuditData() {
     addPointLayer('audit-points-f2', geojsonF2, { color: validatedColorF2, radius: 6, strokeColor: '#ffffff67', strokeWidth: 1.5 });
     map.setFilter('audit-points-f2', ['!=', ['get', '_validation_status'], 'no']);
 
-    // Highlight ring — sits behind audit points, moved to the active point on click
+    // Location pin — marks the selected audit point
+    if (!map.hasImage('location-pin')) map.addImage('location-pin', await loadFAPin('#ff00f2ff', 30));
     addLayer('audit-point-highlight',
         { type: 'FeatureCollection', features: [] },
-        'circle',
+        'symbol',
+        {},
         {
-            'circle-radius': 13,
-            'circle-color': 'rgba(255,255,255,0.2)',
-            'circle-stroke-color': '#f80cf8ff',
-            'circle-stroke-width': 3
+            'icon-image': 'location-pin',
+            'icon-anchor': 'bottom',
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true,
         }
     );
 
@@ -798,6 +825,9 @@ let _activeColorField = 'water_contamination';
 
 function applyAttributeColor(field = _activeColorField) {
     _activeColorField = field;
+    document.querySelectorAll('.category-panel').forEach(p => p.classList.remove('panel-color-active'));
+    const activePanelId = Object.keys(PANEL_CONFIG).find(id => field in PANEL_CONFIG[id].fieldPicMap);
+    if (activePanelId) document.getElementById(activePanelId)?.classList.add('panel-color-active');
     const fallback = '#b6b6b6b4';
     let expr;
     if (MULTI_SELECT_FIELDS.has(field)) {
@@ -1030,7 +1060,7 @@ function initPanelDropdownListeners() {
 
 initPanelDropdownListeners();
 
-const auditPopup = new maplibregl.Popup({ className: 'audit-popup', maxWidth: '320px' });
+const auditPopup = new maplibregl.Popup({ className: 'audit-popup', maxWidth: '320px', anchor: 'top' });
 
 function updatePanels(props) {
     _lastAuditProps = props;
@@ -1083,5 +1113,12 @@ map.on('mouseenter', 'audit-points',    () => { map.getCanvas().style.cursor = '
 map.on('mouseleave', 'audit-points',    () => { map.getCanvas().style.cursor = ''; });
 map.on('mouseenter', 'audit-points-f2', () => { map.getCanvas().style.cursor = 'pointer'; });
 map.on('mouseleave', 'audit-points-f2', () => { map.getCanvas().style.cursor = ''; });
+
+//#region Info Panel Toggle
+document.getElementById('info-toggle-btn').addEventListener('click', () => {
+    document.body.classList.toggle('info-collapsed');
+    map.resize();
+});
+//#endregion
 
 //#endregion

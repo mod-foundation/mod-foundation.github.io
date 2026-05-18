@@ -36,8 +36,50 @@
     <body>
             <div id="dashboard-title">
                 <span class="dashboard-title-main">Stormwater Drain Audit Dashboard</span>
-                <span class="dashboard-subtitle">Building a Resilient Bengaluru</span>
+        
+                <button id="info-toggle-btn" title="Toggle info panel">
+                    <wa-icon name="chevron-down" id="info-toggle-icon"></wa-icon>
+                </button>
             </div>
+
+            <div id="information-panel">
+                <div class="info-tip">
+                    <div class="info-tip-header">
+                        <wa-icon name="location-dot" class="info-tip-icon" style="color:#e603c0"></wa-icon>
+                        <span class="info-tip-label">Select a point</span>
+                    </div>
+                    <p class="info-tip-text">Click any drain point on the map to see its audit photo and attribute values in the panels.</p>
+                </div>
+                <div class="info-tip">
+                    <div class="info-tip-header">
+                        <wa-icon name="palette" class="info-tip-icon" style="color:#82f984"></wa-icon>
+                        <span class="info-tip-label">Change colour</span>
+                    </div>
+                    <p class="info-tip-text">Use the dropdown in each category panel to recolour the map points by a different attribute.</p>
+                </div>
+                <div class="info-tip">
+                    <div class="info-tip-header">
+                        <wa-icon name="users" class="info-tip-icon" style="color:#000000"></wa-icon>
+                        <span class="info-tip-label">Filter by team</span>
+                    </div>
+                    <p class="info-tip-text">Use the Team dropdown (top right) to show only one team's audit points on the map.</p>
+                </div>
+                <div class="info-tip">
+                    <div class="info-tip-header">
+                        <wa-icon name="chart-bar" class="info-tip-icon"></wa-icon>
+                        <span class="info-tip-label">Filter by chart</span>
+                    </div>
+                    <p class="info-tip-text">Click a bar in any chart to filter the map to points matching only that category value.</p>
+                </div>
+                <div class="info-tip">
+                    <div class="info-tip-header">
+                        <wa-icon name="rotate-left" class="info-tip-icon" style="color:#ef4444"></wa-icon>
+                        <span class="info-tip-label">Reset filters</span>
+                    </div>
+                    <p class="info-tip-text">Click Reset Filters to clear all active chart selections and restore the full dataset.</p>
+                </div>
+            </div>
+
 
             <div id="map-container">
                 <div id="search-container">
