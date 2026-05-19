@@ -1033,7 +1033,7 @@ function _updateChart(el, catId) {
 }
 
 function _applyBadge(badge, field, val) {
-    badge.textContent = val;
+    badge.textContent = getValueLabel(field, val) || val;
     const color = getValueColor(field, val);
     badge.style.background = color || '#FAE49C';
     badge.style.color = color ? '#fff' : '#5E5E5E';
@@ -1120,5 +1120,6 @@ document.getElementById('info-toggle-btn').addEventListener('click', () => {
     map.resize();
 });
 //#endregion
+
 
 //#endregion

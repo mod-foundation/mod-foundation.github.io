@@ -174,12 +174,65 @@ function makePieChart({ container, data, field, colors, labels: labelMap, title,
     if (window._chartFilters?.[field]) return;
     const el = _resolveContainer(container);
     if (!el) return;
-    const canvas = _createCanvas(el);
+
+    // Destroy any existing chart then rebuild slot with canvas + scrollable legend
+    const existing = el.querySelector('canvas');
+    if (existing?._chartInstance) existing._chartInstance.destroy();
+    el.innerHTML = '';
+
+    const canvasWrap = document.createElement('div');
+    canvasWrap.className = 'chart-canvas-wrap';
+    const canvas = document.createElement('canvas');
+    canvasWrap.appendChild(canvas);
+    const legendDiv = document.createElement('div');
+    legendDiv.className = 'chart-legend-div';
+    el.appendChild(canvasWrap);
+    el.appendChild(legendDiv);
+
     const counts = _countValues(data, field);
     const rawKeys = _filterIgnored(Object.keys(counts), ignore);
     const labels = _resolveLabels(rawKeys, labelMap);
     const values = rawKeys.map(k => counts[k]);
     const bgColors = _resolveColors(rawKeys, colors);
+    const total = values.reduce((a, b) => a + b, 0);
+
+    const htmlLegendPlugin = {
+        id: 'htmlLegend',
+        afterUpdate(chart) {
+            legendDiv.innerHTML = '';
+            const ul = document.createElement('ul');
+            ul.className = 'chart-legend-list';
+            (chart.legend?.legendItems || []).forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'chart-legend-item' + (item.hidden ? ' is-hidden' : '');
+
+                const box = document.createElement('span');
+                box.className = 'chart-legend-box';
+                box.style.background = item.fillStyle;
+
+                const text = document.createElement('span');
+                text.className = 'chart-legend-text';
+                text.textContent = Array.isArray(item.text) ? item.text.join(' ') : item.text;
+
+                if (interactive) {
+                    li.style.cursor = 'pointer';
+                    li.addEventListener('click', () => {
+                        const idx = item.index;
+                        const wasVisible = chart.getDataVisibility(idx);
+                        chart.toggleDataVisibility(idx);
+                        chart.update();
+                        const visible = rawKeys.filter((_, i) => i === idx ? !wasVisible : chart.getDataVisibility(i));
+                        _setChartFilter(field, visible, rawKeys);
+                    });
+                }
+
+                li.appendChild(box);
+                li.appendChild(text);
+                ul.appendChild(li);
+            });
+            legendDiv.appendChild(ul);
+        },
+    };
 
     const chart = new Chart(canvas, {
         type: donut ? 'doughnut' : 'pie',
@@ -196,36 +249,13 @@ function makePieChart({ container, data, field, colors, labels: labelMap, title,
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                title:    { display: false },
-                //subtitle: { display: !!title, text: title, align: 'start', position: 'bottom', font: { size: 13 }, padding: { top: 12 } },
-                legend: {
-                    position: 'top',
-                    align: 'start',
-                    labels: {
-                        boxWidth: 10,
-                        font: { size: 10 },
-                        generateLabels(chart) {
-                            return Chart.overrides.pie.plugins.legend.labels.generateLabels(chart)
-                                .map(item => ({ ...item, text: _wrapLegendText(item.text) }));
-                        },
-                    },
-                    ...(interactive && {
-                        onClick(e, legendItem, legend) {
-                            const chart = legend.chart;
-                            const idx = legendItem.index;
-                            const wasVisible = chart.getDataVisibility(idx);
-                            chart.toggleDataVisibility(idx);
-                            chart.update();
-                            const visible = rawKeys.filter((_, i) => i === idx ? !wasVisible : chart.getDataVisibility(i));
-                            _setChartFilter(field, visible, rawKeys);
-                        },
-                    }),
-                },
+                title:   { display: false },
+                legend:  { display: false },
                 tooltip: {
-                callbacks: {
-                    label: ctx => `${Math.round(ctx.parsed / values.reduce((a,b) => a+b, 0) * 100)}%`,
-                    title: () => ''
-                }
+                    callbacks: {
+                        label: ctx => `${Math.round(ctx.parsed / total * 100)}%`,
+                        title: () => '',
+                    },
                 },
             },
             ...(interactive && {
@@ -240,6 +270,7 @@ function makePieChart({ container, data, field, colors, labels: labelMap, title,
                 },
             }),
         },
+        plugins: [htmlLegendPlugin],
     });
     canvas._chartInstance = chart;
 }
@@ -461,7 +492,7 @@ const WATER_STAGNANT_COLORS      = { 'flowing': '#4a90d9', 'stagnant': '#e8a838'
 const WATER_STAGNANT_LABELS      = { 'flowing': 'Flowing', 'stagnant': 'Stagnant','cannot':'Cannot See'};
 
 const WATER_CONTAMINATION_COLORS = { 'black': '#546e7a', 'clear': '#b3e5fc', 'solid': '#8d6e63', 'froth': '#4caf50', 'cannot': '#b6b6b6' };
-const WATER_CONTAMINATION_LABELS = { 'black': 'Black/ Grey', 'clear': 'Clear', 'solid': 'Particles/Oily Film', 'froth': 'Froth/ Foam', 'cannot': 'Cannot See' };
+const WATER_CONTAMINATION_LABELS = { 'black': 'Black/ Grey', 'clear': 'Clear', 'solid': 'Particles/Oily_Film', 'froth': 'Froth/ Foam', 'cannot': 'Cannot See' };
 
 const WATER_COLOUR_COLORS        = { 'clear': '#b3e5fc', 'black': '#546e7a', 'green': '#4caf50', 'cannot': '#b6b6b6', 'other': '#8c5ec9ff' , 'milky': '#90a4ae', 'yellow': '#ffb300'};
 const WATER_COLOUR_LABELS        = { /* 'clear': 'Clear', 'brown': 'Brown', 'green': 'Green', 'grey': 'Grey' */ };
@@ -590,3 +621,39 @@ function getValueColor(field, value) {
     return match ? colors[match] : null;
 }
 window.getValueColor = getValueColor;
+
+const _FIELD_LABELS = {
+    wall_condition:       WALL_CONDITION_LABELS,
+    wall_material:        WALL_MATERIAL_LABELS,
+    wall_height:          null,
+    fence:                FENCE_LABELS,
+    bridge_type:          BRIDGE_TYPE_LABELS,
+    bridge_condition:     BRIDGE_CONDITION_LABELS,
+    bridge_walkable:      BRIDGE_WALKABLE_LABELS,
+    piers_condition:      PIERS_CONDITION_LABELS,
+    piers_num:            PIERS_NUM_LABELS,
+    elec_condition:       ELEC_CONDITION_LABELS,
+    cables_condition:     CABLES_CONDITION_LABELS,
+    manholes_condition:   MANHOLES_CONDITION_LABELS,
+    inlets:               INLETS_LABELS,
+    unauthorised_inlets:  UNAUTHORISED_INLETS_LABELS,
+    water_stagnant:       WATER_STAGNANT_LABELS,
+    water_contamination:  WATER_CONTAMINATION_LABELS,
+    water_colour:         WATER_COLOUR_LABELS,
+    water_turbidity:      WATER_TURBIDITY_LABELS,
+    water_smell:          WATER_SMELL_LABELS,
+    sw_inside:            SW_INSIDE_LABELS,
+    sw_inside_type:       SW_INSIDE_TYPE_LABELS,
+    sw_outside:           SW_OUTSIDE_LABELS,
+    sw_outside_type:      SW_OUTSIDE_TYPE_LABELS,
+    community_engagement: COMMUNITY_ENGAGEMENT_LABELS,
+};
+
+function getValueLabel(field, value) {
+    const labels = _FIELD_LABELS[field];
+    if (!labels || !value || value === '—') return null;
+    const lk = String(value).toLowerCase();
+    const match = Object.keys(labels).find(k => lk === k.toLowerCase() || lk.includes(k.toLowerCase()));
+    return match ? labels[match] : null;
+}
+window.getValueLabel = getValueLabel;

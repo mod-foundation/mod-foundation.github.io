@@ -537,10 +537,77 @@ body.info-collapsed #information-panel {
 
         .chart-slot {
             width: fill;
-            flex: 1;                /* fill chart-wrapper height */
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-canvas-wrap {
+            position: relative;
+            flex: 1;
             min-height: 0;
             overflow: hidden;
         }
+
+        .chart-slot > canvas {
+            flex: 1;
+            min-height: 0;
+        }
+
+        .chart-legend-div {
+            flex-shrink: 0;
+            max-height: 64px;
+            overflow-y: auto;
+            padding: 2px 0;
+        }
+
+        .chart-legend-div::-webkit-scrollbar       { width: 3px; }
+        .chart-legend-div::-webkit-scrollbar-track  { background: transparent; }
+        .chart-legend-div::-webkit-scrollbar-thumb  { background: #d0d0d0; border-radius: 2px; }
+
+        .chart-legend-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .chart-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Barlow', sans-serif;
+            font-size: 11.5px;
+            font-weight: 500;
+            line-height: 1.3;
+            color: #5E5E5E;
+            padding: 1px 3px;
+            border-radius: 2px;
+        }
+
+        .chart-legend-item:hover {
+            background: #f0f0f0;
+        }
+
+        .chart-legend-item.is-hidden .chart-legend-text {
+            text-decoration: line-through;
+            opacity: 0.45;
+        }
+
+        .chart-legend-box {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .chart-legend-text {
+            word-break: break-word;
+        }
+
         .chart-title {
             font-family: 'Barlow', sans-serif;
             text-transform: uppercase;
@@ -572,7 +639,7 @@ body.info-collapsed #information-panel {
         }
 
         .attr-select {
-            max-width: calc(var(--pic-width) - 10px);
+            width: 100%;
         }
 
         .attr-select::part(combobox) {
