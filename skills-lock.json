@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "skills": {
+    "maplibre-mapbox-migration": {
+      "source": "maplibre/maplibre-agent-skills",
+      "sourceType": "github",
+      "computedHash": "2bbaad06867c76a0a20f346719c8206698be35ad60554caaaa89951b73896a49"
+    },
+    "maplibre-pmtiles-patterns": {
+      "source": "maplibre/maplibre-agent-skills",
+      "sourceType": "github",
+      "computedHash": "2afbd07a198a6e0c6f1a65163c51332aa4925f85d91c38675f7b60d7e479afa7"
+    },
+    "maplibre-tile-sources": {
+      "source": "maplibre/maplibre-agent-skills",
+      "sourceType": "github",
+      "computedHash": "c730bb1717e81e039816209a9f2af26671be66238e56a17b2655a82106aa7474"
+    },
+    "webawesome": {
+      "source": "N:\\01.DESIGN LAB\\25-06_BSF SMALL GRANTS PROGRAMME\\02_Implementation\\04_Dashboard\\Decoding Stormwater Tools\\02. Github Repo - DO NOT OPEN\\mod-foundation\\node_modules\\@awesome.me\\webawesome\\dist\\skills\\webawesome",
+      "sourceType": "local",
+      "computedHash": "f46ee156842200187135f7c1b0478c14ee3d1bc41a4f4d810f8c6f0651b4801f"
+    }
+  }
+}
