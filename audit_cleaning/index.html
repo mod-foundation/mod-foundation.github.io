@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Audit Dashboard</title>
+        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+
+        <!-- MapLibre -->
+        <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+        <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+
+        <!--Base Map Control-->
+        <script src="https://unpkg.com/maplibre-basemaps@0.0.6/dist/maplibre-basemaps.js"></script>
+
+        <!-- Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
+
+        <!-- Papa Parse -->
+        <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+
+        <link rel="stylesheet" href="styles.css" />
+
+        <!-- Web Awesome -->
+        <script src="https://kit.webawesome.com/12f6b474bd1f41e1.js" crossorigin="anonymous"></script>
+
+        <!-- Mapbox Search JS (for search-container) -->
+        <script id="search-js" defer src="https://api.mapbox.com/search-js/v1.0.0/web.js"></script>
+    </head>
+    <body>
+        <div id="map-container">
+            <div id="search-container">
+                <wa-switch id="typology-switch" checked size="small">Typology</wa-switch>
+                <wa-select id="team-filter" size="small" with-clear placeholder="Team" class="team-filter-select"></wa-select>
+                <wa-button id="reset-filters-btn" size="small" appearance="outlined" style="display:none" title="Reset all chart filters">
+                    <wa-icon slot="prefix" name="rotate-left"></wa-icon>
+                    Reset Filters
+                </wa-button>
+                <mapbox-search-box id="search-box"></mapbox-search-box>
+            </div>
+        </div>
+
+        <!-- Panel 1: Infrastructure -->
+        <div id="panel-infrastructure" class="map-panel">
+            <div class="panel-title"><wa-icon name="city"></wa-icon> Infrastructure</div>
+
+            <wa-details open class="category-details">
+                <span slot="summary">Retaining Wall</span>
+                <wa-details open class="chart-details"><span slot="summary">Wall Condition</span><div class="chart-slot"></div></wa-details>
+                <wa-details open class="chart-details"><span slot="summary">Fence</span><div class="chart-slot"></div></wa-details>
+                <wa-details class="chart-details"><span slot="summary">Wall Material</span><div class="chart-slot"></div></wa-details>
+                <wa-details class="chart-details"><span slot="summary">Wall Height (feet)</span><div class="chart-slot"></div></wa-details>
+            </wa-details>
+
+            <wa-details class="category-details">
+                <span slot="summary">Bridge</span>
+                <wa-details open class="chart-details"><span slot="summary">Bridge Type</span><div class="chart-slot"></div></wa-details>
+                <wa-details open class="chart-details"><span slot="summary">Bridge Condition</span><div class="chart-slot"></div></wa-details>
+                <wa-details open class="chart-details"><span slot="summary">Walkable</span><div class="chart-slot"></div></wa-details>
+                <wa-details open class="chart-details"><span slot="summary">Piers Condition</span><div class="chart-slot"></div></wa-details>
+                <wa-details open class="chart-details"><span slot="summary">Piers Count</span><div class="chart-slot"></div></wa-details>
+            </wa-details>
+
+            <wa-details open class="category-details">
+                <span slot="summary">Utilities</span>
+               
+                <wa-details open class="chart-details"><span slot="summary">Electrical</span><div class="chart-slot"></div></wa-details>
+                <wa-details open class="chart-details"><span slot="summary">Cables</span><div class="chart-slot"></div></wa-details>
+                <wa-details open class="chart-details"><span slot="summary">Manholes</span><div class="chart-slot"></div></wa-details>
+            </wa-details>
+        </div>
+
+        <!-- Panel 2: Water Quality -->
+        <div id="panel-water-quality" class="map-panel">
+            <div class="panel-title"><wa-icon name="droplet"></wa-icon> Water Quality</div>
+
+            <wa-details open class="category-details">
+                <span slot="summary">Water</span>
+                <wa-details  class="chart-details"><span slot="summary">Authorised Inlets</span><div class="chart-slot"></div></wa-details>
+                <wa-details open class="chart-details"><span slot="summary">Unauthorised Inlets</span><div class="chart-slot"></div></wa-details>
+                <wa-details  class="chart-details"><span slot="summary">Water Flow</span><div class="chart-slot"></div></wa-details>
+                <wa-details  class="chart-details"><span slot="summary">Water Contamination</span><div class="chart-slot"></div></wa-details>
+                <wa-details open class="chart-details"><span slot="summary">Water Colour</span><div class="chart-slot"></div></wa-details>
+                <wa-details  class="chart-details"><span slot="summary">Water Turbidity</span><div class="chart-slot"></div></wa-details>
+                <wa-details  class="chart-details"><span slot="summary">Water Smell</span><div class="chart-slot"></div></wa-details>
+
+            </wa-details>
+
+            <wa-details open class="category-details">
+                <span slot="summary">Solid Waste</span>
+                <wa-details open class="chart-details"><span slot="summary">Solid Waste Inside</span><div class="chart-slot"></div></wa-details>
+                <wa-details  class="chart-details"><span slot="summary">Solid Waste Inside - Type</span><div class="chart-slot"></div></wa-details>
+
+                <wa-details open class="chart-details"><span slot="summary">Solid Waste Outside</span><div class="chart-slot"></div></wa-details>
+                <wa-details  class="chart-details"><span slot="summary">Solid Waste Outside - Type</span><div class="chart-slot"></div></wa-details>
+
+            </wa-details>
+        </div>
+
+        <!-- Panel 3: Community Engagement 
+        <div id="panel-community" class="map-panel">
+            <div class="panel-title"><wa-icon name="people-group"></wa-icon> Community Engagement</div>
+            <div class="community-panels">
+
+
+                <wa-details open class="community-chart-details">
+                    <span slot="summary">Community Participation</span>
+                    <div class="chart-slot"></div>
+                </wa-details>
+
+               <wa-details open class="community-chart-details">
+                    <span slot="summary">Flood History</span>
+                    <div class="chart-slot"></div>
+                </wa-details>
+
+                <wa-details open class="community-chart-details">
+                    <span slot="summary">Flood Height</span>
+                    <div class="chart-slot"></div>
+                </wa-details>
+
+                <wa-details open class="community-chart-details">
+                    <span slot="summary">Desilting</span>
+                    <div class="chart-slot"></div>
+                </wa-details>
+
+                <wa-details open class="community-chart-details">
+                    <span slot="summary">Last Cleaned</span>
+                    <div class="chart-slot"></div>
+                </wa-details>
+
+                <wa-details open class="community-chart-details">
+                    <span slot="summary">Drain Maintainer</span>
+                    <div class="chart-slot"></div>
+                </wa-details>
+
+            </div> -->
+        </div>
+        
+        <!-- Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+        <script src="charts.js"></script>
+        <script src="script.js"></script>
+    </body>
+</html>

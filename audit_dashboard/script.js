@@ -205,13 +205,13 @@ async function loadAuditData() {
     // form-2 lookup keyed by _index_f1 (references form-1._index)
     const f2ByIndex = new Map(f2.map(row => [row._index_f1, row]));
 
-    // Joined records — form-1 fields win shared columns; _f2_uuid and _f2_index preserved separately
+    // Joined records — form-1 fields win shared columns; _f2_rootUuid and _f2_index preserved separately
     auditData = f1.map(row => {
         const f2row = f2ByIndex.get(row._index) ?? {};
-        return { ...f2row, ...row,_f2_index: f2row._index, _f2_uuid: f2row._uuid ?? null };
+        return { ...f2row, ...row,_f2_index: f2row._index, _f2_rootUuid: f2row._rootUuid ?? null };
     });
 
-    // GeoJSON — coordinates always from form-1; _f2_uuid preserved for image paths
+    // GeoJSON — coordinates always from form-1; _f2_rootUuid preserved for image paths
     const geojson = {
         type: 'FeatureCollection',
         features: f1
@@ -221,7 +221,7 @@ async function loadAuditData() {
                 return {
                     type: 'Feature',
                     geometry: { type: 'Point', coordinates: [+r.long, +r.lat] },
-                    properties: { ...f2row, ...r, _f2_uuid: f2row._uuid ?? null, _f2_index: f2row._index ?? null }
+                    properties: { ...f2row, ...r, _f2_rootUuid: f2row._rootUuid ?? null, _f2_index: f2row._index ?? null }
                 };
             })
     };
@@ -239,7 +239,7 @@ async function loadAuditData() {
         features: unmatchedF2.map(r => ({
             type: 'Feature',
             geometry: { type: 'Point', coordinates: [+r.long, +r.lat] },
-            properties: { ...r, _f2_uuid: r._uuid ?? null, _f2_index: r._index ?? null, _f2_only: true }
+            properties: { ...r, _f2_rootUuid: r._rootUuid ?? null, _f2_index: r._index ?? null, _f2_only: true }
         }))
     };
     // Green if _validation_status = yes, otherwise pink
@@ -272,7 +272,7 @@ async function loadAuditData() {
         desilting:        row['desiliting']?.trim(),    // CSV col is 'desiliting'
         last_cleaned:     row['last_cleaned']?.trim(),
         drain_maintainer: row['maintenance']?.trim(),   // CSV col is 'maintenance'
-        _uuid:            row['_uuid'],
+        _rootUuid:            row['_rootUuid'],
         _validation_status: row['_validation_status'],
     })).filter(r => r._drain);
 
@@ -929,9 +929,10 @@ window.addEventListener('load', () => {
 
 //#region Audit Point Click — Panel Update
 
-function buildImgSrc(filename, uuid, formNum) {
-    if (!filename || !uuid) return null;
-    return `https://pub-4d67c97c1d2843adbeffa3b98cd45d19.r2.dev/form-${formNum}/images/${uuid.replace('uuid:', '')}/${filename}`;
+function buildImgSrc(filename, _rootUuid, formNum) {
+    if (!filename || !_rootUuid) return null;
+    const cleanUuid = _rootUuid.replace('uuid:', '');
+    return `https://pub-4d67c97c1d2843adbeffa3b98cd45d19.r2.dev/form-${formNum}/images/${cleanUuid}/${filename}`;
     //return `data/media/form-${formNum}/images/${uuid.replace('uuid:', '')}/${filename}`;
 }
 
@@ -942,10 +943,10 @@ const PANEL_CONFIG = {
         defaultField: 'wall_condition',
         renderFn: () => renderInfrastructureCharts(getFilteredAuditData()),
         fieldPicMap: {
-            wall_condition: [{ picField: 'wall_pic', uuidField: '_uuid', form: 1 }],
-            wall_height:    [{ picField: 'wall_pic', uuidField: '_uuid', form: 1 }],
-            fence:          [{ picField: 'wall_pic', uuidField: '_uuid', form: 1 }],
-            wall_material:  [{ picField: 'wall_pic', uuidField: '_uuid', form: 1 }],
+            wall_condition: [{ picField: 'wall_pic', uuidField: '_rootUuid', form: 1 }],
+            wall_height:    [{ picField: 'wall_pic', uuidField: '_rootUuid', form: 1 }],
+            fence:          [{ picField: 'wall_pic', uuidField: '_rootUuid', form: 1 }],
+            wall_material:  [{ picField: 'wall_pic', uuidField: '_rootUuid', form: 1 }],
         },
         fieldChartLabel: {
             wall_condition: 'Wall Condition',
@@ -958,9 +959,9 @@ const PANEL_CONFIG = {
         defaultField: 'elec_condition',
         renderFn: () => renderInfrastructureCharts(getFilteredAuditData()),
         fieldPicMap: {
-            elec_condition:     [{ picField: 'elec_pic',     uuidField: '_uuid', form: 1 }],
-            cables_condition:   [{ picField: 'cables_pic',   uuidField: '_uuid', form: 1 }],
-            manholes_condition: [{ picField: 'manholes_pic', uuidField: '_uuid', form: 1 }],
+            elec_condition:     [{ picField: 'elec_pic',     uuidField: '_rootUuid', form: 1 }],
+            cables_condition:   [{ picField: 'cables_pic',   uuidField: '_rootUuid', form: 1 }],
+            manholes_condition: [{ picField: 'manholes_pic', uuidField: '_rootUuid', form: 1 }],
         },
         fieldChartLabel: {
             elec_condition:     'Electrical',
@@ -972,11 +973,11 @@ const PANEL_CONFIG = {
         defaultField: 'bridge_condition',
         renderFn: () => renderInfrastructureCharts(getFilteredAuditData()),
         fieldPicMap: {
-            bridge_type:      [{ picField: 'bridge_pic', uuidField: '_uuid', form: 1 }],
-            bridge_condition: [{ picField: 'bridge_pic', uuidField: '_uuid', form: 1 }],
-            bridge_walkable:  [{ picField: 'bridge_pic', uuidField: '_uuid', form: 1 }],
-            piers_condition:  [{ picField: 'piers_pic',  uuidField: '_uuid', form: 1 }],
-            piers_num:        [{ picField: 'piers_pic',  uuidField: '_uuid', form: 1 }],
+            bridge_type:      [{ picField: 'bridge_pic', uuidField: '_rootUuid', form: 1 }],
+            bridge_condition: [{ picField: 'bridge_pic', uuidField: '_rootUuid', form: 1 }],
+            bridge_walkable:  [{ picField: 'bridge_pic', uuidField: '_rootUuid', form: 1 }],
+            piers_condition:  [{ picField: 'piers_pic',  uuidField: '_rootUuid', form: 1 }],
+            piers_num:        [{ picField: 'piers_pic',  uuidField: '_rootUuid', form: 1 }],
         },
         fieldChartLabel: {
             bridge_type:      'Bridge Type',
@@ -990,13 +991,13 @@ const PANEL_CONFIG = {
         defaultField: 'water_contamination',
         renderFn: () => renderWaterQualityCharts(getFilteredAuditData()),
         fieldPicMap: {
-            inlets:              [{ picField: 'inlets_pic',              uuidField: '_f2_uuid', form: 2 }],
-            unauthorised_inlets: [{ picField: 'unauthorised_inlets_pic', uuidField: '_f2_uuid', form: 2 }],
-            water_stagnant:      [{ picField: 'water_pic', uuidField: '_f2_uuid', form: 2 }],
-            water_contamination: [{ picField: 'water_pic', uuidField: '_f2_uuid', form: 2 }],
-            water_colour:        [{ picField: 'water_pic', uuidField: '_f2_uuid', form: 2 }],
-            water_turbidity:     [{ picField: 'water_pic', uuidField: '_f2_uuid', form: 2 }],
-            water_smell:         [{ picField: 'water_pic', uuidField: '_f2_uuid', form: 2 }],
+            inlets:              [{ picField: 'inlets_pic',              uuidField: '_f2_rootUuid', form: 2 }],
+            unauthorised_inlets: [{ picField: 'unauthorised_inlets_pic', uuidField: '_f2_rootUuid', form: 2 }],
+            water_stagnant:      [{ picField: 'water_pic', uuidField: '_f2_rootUuid', form: 2 }],
+            water_contamination: [{ picField: 'water_pic', uuidField: '_f2_rootUuid', form: 2 }],
+            water_colour:        [{ picField: 'water_pic', uuidField: '_f2_rootUuid', form: 2 }],
+            water_turbidity:     [{ picField: 'water_pic', uuidField: '_f2_rootUuid', form: 2 }],
+            water_smell:         [{ picField: 'water_pic', uuidField: '_f2_rootUuid', form: 2 }],
         },
         fieldChartLabel: {
             inlets:              'Authorised Inlets',
@@ -1012,12 +1013,12 @@ const PANEL_CONFIG = {
         defaultField: 'sw_inside',
         renderFn: () => renderWaterQualityCharts(getFilteredAuditData()),
         fieldPicMap: {
-            sw_inside:         [{ picField: 'sw_inside_pic',  uuidField: '_f2_uuid', form: 2 }],
-            sw_inside_type:    [{ picField: 'sw_inside_pic',  uuidField: '_f2_uuid', form: 2 }],
-            sw_inside_source:  [{ picField: 'sw_inside_pic',  uuidField: '_f2_uuid', form: 2 }],
-            sw_outside:        [{ picField: 'sw_outside_pic', uuidField: '_f2_uuid', form: 2 }],
-            sw_outside_type:   [{ picField: 'sw_outside_pic', uuidField: '_f2_uuid', form: 2 }],
-            sw_outside_source: [{ picField: 'sw_outside_pic', uuidField: '_f2_uuid', form: 2 }],
+            sw_inside:         [{ picField: 'sw_inside_pic',  uuidField: '_f2_rootUuid', form: 2 }],
+            sw_inside_type:    [{ picField: 'sw_inside_pic',  uuidField: '_f2_rootUuid', form: 2 }],
+            sw_inside_source:  [{ picField: 'sw_inside_pic',  uuidField: '_f2_rootUuid', form: 2 }],
+            sw_outside:        [{ picField: 'sw_outside_pic', uuidField: '_f2_rootUuid', form: 2 }],
+            sw_outside_type:   [{ picField: 'sw_outside_pic', uuidField: '_f2_rootUuid', form: 2 }],
+            sw_outside_source: [{ picField: 'sw_outside_pic', uuidField: '_f2_rootUuid', form: 2 }],
         },
         fieldChartLabel: {
             sw_inside:         'Solid Waste Inside',
@@ -1033,8 +1034,8 @@ const PANEL_CONFIG = {
         renderFn: () => renderCommunityCharts(getFilteredAuditData(), communityData),
         fieldPicMap: {
             community_engagement: [
-                { picField: 'community_engagement_pic', uuidField: '_f2_uuid', form: 2 },
-                { picField: 'street_pic',               uuidField: '_uuid',    form: 1 },
+                { picField: 'community_engagement_pic', uuidField: '_f2_rootUuid', form: 2 },
+                { picField: 'street_pic',               uuidField: '_rootUuid',    form: 1 },
             ],
         },
         fieldChartLabel: {
