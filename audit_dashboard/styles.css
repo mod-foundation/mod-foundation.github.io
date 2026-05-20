@@ -13,7 +13,7 @@
     --sky-blue: #68c2fb;
     --aqua-blue: #6fe6fd;
     --light-aqua-blue:#6fe5fd56;
-    --lighter-aqua-blue:#6fe5fd46;
+    --lighter-aqua-blue:#90e8fa46;
 
     /* Greens */
     --mint-green: #85fbeb;
@@ -55,6 +55,13 @@
     --header: var(--primary-blue);
     --border-highlight: 5px solid var(--highlight-green);
     --border-panel: 5px solid var(--panel-bg);
+
+    /* Map control tokens */
+    --ctrl-bg: rgba(255, 255, 255, 0.97);
+    --ctrl-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    --ctrl-radius: 6px;
+    --ctrl-border: 1px solid rgba(0, 0, 0, 0.1);
+    --ctrl-font-size: 12px;
 }
 
 
@@ -157,21 +164,31 @@ body.info-collapsed #information-panel {
 #search-container {
     position: absolute;
     top: 10px;
-    right: 50px;
-    z-index: 1;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
-
 
 .team-filter-select {
     flex-shrink: 0;
     background: #fff;
     border-radius: 6px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-    min-width: 90px;
-    max-width: 160px;
+    min-width: 75px;
+    max-width: 130px;
+}
+
+.team-filter-select::part(combobox) {
+    padding-block: 2px;
+    min-height: unset;
+}
+
+.team-filter-select::part(display-input) {
+    font-family: 'Barlow', sans-serif;
+    font-size: 11px;
 }
 
 #reset-filters-btn::part(base) {
@@ -183,6 +200,8 @@ body.info-collapsed #information-panel {
     font-family: 'Barlow', sans-serif;
     font-size: 12px;
     white-space: nowrap;
+    padding-block: 2px;
+    min-height: unset;
 }
 
 #reset-filters-btn::part(base):hover {
@@ -190,87 +209,7 @@ body.info-collapsed #information-panel {
     border-color: #0050cc;
     color: #0050cc;
 }
-/* #endregion */
 
-/* #region Basemap Control */
-.maplibregl-ctrl-basemap {
-    background: white;
-    border-radius: 4px;
-    box-shadow: 0 0 0 2px rgba(0,0,0,.1);
-}
-
-.basemap-switcher-btn {
-    width: 29px;
-    height: 29px;
-    background: white;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-}
-
-.basemap-switcher-btn:hover { background-color: #f5f5f5; }
-
-.basemap-switcher-btn svg { width: 20px; height: 20px; }
-
-.basemap-panel {
-    display: none;
-    position: absolute;
-    bottom: 100%;
-    left: 0;
-    margin-bottom: 10px;
-    background: white;
-    border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    padding: 12px;
-    min-width: 180px;
-}
-
-.basemap-panel.active { display: block; }
-
-.basemap-panel h4 {
-    margin: 0 0 10px 0;
-    font-size: 13px;
-    color: #333;
-    font-weight: 600;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 8px;
-}
-
-.basemap-options { display: flex; flex-direction: column; gap: 6px; }
-
-.basemap-option {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    padding: 6px 8px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-}
-
-.basemap-option:hover { background-color: #f5f5f5; }
-
-.basemap-option input[type="radio"] {
-    margin-right: 8px;
-    cursor: pointer;
-    accent-color: #007cbf;
-}
-
-.basemap-option label {
-    cursor: pointer;
-    font-size: 13px;
-    color: #666;
-    user-select: none;
-    flex: 1;
-}
-
-.basemap-option input[type="radio"]:checked + label {
-    color: #007cbf;
-    font-weight: 500;
-}
 /* #endregion */
 
 /* #region Panels */
@@ -292,7 +231,7 @@ body.info-collapsed #information-panel {
             overflow: clip;         /* clip without scroll container — keeps overflow-x unaffected */
             box-sizing: border-box;
             width: fit-content;
-            --pic-width: min(250px, calc((100vh - 180px) / 4));
+            --pic-width: min(250px, calc((100vh - 200px) / 4));
 
 
         }
@@ -306,7 +245,7 @@ body.info-collapsed #information-panel {
             overflow: clip;
             box-sizing: border-box;
             width: fit-content;
-           --pic-width: min(250px, calc((100vh - 180px) / 4));
+           --pic-width: min(250px, calc((100vh - 200px) / 4));
             /*border: 3px solid var(--primary-blue);*/
         }
 
@@ -330,8 +269,8 @@ body.info-collapsed #information-panel {
             display: flex;
             justify-content: space-around;
             align-items: stretch;
-            gap: 10px;
-            padding: 10px 16px;
+            gap: 1px;
+            padding: 10px 0px;
             background-color: #6fe5fd2a;
         }
 
@@ -340,7 +279,7 @@ body.info-collapsed #information-panel {
             display: flex;
             flex-direction: column;
             gap: 2px;
-            padding: 0 16px;
+            padding: 0 10px;
             border-right: 1px solid #b6d8e8;
         }
 
@@ -361,10 +300,9 @@ body.info-collapsed #information-panel {
         }
 
         .info-tip-label {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
             color: var(--header);
         }
 
@@ -434,7 +372,7 @@ body.info-collapsed #information-panel {
 
         .panel-header {
             padding: 10px 20px;
-             box-shadow: 0 2px 8px rgba(123, 47, 255, 0.35);
+            box-shadow: 0 2px 8px rgba(123, 47, 255, 0.35);
             background-color: var(--panel-header);
             display: flex;
             justify-content: space-between;
@@ -529,7 +467,7 @@ body.info-collapsed #information-panel {
         .chart-wrapper {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 12px;
             width: 180px;
             height: calc(var(--pic-width) * 4 / 3);
             flex-shrink: 0;
@@ -541,6 +479,7 @@ body.info-collapsed #information-panel {
             min-height: 0;
             display: flex;
             flex-direction: column;
+            gap: 6px;
         }
 
         .chart-canvas-wrap {
@@ -559,7 +498,8 @@ body.info-collapsed #information-panel {
             flex-shrink: 0;
             max-height: 64px;
             overflow-y: auto;
-            padding: 2px 0;
+            padding: 2px 2px;
+
         }
 
         .chart-legend-div::-webkit-scrollbar       { width: 3px; }
@@ -643,15 +583,15 @@ body.info-collapsed #information-panel {
         }
 
         .attr-select::part(combobox) {
-            background: #ffffff;
+            background: var(--primary-blue);
             border: none;
-            border-radius: 4px;
+            border-radius: 0px;
             font-family: 'Barlow', sans-serif;
             font-size: 10px;
             font-weight: 400;
-            color: #5E5E5E;
-            padding: 0 4px 0 6px;
-            height: 18px;
+            color: #ffffff;
+            padding: 4px 4px 4px 6px;
+            height: fit-content;
             min-height: unset;
             box-shadow: none;
             gap: 2px;
@@ -660,12 +600,13 @@ body.info-collapsed #information-panel {
         .attr-select::part(display-input) {
             font-family: 'Barlow', sans-serif;
             font-weight: 500;
-            font-size: 11px;
-            color: #5E5E5E;
+            font-size: 12px;
+            color: #ffffff;
         }
 
         .attr-select::part(expand-icon) {
-            font-size: 8px;
+            font-size: 12px;
+            color: white;
         }
 
         .attr-badge {
@@ -1146,9 +1087,17 @@ body.info-collapsed #information-panel {
         grid-template:
 
             "panel-1  map      panel-2"  1fr
-            "panel-1   title    panel-2"    40px
-            "panel-1    info   panel-2"   80px
-            "panel-1  stats    panel-2"  80px
+            "panel-1   title    panel-2"    30px
+            "panel-1    info   panel-2"   110px
+            "panel-1  stats    panel-2"  70px
+            / max-content   1fr   max-content;
+    }
+
+    body.info-collapsed {
+        grid-template:
+            "panel-1  map      panel-2"  1fr
+            "panel-1    title   panel-2" 30px
+            "panel-1  stats    panel-2"  70px
             / max-content   1fr   max-content;
     }
 
@@ -1159,27 +1108,57 @@ body.info-collapsed #information-panel {
     }
 
     
-    #information-panel { padding: 5px 5px; }
+    #stats {
+            gap: 10px;
+            padding: 10px 16px;
+    }
 
-    .info-tip          { padding: 0 5px;   }
-    .info-tip-label    { font-size: 9px;   }
-    .info-tip-text     { font-size: 9px;   }
+    
+    #information-panel { padding: 10px 5px; }
+
+    #dashboard-title   { padding: 0 15px;   }
+
+    .dashboard-title-main { font-size: 12px; }
+
+
+    .info-tip          { padding: 0 9px; gap: 5px;  }
+    .info-tip-label    { font-size: 10.5px;   }
+    .info-tip-text     { font-size: 10.5px;   }
 
 
     .panel-header   { gap: 18px;             padding: 6px 8px;}
     .panel-title    {font-size: 11px;                         }
     .panel-id       {font-size: 10px;                         }
     .panel-content  { gap: 10px;             padding: 8px 8px;}
-    .chart-wrapper  { width: 140px; gap: 4px; }
+    .chart-wrapper  { width: 140px; gap: 10px; }
     .chart-slot     { width: 140px; }
+    
+    .chart-legend-item {font-size: 10px; }
 
     .audit-popup .maplibregl-popup-content { width: 500px; }
 
-    .stats-value    { font-size: 15px; }
+    
+    .stats-category {
+            padding: 8px 16px;
+            gap: 3px;
+            min-width: 160px;
+            max-width: 240px;
+    }
+
+    .stats-label-row { gap: 6px;        }
+    .stats-icon      { font-size: 13px; }
+    .stats-title     { font-size: 10px; }
+    .stats-value     { font-size: 20px; }
 
 
-    .team-filter-select { min-width: 80px; }
-    .team-filter-select { max-width: 160px; }
+    #search-container   { max-width: 80vw; gap: 4px; }
+    .team-filter-select { min-width: 58px; max-width: 100px; }
+    .team-filter-select::part(combobox)      { padding-inline: 5px; gap: 2px; }
+    .team-filter-select::part(display-input) { font-size: 10px; }
+    .team-filter-select::part(expand-icon)   { font-size: 7px; }
+    mapbox-search-box   { max-width: 160px; }
+    .attr-select::part(display-input) { font-size: 10.5px; }
+
 }
 
 
@@ -1198,14 +1177,15 @@ body.info-collapsed #information-panel {
     #information-panel { display: none; }
 
     #panel-1, #panel-2 {
-        --pic-width: min(150px, calc((100vh - 120px) / 4));
+        --pic-width: min(150px, calc((100vh - 150px) / 4));
     }
 
 
     .panel-header   { gap: 14px; padding: 5px 5px;}
     .panel-content  { gap: 8px; padding: 5px 5px;}
-    .chart-wrapper  { width: 110px; gap: 4px; }
-    .chart-slot     { width: 110px; }
+    .chart-wrapper  { width: 130px; gap: 8px; }
+    .chart-slot     { width: 130px; }
+    .chart-legend-item {font-size: 10px; }
 
     .panel-title    { font-size: 11px; }
     .panel-id       { font-size: 10px; }
@@ -1217,10 +1197,16 @@ body.info-collapsed #information-panel {
 
     .audit-popup .maplibregl-popup-content { width: 400px; }
 
-     #search-container { right: 40px; gap: 6px; }
-    .team-filter-select { min-width: 70px; }
-    .team-filter-select { max-width: 160px; }
-    mapbox-search-box { max-width: 160px; }
+    #search-container    { max-width: 75vw; gap: 3px; }
+    .team-filter-select  { min-width: 48px; max-width: 78px; }
+    .team-filter-select::part(combobox)      { padding-inline: 4px; gap: 1px; }
+    .team-filter-select::part(display-input) { font-size: 9px; }
+    .team-filter-select::part(expand-icon)   { display: none; }
+    mapbox-search-box    { max-width: 120px; }
+    #reset-filters-btn .btn-text { display: none; }
+    #reset-filters-btn::part(base) { padding-inline: 6px; }
+    .attr-select::part(display-input) { font-size: 10px; }
+
 }
 
 

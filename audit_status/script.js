@@ -177,17 +177,17 @@ function addPointLayer(id, data, {
 //#region Layers
 
 function addLayers() {
-    const statusColor = ['match', ['get', 'Status'], 1, '#ffaa0dc7', '#0dbaffff'];
-    addLineLayer('primarydrains', 'data/json/primarydrains.geojson', { color: statusColor, width: 2.5 });
-    addLineLayer('secondarydrains', 'data/json/secondarydrains.geojson', { color: statusColor, width: 2.5, opacity: 0.8 });
-    addLineLayer('gbaboundary', 'data/json/gba_boundary.geojson', { color: '#ffffff', width: 2, opacity: 0.8 });
+    const statusColor = ['match', ['get', 'Status'], 1, '#ff0d0d8c', '#0dbaffff'];
+    addLineLayer('primarydrains', '../data/json/primarydrains.geojson', { color: statusColor, width: 2.5 });
+    addLineLayer('secondarydrains', '../data/json/secondarydrains.geojson', { color: statusColor, width: 2.5, opacity: 0.8 });
+    addLineLayer('gbaboundary', '../data/json/gba_boundary.geojson', { color: '#ffffff', width: 2, opacity: 0.8 });
 
     // Invisible wide buffer layers for easier hover/click on drain lines
-    addLayer('primarydrains-buffer', 'data/json/primarydrains.geojson', 'line',
+    addLayer('primarydrains-buffer', '../data/json/primarydrains.geojson', 'line',
         { 'line-color': 'transparent', 'line-width': 20, 'line-opacity': 0 },
         { 'line-cap': 'round', 'line-join': 'round' }
     );
-    addLayer('secondarydrains-buffer', 'data/json/secondarydrains.geojson', 'line',
+    addLayer('secondarydrains-buffer', '../data/json/secondarydrains.geojson', 'line',
         { 'line-color': 'transparent', 'line-width': 20, 'line-opacity': 0 },
         { 'line-cap': 'round', 'line-join': 'round' }
     );
@@ -231,8 +231,8 @@ function addLineInteractivity(layerId, attrs) {
 async function loadAuditAssignments() {
     const [xlsxBuffer, priJson, secJson] = await Promise.all([
         fetch('data/csv/drains_auditing.xlsx').then(r => r.arrayBuffer()),
-        fetch('data/json/primarydrains.geojson').then(r => r.json()),
-        fetch('data/json/secondarydrains.geojson').then(r => r.json())
+        fetch('../data/json/primarydrains.geojson').then(r => r.json()),
+        fetch('../data/json/secondarydrains.geojson').then(r => r.json())
     ]);
 
     const wb = XLSX.read(new Uint8Array(xlsxBuffer), { type: 'array' });

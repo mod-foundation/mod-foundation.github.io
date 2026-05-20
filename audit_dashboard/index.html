@@ -60,9 +60,9 @@
                 <div class="info-tip">
                     <div class="info-tip-header">
                         <wa-icon name="users" class="info-tip-icon" style="color:#000000"></wa-icon>
-                        <span class="info-tip-label">Filter by team</span>
+                        <span class="info-tip-label">Filters</span>
                     </div>
-                    <p class="info-tip-text">Use the Team dropdown (top right) to show only one team's audit points on the map.</p>
+                    <p class="info-tip-text">Use the dropdowns on the map to filter audit points by team, drain ID, corporation and valley.</p>
                 </div>
                 <div class="info-tip">
                     <div class="info-tip-header">
@@ -84,9 +84,9 @@
             <div id="map-container">
                 <div id="search-container">
                     <wa-select id="team-filter" size="small" with-clear placeholder="Team" class="team-filter-select"></wa-select>
-                    <wa-button id="reset-filters-btn" size="small" appearance="outlined" style="display:none" title="Reset all chart filters">
+                    <wa-button id="reset-filters-btn" size="small" appearance="outlined" title="Reset all chart filters">
                         <wa-icon slot="prefix" name="rotate-left"></wa-icon>
-                        Reset Filters
+                        <span class="btn-text">Reset Filters</span>
                     </wa-button>
                     <mapbox-search-box id="search-box"></mapbox-search-box>
                 </div>

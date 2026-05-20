@@ -294,6 +294,18 @@ async function loadAuditData() {
         fields: ['_drain', '_secondarydrain'],
         insertAfter: '#team-filter',
     });
+    makeFilterDropdown({
+        id: 'corp-filter',
+        placeholder: 'Corporation',
+        fields: ['corporatio'],
+        insertAfter: '#drain-filter',
+    });
+    makeFilterDropdown({
+        id: 'valley-filter',
+        placeholder: 'Valley',
+        fields: ['valley'],
+        insertAfter: '#corp-filter',
+    });
 
     const defaultFeature = geojson.features.find(f => f.properties._index === '20');
     if (defaultFeature) {
@@ -310,8 +322,14 @@ async function loadAuditData() {
 
 function addLayers() {
     const statusColor = ['match', ['get', 'Status'], 1, '#ff222267', '#0d6aff'];
-    addLineLayer('primarydrains', 'data/json/primarydrains.geojson', { color: statusColor, width: 2 });
-    addLineLayer('secondarydrains', 'data/json/secondarydrains.geojson', { color: statusColor, width: 1.5, opacity: 0.8 });
+    addLineLayer('primarydrains', '../data/json/primarydrains.geojson', { color: statusColor, width: 1.5, opacity: 0.8 });
+    addLineLayer('secondarydrains', '../data/json/secondarydrains.geojson', { color: statusColor, width: 1, opacity: 0.8 });
+    addLineLayer('gbaboundary', '../data/json/gba_boundary.geojson', { color: '#575757ff', width: 1, opacity: 0.8 });
+    addLineLayer('gbacorporations', '../data/json/gba_corporations.geojson', { color: '#7a7a7aff', width: 0.5, opacity: 0.8 });
+    addLineLayer('valleys', '../data/json/valley.geojson', { color: '#8a4343ff', width: 0.5, opacity: 0.3 });
+
+
+
 
 }
 
@@ -626,15 +644,23 @@ class DownloadControl {
     map.on('load', async () => {
         console.log('✓ Map loaded');
 
-        //Base Map Control
-        const basemapControl = new BasemapControl({
-            basemaps: baseLayers,
-            initialBasemap: 'cartoPositron',
-            width: '150px',
-            height: '100px',
-            keepOpen: false
+        // Add all basemap raster sources/layers at the bottom of the stack
+        const _initialBasemap = 'cartoPositron';
+        Object.entries(baseLayers).forEach(([key, bm]) => {
+            map.addSource(key, {
+                type: 'raster',
+                tiles: bm.tiles,
+                tileSize: 256,
+                maxzoom: bm.maxzoom,
+                attribution: bm.attribution,
+            });
+            map.addLayer({
+                id: key,
+                type: 'raster',
+                source: key,
+                layout: { visibility: key === _initialBasemap ? 'visible' : 'none' },
+            });
         });
-        map.addControl(basemapControl, 'top-right');
 
         addLayers();
         await loadAuditData();
@@ -643,12 +669,18 @@ class DownloadControl {
             layers: [
                 { id: 'primarydrains',   name: 'Primary Drains',   visible: true },
                 { id: 'secondarydrains', name: 'Secondary Drains', visible: true },
+                { id: 'gbaboundary',     name: 'GBA Boundary',     visible: true },
+                { id: 'gbacorporations', name: 'Corporations',     visible: true },
                 { id: 'audit-points',    name: 'Audit Points',     visible: true },
+                { id: 'cartoPositron',   name: 'Carto Positron',   visible: true },
+                { id: 'satellite',       name: 'Satellite',        visible: false },
+                { id: 'osm',             name: 'OpenStreetMap',    visible: false },
             ],
             position: 'bottom-left',
             collapsed: true,
         });
         map.addControl(layerLegend, 'bottom-left');
+
         map.addControl(new UploadControl(), 'top-left');
         map.addControl(new DownloadControl(), 'top-left');
     });
@@ -795,6 +827,25 @@ function buildAndApplyFilter() {
     if (map.getLayer('audit-points'))    map.setFilter('audit-points', filter);
     if (map.getLayer('audit-points-f2')) map.setFilter('audit-points-f2', filter);
 
+    // Filter drain + corporation layers by valley and/or corporation selection
+    const valleyVals = window._dropdownFilters?.['valley-filter']?.values;
+    const corpVals   = window._dropdownFilters?.['corp-filter']?.values;
+
+    const drainParts = [];
+    if (valleyVals?.size > 0) drainParts.push(['in', ['get', 'valley'],      ['literal', [...valleyVals]]]);
+    if (corpVals?.size   > 0) drainParts.push(['in', ['get', 'corporatio'],  ['literal', [...corpVals]]]);
+    const drainFilter = drainParts.length === 0 ? null
+                      : drainParts.length === 1 ? drainParts[0]
+                      : ['all', ...drainParts];
+
+    if (map.getLayer('primarydrains'))   map.setFilter('primarydrains',   drainFilter);
+    if (map.getLayer('secondarydrains')) map.setFilter('secondarydrains', drainFilter);
+
+    const corpLayerFilter = corpVals?.size > 0
+        ? ['in', ['get', 'corporatio'], ['literal', [...corpVals]]]
+        : null;
+    if (map.getLayer('gbacorporations')) map.setFilter('gbacorporations', corpLayerFilter);
+
     const filtered = getFilteredAuditData();
     renderInfrastructureCharts(filtered);
     renderWaterQualityCharts(filtered);
@@ -802,7 +853,6 @@ function buildAndApplyFilter() {
     refreshDropdownOptions();
 
     const resetBtn = document.getElementById('reset-filters-btn');
-    if (resetBtn) resetBtn.style.display = Object.keys(window._chartFilters || {}).length ? '' : 'none';
 
     const filterState = {};
     for (const [id, def] of Object.entries(window._dropdownFilters || {})) {
