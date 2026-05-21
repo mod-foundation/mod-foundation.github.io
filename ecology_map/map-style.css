@@ -1742,7 +1742,7 @@ sl-input[type='search'] {
 /* #endregion */
 
 /*#region panel RESET*/
-#panel_reset {
+.panel-reset {
     width: 100%;
     height: auto;
     margin-top: 5px;
@@ -1750,7 +1750,7 @@ sl-input[type='search'] {
     background: transparent;
 }
 
-#panel_reset::part(base) {
+.panel-reset::part(base) {
     color: white;
     background: transparent;
     font-family: 'Poppins', sans-serif;
@@ -1766,22 +1766,22 @@ sl-input[type='search'] {
     border-radius: 0px;
 }
 
-#panel_reset::part(base):hover {
+.panel-reset::part(base):hover {
     background-color: var(--highlight-green);
     color: var(--darker-blue);
 }
 
-#panel_reset::part(label):hover {
+.panel-reset::part(label):hover {
     color: var(--darker-blue);
 }
 
 /* Active state - when button is clicked */
-#panel_reset.active::part(base) {
+.panel-reset.active::part(base) {
     background-color: var(--highlight-green);
     color: var(--darker-blue);
 }
 
-#panel_reset.active::part(label) {
+.panel-reset.active::part(label) {
     color: var(--darker-blue);
 }
 /*#endregion*/
