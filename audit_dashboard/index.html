@@ -48,47 +48,64 @@
                         <wa-icon name="location-dot" class="info-tip-icon" style="color:#e603c0"></wa-icon>
                         <span class="info-tip-label">Select a point</span>
                     </div>
-                    <p class="info-tip-text">Click any drain point on the map to see its audit photo and attribute values in the panels.</p>
+                    <p class="info-tip-text">
+                        Click any drain point on the map to see its audit photos and attribute values
+                         in the panels.</p>
                 </div>
                 <div class="info-tip">
                     <div class="info-tip-header">
                         <wa-icon name="palette" class="info-tip-icon" style="color:#82f984"></wa-icon>
                         <span class="info-tip-label">Change colour</span>
                     </div>
-                    <p class="info-tip-text">Use the dropdown in each category panel to recolour the map points by a different attribute.</p>
+                    <p class="info-tip-text">
+                        Use the dropdown in each category panel to recolour
+                         the map points by their attribute values.</p>
                 </div>
                 <div class="info-tip">
                     <div class="info-tip-header">
                         <wa-icon name="users" class="info-tip-icon" style="color:#000000"></wa-icon>
                         <span class="info-tip-label">Filters</span>
                     </div>
-                    <p class="info-tip-text">Use the dropdowns on the map to filter audit points by team, drain ID, corporation and valley.</p>
+                    <p class="info-tip-text">Use the dropdowns on the map to filter audit points
+                         by team, drain ID, corporation and valley.</p>
                 </div>
                 <div class="info-tip">
                     <div class="info-tip-header">
                         <wa-icon name="chart-bar" class="info-tip-icon"></wa-icon>
                         <span class="info-tip-label">Filter by chart</span>
                     </div>
-                    <p class="info-tip-text">Click a bar in any chart to filter the map to points matching only that category value.</p>
+                    <p class="info-tip-text">Click on the charts to filter
+                          out the map points by attribute value.</p>
                 </div>
                 <div class="info-tip">
                     <div class="info-tip-header">
                         <wa-icon name="rotate-left" class="info-tip-icon" style="color:#ef4444"></wa-icon>
                         <span class="info-tip-label">Reset filters</span>
                     </div>
-                    <p class="info-tip-text">Click Reset Filters to clear all active chart selections and restore the full dataset.</p>
+                    <p class="info-tip-text">Click Reset Filters to clear all 
+                        active chart selections and restore the full dataset.</p>
                 </div>
             </div>
 
 
             <div id="map-container">
-                <div id="search-container">
-                    <wa-select id="team-filter" size="small" with-clear placeholder="Team" class="team-filter-select"></wa-select>
-                    <wa-button id="reset-filters-btn" size="small" appearance="outlined" title="Reset all chart filters">
-                        <wa-icon slot="prefix" name="rotate-left"></wa-icon>
-                        <span class="btn-text">Reset Filters</span>
-                    </wa-button>
-                    <mapbox-search-box id="search-box"></mapbox-search-box>
+                <div id="map-top-bar">
+                    <div id="bar-left"></div>
+                    <div id="bar-center">
+                        <div id="search-container">
+                            <div id="filter-row">
+                                <wa-select id="team-filter" size="small" multiple with-clear hoist placeholder="Team" class="filter-select" max-options-visible="1"></wa-select>
+                            </div>
+                            <div id="controls-row">
+                                <wa-button id="reset-filters-btn" size="small" appearance="outlined" title="Reset all chart filters">
+                                    <wa-icon slot="prefix" name="rotate-left"></wa-icon>
+                                    <span class="btn-text">Reset Filters</span>
+                                </wa-button>
+                                <mapbox-search-box id="search-box"></mapbox-search-box>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="bar-right"></div>
                 </div>
             </div>
 
@@ -261,21 +278,21 @@
                         <wa-icon name="user-group" class="stats-icon"></wa-icon>
                         <span class="stats-title">Citizen Auditors</span>
                     </div>
-                    <div class="stats-value">200</div>
+                    <div class="stats-value">230</div>
                 </div>
                 <div class="stats-category">
                     <div class="stats-label-row">
                         <wa-icon name="route" class="stats-icon"></wa-icon>
                         <span class="stats-title">Drain KM Audited</span>
                     </div>
-                    <div class="stats-value">30.7 km</div>
+                    <div class="stats-value">40.8 km</div>
                 </div>
                 <div class="stats-category">
                     <div class="stats-label-row">
                         <wa-icon name="house" class="stats-icon"></wa-icon>
                         <span class="stats-title">Residents Engaged</span>
                     </div>
-                    <div class="stats-value">215</div>
+                    <div class="stats-value">242</div>
                 </div>
             </div>
 
@@ -292,6 +309,11 @@
             </div>
         
 
+
+        <!-- Image lightbox -->
+        <wa-dialog id="img-lightbox" without-header light-dismiss style="--width: fit-content; --spacing: 0;">
+            <img id="lightbox-img" src="" alt="Audit photo" />
+        </wa-dialog>
 
         <!-- Chart.js -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>

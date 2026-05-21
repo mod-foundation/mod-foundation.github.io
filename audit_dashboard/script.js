@@ -44,6 +44,8 @@ const baseLayers = { osm, satellite, cartoLight, cartoPositron };
 
 //#endregion
 
+const DATA_ROOT = '../download_center/data';
+
 //#region Map Container
 const map = new maplibregl.Map({
     container: 'map-container',
@@ -205,13 +207,13 @@ async function loadAuditData() {
     // form-2 lookup keyed by _index_f1 (references form-1._index)
     const f2ByIndex = new Map(f2.map(row => [row._index_f1, row]));
 
-    // Joined records — form-1 fields win shared columns; _f2_rootUuid and _f2_index preserved separately
+    // Joined records — form-1 fields win shared columns; _f2_rootUuid/_f2_uuid and _f2_index preserved separately
     auditData = f1.map(row => {
         const f2row = f2ByIndex.get(row._index) ?? {};
-        return { ...f2row, ...row,_f2_index: f2row._index, _f2_rootUuid: f2row._rootUuid ?? null };
+        return { ...f2row, ...row, _f2_index: f2row._index, _f2_rootUuid: f2row._rootUuid ?? null, _f2_uuid: f2row._uuid ?? null };
     });
 
-    // GeoJSON — coordinates always from form-1; _f2_rootUuid preserved for image paths
+    // GeoJSON — coordinates always from form-1; _f2_rootUuid/_f2_uuid preserved for image paths
     const geojson = {
         type: 'FeatureCollection',
         features: f1
@@ -221,7 +223,7 @@ async function loadAuditData() {
                 return {
                     type: 'Feature',
                     geometry: { type: 'Point', coordinates: [+r.long, +r.lat] },
-                    properties: { ...f2row, ...r, _f2_rootUuid: f2row._rootUuid ?? null, _f2_index: f2row._index ?? null }
+                    properties: { ...f2row, ...r, _f2_rootUuid: f2row._rootUuid ?? null, _f2_index: f2row._index ?? null, _f2_uuid: f2row._uuid ?? null }
                 };
             })
     };
@@ -322,11 +324,11 @@ async function loadAuditData() {
 
 function addLayers() {
     const statusColor = ['match', ['get', 'Status'], 1, '#ff222267', '#0d6aff'];
-    addLineLayer('primarydrains', '../data/json/primarydrains.geojson', { color: statusColor, width: 1.5, opacity: 0.8 });
-    addLineLayer('secondarydrains', '../data/json/secondarydrains.geojson', { color: statusColor, width: 1, opacity: 0.8 });
-    addLineLayer('gbaboundary', '../data/json/gba_boundary.geojson', { color: '#575757ff', width: 1, opacity: 0.8 });
-    addLineLayer('gbacorporations', '../data/json/gba_corporations.geojson', { color: '#7a7a7aff', width: 0.5, opacity: 0.8 });
-    addLineLayer('valleys', '../data/json/valley.geojson', { color: '#8a4343ff', width: 0.5, opacity: 0.3 });
+    addLineLayer('primarydrains', `${DATA_ROOT}/json/primarydrains.geojson`, { color: statusColor, width: 1.5, opacity: 0.8 });
+    addLineLayer('secondarydrains', `${DATA_ROOT}/json/secondarydrains.geojson`, { color: statusColor, width: 1, opacity: 0.8 });
+    addLineLayer('gbaboundary', `${DATA_ROOT}/json/gba_boundary.geojson`, { color: '#575757ff', width: 1, opacity: 0.8 });
+    addLineLayer('gbacorporations', `${DATA_ROOT}/json/gba_corporations.geojson`, { color: '#7a7a7aff', width: 0.5, opacity: 0.8 });
+    addLineLayer('valleys', `${DATA_ROOT}/json/valley.geojson`, { color: '#8a4343ff', width: 0.5, opacity: 0.3 });
 
 
 
@@ -591,42 +593,10 @@ class DownloadControl {
                     <line x1="12" y1="15" x2="12" y2="3"/>
                 </svg>
             </button>
-            <div class="download-panel" style="display:none">
-                <div class="download-panel-header">Download Data</div>
-                <a class="download-link" href="data/csv/form-1.csv" download="form-1.csv">
-                    <span class="download-link-icon">&#8675;</span>
-                    <span>
-                        <span class="download-link-name">Form 1 Audit Data</span>
-                        <span class="download-link-meta">CSV</span>
-                    </span>
-                </a>
-                <a class="download-link" href="data/csv/form-2.csv" download="form-2.csv">
-                    <span class="download-link-icon">&#8675;</span>
-                    <span>
-                        <span class="download-link-name">Form 2 Audit Data</span>
-                        <span class="download-link-meta">CSV</span>
-                    </span>
-                </a>
-                <a class="download-link" href="data/json/primarydrains.geojson" download="primarydrains.geojson">
-                    <span class="download-link-icon">&#8675;</span>
-                    <span>
-                        <span class="download-link-name">Primary Drains</span>
-                        <span class="download-link-meta">GeoJSON</span>
-                    </span>
-                </a>
-                <a class="download-link" href="data/json/secondarydrains.geojson" download="secondarydrains.geojson">
-                    <span class="download-link-icon">&#8675;</span>
-                    <span>
-                        <span class="download-link-name">Secondary Drains</span>
-                        <span class="download-link-meta">GeoJSON</span>
-                    </span>
-                </a>
-            </div>
         `;
         this._container.querySelector('.download-toggle-btn')
             .addEventListener('click', () => {
-                const panel = this._container.querySelector('.download-panel');
-                panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+                window.open('https://buildingaresilientbengaluru.com/decoding-stormwater-infrastructure/#download-centre', '_blank', 'noopener,noreferrer');
             });
         return this._container;
     }
@@ -667,14 +637,15 @@ class DownloadControl {
 
         const layerLegend = new LayerManager({
             layers: [
-                { id: 'primarydrains',   name: 'Primary Drains',   visible: true },
-                { id: 'secondarydrains', name: 'Secondary Drains', visible: true },
-                { id: 'gbaboundary',     name: 'GBA Boundary',     visible: true },
-                { id: 'gbacorporations', name: 'Corporations',     visible: true },
-                { id: 'audit-points',    name: 'Audit Points',     visible: true },
-                { id: 'cartoPositron',   name: 'Carto Positron',   visible: true },
-                { id: 'satellite',       name: 'Satellite',        visible: false },
-                { id: 'osm',             name: 'OpenStreetMap',    visible: false },
+                { id: 'audit-points',    name: 'Audit Points',         visible: true,  opacity: 1.0 },
+                { id: 'primarydrains',   name: 'Primary Drains',       visible: true,  opacity: 0.8 },
+                { id: 'secondarydrains', name: 'Secondary Drains',     visible: true,  opacity: 0.8 },
+                { id: 'gbacorporations', name: 'Corporations',          visible: true,  opacity: 0.8 },
+                { id: 'gbaboundary',     name: 'GBA Boundary',         visible: true,  opacity: 0.8 },
+                { id: 'valleys',         name: 'Valleys',              visible: true,  opacity: 0.3 },
+                { id: 'cartoPositron',   name: 'Base Map: Carto Positron',       visible: true,  opacity: 1.0 },
+                { id: 'satellite',       name: 'Base Map: Satellite',            visible: false, opacity: 1.0 },
+                { id: 'osm',             name: 'Base Map: OpenStreetMap',        visible: false, opacity: 1.0 },
             ],
             position: 'bottom-left',
             collapsed: true,
@@ -683,6 +654,12 @@ class DownloadControl {
 
         map.addControl(new UploadControl(), 'top-left');
         map.addControl(new DownloadControl(), 'top-left');
+
+        // Move controls into the top bar row
+        const barLeft  = document.getElementById('bar-left');
+        const barRight = document.getElementById('bar-right');
+        document.querySelectorAll('.upload-ctrl, .download-ctrl').forEach(el => barLeft.appendChild(el));
+        document.querySelectorAll('.maplibregl-ctrl-top-right .maplibregl-ctrl').forEach(el => barRight.appendChild(el));
     });
 
     map.on('error', (e) => {
@@ -701,9 +678,12 @@ function makeFilterDropdown({ id, placeholder, fields, insertAfter, el: existing
         const s = document.createElement('wa-select');
         s.id = id;
         s.setAttribute('size', 'small');
+        s.setAttribute('multiple', '');
         s.setAttribute('with-clear', '');
+        s.setAttribute('hoist', '');
         s.setAttribute('placeholder', placeholder);
-        s.className = 'team-filter-select';
+        s.setAttribute('max-options-visible', '1');
+        s.className = 'filter-select';
         const anchor = typeof insertAfter === 'string'
             ? document.querySelector(insertAfter)
             : insertAfter;
@@ -713,8 +693,9 @@ function makeFilterDropdown({ id, placeholder, fields, insertAfter, el: existing
 
     sel.setAttribute('multiple', '');
 
-    // Register entry first so populateOptions can read .values
-    window._dropdownFilters[id] = { fields, values: new Set(), refresh: null };
+    window._dropdownFilters[id] = { fields, values: new Set(), refresh: null, el: sel };
+
+    const optMap = new Map(); // value → wa-option
 
     function populateOptions(data) {
         const available = new Set();
@@ -724,24 +705,24 @@ function makeFilterDropdown({ id, placeholder, fields, insertAfter, el: existing
                 if (v != null && v !== '') available.add(v);
             }
         }
-        // Add options that don't exist yet; disable those not in available
-        const existing = new Map([...sel.querySelectorAll('wa-option')].map(o => [o.value, o]));
+        // Add options that don't exist yet
         for (const v of [...available].sort()) {
-            if (!existing.has(v)) {
+            if (!optMap.has(v)) {
                 const opt = document.createElement('wa-option');
                 opt.value = v;
                 opt.textContent = v;
                 sel.appendChild(opt);
-                existing.set(v, opt);
+                optMap.set(v, opt);
             }
         }
-        for (const [v, opt] of existing) {
+        // Disable options outside the current cross-filter; drop stale selections
+        const current = window._dropdownFilters[id].values;
+        for (const v of [...current]) {
+            if (!available.has(v)) current.delete(v);
+        }
+        for (const [v, opt] of optMap) {
             opt.disabled = !available.has(v);
         }
-        // Drop selections that are no longer available
-        const current = window._dropdownFilters[id].values;
-        const stillValid = [...current].filter(v => available.has(v));
-        window._dropdownFilters[id].values = new Set(stillValid);
     }
 
     window._dropdownFilters[id].refresh = populateOptions;
@@ -852,7 +833,6 @@ function buildAndApplyFilter() {
     renderCommunityCharts(filtered, getFilteredCommunityData());
     refreshDropdownOptions();
 
-    const resetBtn = document.getElementById('reset-filters-btn');
 
     const filterState = {};
     for (const [id, def] of Object.entries(window._dropdownFilters || {})) {
@@ -863,6 +843,10 @@ function buildAndApplyFilter() {
 
 function resetAllChartFilters() {
     window._chartFilters = {};
+    for (const def of Object.values(window._dropdownFilters || {})) {
+        def.values = new Set();
+        if (def.el) def.el.value = [];
+    }
     buildAndApplyFilter();
 }
 
@@ -1054,17 +1038,30 @@ function _updatePic(el, catId, props) {
     if (!img) return;
     const field = _activeField[catId] || config.defaultField;
     const candidates = config.fieldPicMap[field] || [];
-    let src = null;
+
+    // For each candidate build two src attempts: primary UUID field, then alternate (_uuid / _f2_uuid)
+    const srcs = [];
     for (const p of candidates) {
-        src = buildImgSrc(props[p.picField], props[p.uuidField], p.form);
-        if (src) break;
+        const filename = props[p.picField];
+        if (!filename) continue;
+        const altField = p.uuidField === '_rootUuid' ? '_uuid' : p.uuidField === '_f2_rootUuid' ? '_f2_uuid' : null;
+        const primary = buildImgSrc(filename, props[p.uuidField], p.form);
+        const alt     = altField ? buildImgSrc(filename, props[altField], p.form) : null;
+        if (primary) srcs.push(primary);
+        if (alt && alt !== primary) srcs.push(alt);
     }
+
     const gen = (_picGeneration[catId] = (_picGeneration[catId] || 0) + 1);
     img.style.display = 'none';
-    if (!src) { img.src = ''; return; }
-    img.onerror = () => { if (_picGeneration[catId] === gen) img.style.display = 'none'; };
-    img.onload  = () => { if (_picGeneration[catId] === gen) img.style.display = 'block'; };
-    img.src = src;
+
+    function tryNext(i) {
+        if (i >= srcs.length) { img.src = ''; return; }
+        img.onerror = () => { if (_picGeneration[catId] === gen) tryNext(i + 1); };
+        img.onload  = () => { if (_picGeneration[catId] === gen) img.style.display = 'block'; };
+        img.src = srcs[i];
+    }
+
+    tryNext(0);
 }
 
 function _updateChart(el, catId) {
@@ -1115,7 +1112,7 @@ const auditPopup = new maplibregl.Popup({ className: 'audit-popup', maxWidth: '3
 
 function updatePanels(props) {
     _lastAuditProps = props;
-    const idText = [props._drain, props._index].filter(Boolean).join(' · ');
+    const idText = [props._drain].filter(Boolean);
 
     for (const [catId, config] of Object.entries(PANEL_CONFIG)) {
         const el = document.getElementById(catId);
@@ -1172,5 +1169,16 @@ document.getElementById('info-toggle-btn').addEventListener('click', () => {
 });
 //#endregion
 
+//#region Image Lightbox
+const imgLightbox = document.getElementById('img-lightbox');
+const lightboxImg = document.getElementById('lightbox-img');
+
+document.addEventListener('click', e => {
+    const img = e.target.closest('.panel-pic-img');
+    if (!img || !img.src || img.style.display === 'none') return;
+    lightboxImg.src = img.src;
+    imgLightbox.open = true;
+});
+//#endregion
 
 //#endregion

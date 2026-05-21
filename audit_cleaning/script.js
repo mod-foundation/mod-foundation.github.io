@@ -44,6 +44,8 @@ const baseLayers = { osm, satellite, cartoLight, cartoPositron };
 
 //#endregion
 
+const DATA_ROOT = '../download_center/data';
+
 //#region Map Container
 const map = new maplibregl.Map({
     container: 'map-container',
@@ -297,10 +299,10 @@ async function loadAuditData() {
 
 function addLayers() {
     const statusColor = ['match', ['get', 'Status'], 1, '#ff2222', '#0d6aff'];
-    addLineLayer('primarydrains', '../data/json/primarydrains.geojson', { color: statusColor, width: 2 });
-    addLineLayer('secondarydrains', '../data/json/secondarydrains.geojson', { color: statusColor, width: 1.5, opacity: 0.8 });
+    addLineLayer('primarydrains', `${DATA_ROOT}/json/primarydrains.geojson`, { color: statusColor, width: 2 });
+    addLineLayer('secondarydrains', `${DATA_ROOT}/json/secondarydrains.geojson`, { color: statusColor, width: 1.5, opacity: 0.8 });
 
-    addLayer('typology', '../data/json/typology.geojson', 'line', {
+    addLayer('typology', `${DATA_ROOT}/json/typology.geojson`, 'line', {
         'line-color': [
             'match', ['get', 'typology_code'],
             't1',  '#FF0000',
