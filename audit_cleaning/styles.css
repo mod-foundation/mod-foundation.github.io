@@ -13,7 +13,12 @@ body {
         / 360px  1fr        360px;
     height: 100vh;
     overflow: hidden;
+    transition: grid-template-columns 0.25s ease;
 }
+
+body.infra-collapsed                      { grid-template-columns: 40px 1fr 360px; }
+body.quality-collapsed                    { grid-template-columns: 360px 1fr 40px; }
+body.infra-collapsed.quality-collapsed    { grid-template-columns: 40px 1fr 40px; }
 /* #endregion */
 
 /* #region Map */
@@ -140,11 +145,13 @@ body {
 
     /* #region Panel layout */
     .map-panel {
-        overflow-y: auto;
+        overflow: hidden;
         background: #fff;
         border: 1px solid #e0e0e0;
         box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-        padding: 20px 20px 0 20px;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
     }
 
     #panel-infrastructure { grid-area: infra; }
@@ -157,6 +164,14 @@ body {
         overflow: hidden;
     }
 
+    /* Scrollable content area inside each panel */
+    .panel-inner {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px 20px 0 20px;
+        min-height: 0;
+    }
+
     .panel-title {
         display: flex;
         align-items: center;
@@ -166,6 +181,65 @@ body {
         font-size: 15px;
         letter-spacing: 0.04em;
         flex-shrink: 0;
+    }
+
+    /* Collapse toggle button */
+    .panel-toggle-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        align-self: flex-end;
+        margin: 8px 8px 4px 8px;
+        padding: 4px 5px;
+        background: none;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        cursor: pointer;
+        color: #888;
+        transition: background 0.15s, color 0.15s;
+    }
+
+    .panel-toggle-btn:hover {
+        background: #f5f5f5;
+        color: #333;
+    }
+
+    #panel-water-quality .panel-toggle-btn {
+        align-self: flex-start;
+    }
+
+    /* Collapsed state */
+    .map-panel.collapsed .panel-inner {
+        display: none;
+    }
+
+    .panel-collapsed-label {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 0 0 0;
+        color: #888;
+        overflow: hidden;
+    }
+
+    .panel-collapsed-label span {
+        writing-mode: vertical-rl;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #999;
+        white-space: nowrap;
+    }
+
+    #panel-infrastructure .panel-collapsed-label span {
+        transform: rotate(180deg);
+    }
+
+    .map-panel.collapsed .panel-collapsed-label {
+        display: flex;
     }
     /* #endregion */
 
