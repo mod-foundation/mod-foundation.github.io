@@ -5,7 +5,7 @@
 Homepage: https://buildingaresilientbengaluru.com/
 
 <div align="center">
-  <img src="images/meta.PNG" alt="Building a Resilient Bengaluru" >
+  <img src="ecology_map/images/meta.PNG" alt="Building a Resilient Bengaluru" >
 </div>
 
 ## Table of Contents
@@ -35,13 +35,13 @@ In July 2025, Mod Foundation in collaboration with Oorvani Foundation won a gran
 
 ### Features
 
-- Understanding the Watershed : Immersive understanding of regional to city-level watershed.
-- History of Tanks: Explore how the city lost tanks to growth and urbanisation through an immersive timeline.
-- Typologies of Drains: Understand the types of physical adjacencies of drain C100 in the Kormangala Challaghatta Valley.
-
+- Interactive Map: Visualize Bengaluru's stormwater network and understand how water flows through your neighborhood
+- Story Map: Discover how Bengaluru's evolving water systems shaped the city from the 1800s to the 2000s.
+- Audit Dashboard: Explore and Analyse data on our stormwater systems collected by citizens on ground.
+- 
 ### Data
 
-Read through the [README in the datasets folder](https://github.com/mod-foundation/mod-foundation.github.io/tree/main/ecology_map/datasets#readme) for information on sources and access.
+Read through the [README in the datasets folder](https://github.com/mod-foundation/mod-foundation.github.io/tree/main/download_center/datasets#readme) for information on sources and access.
   
 
 ## Built With
