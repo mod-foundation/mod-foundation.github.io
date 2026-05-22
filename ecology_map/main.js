@@ -115,7 +115,7 @@ const layerConfig = {
     },
 
     bg: {
-        label: 'background',
+        label: 'Satellite',
         layers: ['background', 'satellite']
     },
 
@@ -142,6 +142,21 @@ const layerConfig = {
     sewerlines: {
         label: 'BWSSB Sewer lines',
         layers: ['sewer-300-more','sewer-300-less']
+    },
+
+    cartopositron: {
+        label: 'Carto Positron',
+        layers: ['carto-positron']
+    },
+
+    cartodark: {
+        label: 'Carto Dark',
+        layers: ['carto-dark']
+    },
+
+    satelliteoverlay: {
+        label: 'Satellite Dark Overlay',
+        layers: ['satellite-overlay']
     }
 };
 
@@ -239,7 +254,10 @@ const hideLayers = resolveLayers({
         'typologyanalysis',
         'existingtanks',
         'floodhotspots',
-        'sewerlines'
+        'sewerlines',
+        'cartopositron',
+        'cartodark',
+        'satelliteoverlay'
     ]
 });
 
@@ -374,7 +392,7 @@ function generateLegend() {
         {
             label: 'Background',
             isGroup: true,
-            children: ['dem', 'roads', 'placelabels', 'bg']
+            children: ['dem', 'roads', 'placelabels', 'bg', 'satelliteoverlay', 'cartopositron', 'cartodark']
         },
         {
             label: 'Typologies',
@@ -850,7 +868,7 @@ function displayTypologyPair(lhsFeature, rhsFeature) {
 
     const lhsValue = lhsProps.typ || 'N/A';
     const rhsValue = rhsProps.typ || 'N/A';
-    const drainId = lhsProps['drain_id'] || 'N/A'; // 🔥 CHANGED from drain_id
+    const drainId = lhsProps['Drain num'] || 'N/A'; // 🔥 CHANGED from drain_id
 
     const lhsColor = getTypologyColor(lhsValue);
     const rhsColor = getTypologyColor(rhsValue);
@@ -864,6 +882,27 @@ function displayTypologyPair(lhsFeature, rhsFeature) {
     // Find closest point on RHS line to click
     const rhsLine = turf.lineString(rhsFeature.geometry.coordinates);
     const rhsClosestPoint = turf.nearestPointOnLine(rhsLine, clickPoint);
+
+    // Determine popup anchors based on spatial relationship between the two points
+    const lhsCoords = lhsClosestPoint.geometry.coordinates;
+    const rhsCoords = rhsClosestPoint.geometry.coordinates;
+    const deltaLng = lhsCoords[0] - rhsCoords[0];
+    const deltaLat = lhsCoords[1] - rhsCoords[1];
+
+    let lhsAnchor, rhsAnchor;
+    if (Math.abs(deltaLat) >= Math.abs(deltaLng)) {
+        if (deltaLat > 0) {
+            lhsAnchor = 'bottom'; rhsAnchor = 'top';
+        } else {
+            lhsAnchor = 'top';    rhsAnchor = 'bottom';
+        }
+    } else {
+        if (deltaLng < 0) {
+            lhsAnchor = 'right';  rhsAnchor = 'left';
+        } else {
+            lhsAnchor = 'left';   rhsAnchor = 'right';
+        }
+    }
 
     // Extract image URLs from description attribute (fallback to img attribute)
     const lhsImgHtml = lhsProps.description
@@ -891,7 +930,7 @@ function displayTypologyPair(lhsFeature, rhsFeature) {
     const lhsPopup = new mapboxgl.Popup({
         closeButton: true,
         closeOnClick: false,
-        anchor: 'bottom' // Popup appears on top
+        anchor: lhsAnchor
     })
         .setLngLat(lhsClosestPoint.geometry.coordinates)
         .setHTML(lhsHtml)
@@ -903,7 +942,7 @@ function displayTypologyPair(lhsFeature, rhsFeature) {
     const rhsPopup = new mapboxgl.Popup({
         closeButton: true,
         closeOnClick: false,
-        anchor: 'top' // Popup appears on bottom
+        anchor: rhsAnchor
     })
         .setLngLat(rhsClosestPoint.geometry.coordinates)
         .setHTML(rhsHtml)
@@ -968,16 +1007,13 @@ function updateTypologyPanel(drainId, lhsValue, rhsValue) {
 function highlightTypologyPair(lhsFeature, rhsFeature) {
     clearHighlight();
 
-    // Use the typ_analysis layer's source and sourceLayer
     const source = 'typ_source';
-    const sourceLayer = 'typ_analysis-6bvc7g';
 
     // Highlight LHS feature
     map.addLayer({
         id: 'feature-highlight-lhs',
         type: 'line',
         source: source,
-        'source-layer': sourceLayer,
         filter: ['==', ['id'], lhsFeature.id],
         paint: {
             'line-color': '#82f984',
@@ -991,7 +1027,6 @@ function highlightTypologyPair(lhsFeature, rhsFeature) {
         id: 'feature-highlight-rhs',
         type: 'line',
         source: source,
-        'source-layer': sourceLayer,
         filter: ['==', ['id'], rhsFeature.id],
         paint: {
             'line-color': '#82f984',
@@ -2354,9 +2389,7 @@ function setupInteraction() {
             window.lastTypologyClickLngLat = e.lngLat;
 
             // Query all features in typ_source
-            const allFeatures = map.querySourceFeatures('typ_source', {
-                sourceLayer: 'typ_analysis-2cq5z2'
-            });
+            const allFeatures = map.querySourceFeatures('typ_source');
 
             console.log('Total typology features:', allFeatures.length);
 
@@ -4467,11 +4500,83 @@ function addLayers() {
     });
 }
 
+function addSatelliteOverlay() {
+    map.addSource('satellite-overlay-source', {
+        type: 'geojson',
+        data: {
+            type: 'Feature',
+            geometry: {
+                type: 'Polygon',
+                coordinates: [[[-180, -90], [180, -90], [180, 90], [-180, 90], [-180, -90]]]
+            }
+        }
+    });
+
+    // Insert directly above the satellite layer so it only darkens imagery, not vectors
+    const styleLayers = map.getStyle().layers;
+    const satIdx = styleLayers.findIndex(l => l.id === 'satellite');
+    const insertBefore = satIdx >= 0 && satIdx + 1 < styleLayers.length
+        ? styleLayers[satIdx + 1].id
+        : undefined;
+
+    map.addLayer({
+        id: 'satellite-overlay',
+        type: 'fill',
+        source: 'satellite-overlay-source',
+        paint: {
+            'fill-color': '#000000',
+            'fill-opacity': 0.5
+        }
+    }, insertBefore);
+}
+
+function addCartoLayers() {
+    // Insert both basemap tiles just above the 'background' layer
+    const insertBefore = map.getStyle().layers.find(l => l.id !== 'background')?.id;
+
+    map.addSource('carto-positron-source', {
+        type: 'raster',
+        tiles: [
+        'https://a.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',
+        'https://b.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',
+        'https://c.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',
+        'https://d.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png'
+        ],
+        tileSize: 256,
+        attribution: '© <a href="https://carto.com/">CARTO</a>'
+    });
+
+    map.addLayer({
+        id: 'carto-positron',
+        type: 'raster',
+        source: 'carto-positron-source',
+        paint: { 'raster-opacity': 1 }
+    }, insertBefore);
+
+    map.addSource('carto-dark-source', {
+        type: 'raster',
+        tiles: [
+            'https://a.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png',
+            'https://b.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png',
+            'https://c.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png'
+        ],
+        tileSize: 256,
+        attribution: '© <a href="https://carto.com/">CARTO</a>'
+    });
+
+    map.addLayer({
+        id: 'carto-dark',
+        type: 'raster',
+        source: 'carto-dark-source',
+        paint: { 'raster-opacity': 1 }
+    }, insertBefore);
+}
+
 function addTypLayers() {
     // Add typology GeoJSON source and layer
     map.addSource('typ_source', {
-        type: 'vector',
-        url: 'mapbox://mod-foundation.8o8116ot'
+        type: 'geojson',
+        data: '../download_center/data/json/typology_analysis.geojson'
     });
 
     //styling
@@ -4480,7 +4585,6 @@ function addTypLayers() {
         id: 'typ_analysis-glow',
         type: 'line',
         source: 'typ_source',
-        'source-layer': 'typ_analysis-2cq5z2',
         paint: {
             'line-color': '#ffffff', // White drop shadow
             'line-opacity': 0.8, // Semi-transparent
@@ -4494,7 +4598,6 @@ function addTypLayers() {
         id: 'typ_analysis',
         type: 'line',
         source: 'typ_source',
-        'source-layer': 'typ_analysis-2cq5z2',
         paint: {
             'line-color': [
                 'match',
@@ -5151,7 +5254,7 @@ function handlelakesDetail() {
     //console.log('  - tanks: 0.9');
     setOpa('tanks', 0.9);
     //console.log('  - wards: 0.3');
-    setOpa('wards', 0.3);
+    setOpa('wards', 0);
 
     // Log current layer visibility states AFTER panelHandle
     //console.log('\n📊 === LAYER VISIBILITY STATES AFTER panelHandle ===');
@@ -5203,7 +5306,7 @@ function handlePrimaryDetail() {
     // Define groups/layers to stay visible or turn on
     const keepGroups = { groups: ['dem', 'valleys', 'tanks', 'primarydrains', 'wards', 'losttanks', ...alwaysVisible] };
 
-    setOpa('wards', 0.4);
+    setOpa('wards', 0);
 
     panelHandle(keepGroups.groups);
 }
@@ -5219,7 +5322,7 @@ function handleSecondaryDetail() {
 
     // 2️⃣ Make DEM fully visible
     setOpa('dem', 0.4);
-    setOpa('wards', 0.4);
+    setOpa('wards', 0);
     toggleLayerOff('hillshade');
 
     // Define groups/layers to stay visible or turn on
@@ -5252,7 +5355,7 @@ function handleFloodHotspotsDetail() {
 
     // 2️⃣ Make DEM fully visible
     setOpa('dem', 0.4);
-    setOpa('wards', 0.4);
+    setOpa('wards', 0);
     toggleLayerOff('hillshade');
 
     // Define groups/layers to stay visible or turn on (same as handleSecondaryDetail + flood hotspots)
@@ -5287,7 +5390,7 @@ function handleSewageDetail() {
 
     // 2️⃣ Make DEM fully visible
     setOpa('dem', 0.3);
-    setOpa('wards', 0.4);
+    setOpa('wards', 0);
     toggleLayerOff('hillshade');
 
     // Define groups/layers to stay visible or turn on (same as handleSecondaryDetail + flood hotspots)
@@ -5325,8 +5428,10 @@ function handleTypologyDetail() {
     zoomToLayerBounds('typ_analysis', { padding: 50, duration: 2000, maxZoom: 25 });
 
     // 2️⃣ Set DEM to 40% opacity
-    setOpa('dem', 0.4);
-    setOpa('roads', 0.4);
+    setOpa('dem', 0.3);
+    setOpa('roads', 0.1);
+    setOpa('wards', 0);
+    setOpa('satelliteoverlay', 0.7);
     toggleLayerOff('hillshade');
 
     // Define groups/layers to stay visible or turn on
@@ -5343,6 +5448,7 @@ function handleTypologyDetail() {
             'typologyanalysis',
             'wards',
             'greens',
+            'satelliteoverlay',
             ...alwaysVisible
         ]
     };
@@ -6068,6 +6174,8 @@ map.on('load', () => {
 
     //add layers not in the style
     addLayers();
+    addSatelliteOverlay();
+    addCartoLayers();
     addTypLayers();
     addBoundaryLayers();
     addGreens();

@@ -20,6 +20,8 @@
     --lime-green: #7af9b4;
     --spring-green: #71e68b;
     --apple-green: #82f984;
+    --apple-green-dark: #00f704;
+
     --grass-green: #6cd46f;
     --forest-green: #43894d;
 
@@ -53,7 +55,7 @@
     --panel-bg: var(--light-aqua-blue);
     --panel-header: var(--lighter-aqua-blue);
     --header: var(--primary-blue);
-    --border-highlight: 5px solid var(--highlight-green);
+    --border-highlight: 5px solid var(--apple-green-dark);
     --border-panel: 5px solid var(--panel-bg);
 
     /* Map control tokens */

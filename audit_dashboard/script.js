@@ -333,9 +333,22 @@ function addLayers() {
     addLineLayer('gbacorporations', `${DATA_ROOT}/json/gba_corporations.geojson`, { color: '#7a7a7aff', width: 0.5, opacity: 0.8 });
     addLineLayer('valleys', `${DATA_ROOT}/json/valley.geojson`, { color: '#8a4343ff', width: 0.5, opacity: 0.3 });
 
-
-
-
+    const typColor = ['match', ['get', 'typ'],
+        't1', '#FF0000',
+        't2', '#ff7900',
+        't4', '#db3ee9',
+        't5', '#4ed84e',
+        't6', '#F1C40F',
+        't7', '#7D3C98',
+        't8', '#27AE60',
+        't9', '#BA4A00',
+        't10', '#10611e',
+        't11', '#2C3E50',
+        't12', '#efc700',
+        '#999999'
+    ];
+    addLineLayer('typology-analysis', `${DATA_ROOT}/json/typology_analysis.geojson`, { color: typColor, width: 4, opacity: 0.9 });
+    map.setLayoutProperty('typology-analysis', 'visibility', 'none');
 }
 
 //#endregion
@@ -646,6 +659,7 @@ class DownloadControl {
                 { id: 'gbacorporations', name: 'Corporations',          visible: true,  opacity: 0.8 },
                 { id: 'gbaboundary',     name: 'GBA Boundary',         visible: true,  opacity: 0.8 },
                 { id: 'valleys',         name: 'Valleys',              visible: true,  opacity: 0.3 },
+                { id: 'typology-analysis', name: 'Typology Analysis',  visible: false, opacity: 0.9 },
                 { id: 'cartoPositron',   name: 'Base Map: Carto Positron',       visible: true,  opacity: 1.0 },
                 { id: 'satellite',       name: 'Base Map: Satellite',            visible: false, opacity: 1.0 },
                 { id: 'osm',             name: 'Base Map: OpenStreetMap',        visible: false, opacity: 1.0 },
@@ -881,7 +895,7 @@ function applyAttributeColor(field = _activeColorField) {
     document.querySelectorAll('.category-panel').forEach(p => p.classList.remove('panel-color-active'));
     const activePanelId = Object.keys(PANEL_CONFIG).find(id => field in PANEL_CONFIG[id].fieldPicMap);
     if (activePanelId) document.getElementById(activePanelId)?.classList.add('panel-color-active');
-    const fallback = '#b6b6b6b4';
+    const fallback = '#89d4ffb4';
     let expr;
     if (MULTI_SELECT_FIELDS.has(field)) {
         // Explode multi-value strings to get unique tokens, then colour by first match
@@ -1156,9 +1170,27 @@ function next_point(direction) {
     const currentOrder = parseInt(_lastAuditProps?.order, 10);
     if (isNaN(currentOrder)) return;
 
-    const valid = auditFeatures
+    let valid = auditFeatures
         .filter(f => f.properties._validation_status !== 'no')
         .sort((a, b) => parseInt(a.properties.order, 10) - parseInt(b.properties.order, 10));
+
+    for (const { fields, values } of Object.values(window._dropdownFilters || {})) {
+        if (values.size > 0)
+            valid = valid.filter(f => fields.some(field => values.has(f.properties[field])));
+    }
+
+    for (const [field, keys] of Object.entries(window._chartFilters || {})) {
+        if (keys && keys.size > 0) {
+            if (MULTI_SELECT_FIELDS.has(field)) {
+                valid = valid.filter(f => {
+                    const tokens = new Set(String(f.properties[field] ?? '').split(/\s+/).filter(Boolean));
+                    return [...keys].some(k => tokens.has(k));
+                });
+            } else {
+                valid = valid.filter(f => keys.has(f.properties[field]));
+            }
+        }
+    }
 
     let idx = valid.findIndex(f => parseInt(f.properties.order, 10) === currentOrder);
     if (idx === -1) idx = 0;
