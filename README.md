@@ -1,70 +1,74 @@
-# Building A Resilient Bengaluru
+# Decoding Stormwater Infrastructure
 
-" When we see how water flows in our cities, we understand where our city breathes — resilience begins with awareness."
+**Building a Resilient Bengaluru** — Stormwater & the City Dashboard  
+Live: [mod-foundation.github.io](https://mod-foundation.github.io)  
+Campaign site: [buildingaresilientbengaluru.com](https://buildingaresilientbengaluru.com)
 
-Homepage: https://buildingaresilientbengaluru.com/
+---
 
 <div align="center">
   <img src="ecology_map/images/meta.PNG" alt="Building a Resilient Bengaluru" >
 </div>
 
-## Table of Contents
+## About
 
-- [The Campaign](#the-campaign)
-- [Features](#features)
-- [Data](#data)
-- [Built With](#built-with)
-- [Acknowledgments](#acknowledgments)
+*Stormwater & the City* is a 12-month initiative by the Mod Foundation to develop an interactive digital dashboard that maps Bengaluru's stormwater drainage network (Rajakaluves) across physical, urban, and governance dimensions. Funded by the Bengaluru Sustainability Forum's Small Grants Programme, in collaboration with the Oorvani Foundation.
 
-## The Campaign
+The dashboard makes Bengaluru's stormwater systems visible and legible through participatory tools, citizen-led audit data, and open datasets — positioning information as the first step toward action.
 
-Bengaluru stands at a critical crossroads. Once sustained by a man-made ecological network of tanks, lakes, and rajakaluves, the city nurtured thriving water ecologies, economies, and productive landscapes. Over time, however, rapid urbanisation has severed this relationship. Lakes were filled, stormwater canals narrowed, and the systems that once safeguarded the city against floods steadily dismantled. Each monsoon now exposes the cost of this neglect: inundated neighbourhoods, disrupted livelihoods, and a growing vulnerability across the urban fabric.
+---
 
-The Building a Resilient Bengaluru campaign, initiated by the Mod Foundation, responds to this urgency. Rooted in our ethos of making cities observable, the campaign seeks to bring visibility to the often-overlooked systems that keep Bengaluru alive - its waterways. It is the culmination of years of work on the K100 Citizens’ Waterway Project, which reimagined a neglected stormwater canal as a public, ecological, and cultural asset. 
+## Modules
 
-By combining institutional reform with placemaking, the K100 project became a proof of concept that influenced the World Bank’s INR 3000 crore investment in Bengaluru’s flood resilience.By combining institutional reform with placemaking, the K100 project became a proof of concept that influenced the World Bank’s INR 3000 crore investment in Bengaluru’s flood resilience (August 2024).
+| Module | Path | Description |
+|--------|------|-------------|
+| **Interactive Map** | `ecology_map/` | Watershed and ecology map. Covers regional to city-level drainage typologies, tank history, and valley systems. Built with MapLibre GL JS. |
+| **Story Map** | `story_map/` | Immersive narrative map. Explores the history of Bengaluru's tanks and urbanisation through a timeline with georeferenced historical maps. |
+| **Audit Dashboard** | `audit_dashboard/` | Citizen audit data dashboard. Displays geolocated audit points from Form 1/2/3 CSV data with photos, attribute charts, map filters, and keyboard/button point navigation ordered by `order` field. |
+| **Audit Status** | `audit_status/` | Tracks the completion status of the field audit across drain segments and teams. |
+| **Download Center** | `download_center/` | Central repository for downloading datasets (GeoJSON, CSV, DEM) used across the project. |
 
-Our campaign extends these learnings citywide. By creating **a shared knowledge base of strategies, technical insights, and citizen-led practices**, we aim to empower people to see waterways not as backdrops or drains, but as vital infrastructures for health, ecology, and culture. We believe that resilience cannot be engineered by mega projects alone. It must be co-created through collective action, informed citizens, and transparent governance.
+---
 
-Building a Resilient Bengaluru is more than a campaign, it is a call to reclaim the city’s relationship with water. By observing and reimagining the systems beneath our feet, we can shape a Bengaluru that is not only flood-resilient but also equitable, ecological, and future-ready.
-A part of Building a Resilient Bengaluru Campaign, Stormwater & the City is a 12-month initiative to develop an interactive digital dashboard that maps Bengaluru’s stormwater drainage network (Rajakaluves) across physical, urban, and governance dimensions. Storm Water Drains (SWDs) are critical for flood mitigation, public health, and water quality, yet remain invisible in planning and public discourse, often reduced to mere open drains. 
+## Tech Stack
 
-Stormwater & the City positions information as the first, crucial step toward action. One that aligns Bengaluru’s resilience ambitions with inclusive, participatory community engagement. This project aims to make Storm water networks visible and legible through a user-friendly, **participatory dashboard that enhances transparency, encourages civic engagement, and fosters collective stewardship**. Drawing inspiration from the citizen-led revival of Bengaluru’s lakes, this initiative envisions a similar transformation in the perception and management of stormwater infrastructure.
+| Layer | Library / Tool |
+|-------|---------------|
+| Maps | [MapLibre GL JS](https://maplibre.org/) v4.7 |
+| Basemaps | Mapbox Satellite, CartoCDN, OSM via MapLibre |
+| Charts | [Chart.js](https://www.chartjs.org/) v4 |
+| CSV parsing | [PapaParse](https://www.papaparse.com/) v5.4 |
+| UI components | [Web Awesome](https://www.webawesome.com/) (wa-button, wa-select, wa-icon, wa-dialog, wa-details) |
+| UI components (home) | [Shoelace](https://shoelace.style/) v2.15 |
+| Fonts | [Barlow](https://fonts.google.com/specimen/Barlow) — Google Fonts |
+| Hosting | GitHub Pages |
+| Editor | VS Code with Claude Code integration |
 
-In July 2025, Mod Foundation in collaboration with Oorvani Foundation won a grant for this project. This project is funded by Bengaluru Sustainability Forum (BSF).
+---
 
-### Features
+## Data
 
-- Interactive Map: Visualize Bengaluru's stormwater network and understand how water flows through your neighborhood
-- Story Map: Discover how Bengaluru's evolving water systems shaped the city from the 1800s to the 2000s.
-- Audit Dashboard: Explore and Analyse data on our stormwater systems collected by citizens on ground.
-- 
-### Data
+Audit field data is collected via KoboToolbox (Forms 1, 2, 3) and stored as CSV in `audit_dashboard/data/csv/`. Spatial datasets (drain networks, valley boundaries, corporation boundaries, historical maps) are stored in `download_center/data/` as GeoJSON and GeoTIFF.
 
-Read through the [README in the datasets folder](https://github.com/mod-foundation/mod-foundation.github.io/blob/main/download_center/README.md#datasets-and-sources) for information on sources and access.
-  
+See the [datasets README](https://github.com/mod-foundation/mod-foundation.github.io/blob/main/download_center/README.md#datasets-and-sources) for sources and access.
 
-## Built With
-The development of the interactive map was done on Visual Studio Code with Claude Integration. Source code hosted on Github and served via Github Pages
+---
 
-Basemap - Mapbox Studio
+## Deployment
 
-Style: mapbox://styles/mod-foundation/cmimsj4eh00q401qw4s9b2ogt
+The repository is served directly via **GitHub Pages** from the `main` branch. There is no build step — all modules are plain HTML/CSS/JS.
 
-Preview: https://api.mapbox.com/styles/v1/mod-foundation/cmimsj4eh00q401qw4s9b2ogt.html?title=view&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34
+```
+https://mod-foundation.github.io/          → index.html (home)
+https://mod-foundation.github.io/ecology_map/
+https://mod-foundation.github.io/story_map/
+https://mod-foundation.github.io/audit_dashboard/
+https://mod-foundation.github.io/audit_status/
+https://mod-foundation.github.io/download_center/
+```
 
-JS
-Mapbox GL JS for client side map rendering and interactivity
-
-CSS
-Shoelace and WebAwesome for UI components.
-
-Google Fonts
-- Poppins
-- Open Sans
+---
 
 ## Acknowledgments
 
-The Building a Resilient Bengaluru campaign is led by the Mod Foundation, in partnership with the Oorvani Foundation, Citizen Matters, and OpenCity. Together, we combine research, journalism, community engagement, and open data to make Bengaluru’s stormwater systems visible and actionable.
-The campaign is supported by the Bengaluru Sustainability Forum’s Small Grants Programme, enabling collaborative work that strengthens urban resilience across the city.
-
+Led by the **Mod Foundation**, in partnership with the **Oorvani Foundation**, Citizen Matters, and OpenCity. Supported by the **Bengaluru Sustainability Forum's Small Grants Programme**.
