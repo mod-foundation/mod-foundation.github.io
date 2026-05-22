@@ -1,12 +1,6 @@
 # Building A Resilient Bengaluru
-# The Bengaluru Stormwater Ecosystem Map
 
 " When we see how water flows in our cities, we understand where our city breathes — resilience begins with awareness."
-
-The Bengaluru Stormwater Ecosystem Interactive Map is a flexible and interactive web-map to interact spatially with stormwater related datasets.
-The map is currently deployed at:
-
-Interactive Map: https://buildingaresilientbengaluru.com/ecology-map/
 
 Homepage: https://buildingaresilientbengaluru.com/
 
