@@ -1166,6 +1166,31 @@ mapbox-search-box [class*="--Input"] {
 
 /* #endregion */
 
+/* #region Point Navigation */
+
+    .point-nav-ctrl {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .point-nav-ctrl wa-button::part(base) {
+        background: var(--primary-blue);
+        border: 1.5px solid var(--highlight-green);
+        border-radius: 0;
+        color: #fff;
+        min-height: unset;
+        height: 29px;
+        width: 29px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .point-nav-ctrl wa-button::part(base):hover { background: var(--dark-blue); }
+
+/* #endregion */
+
 /* #region Responsiveness */
 
 /* ─── Desktop overlay ────────────────────────────────────────────────────── */

@@ -191,6 +191,7 @@ function addPointLayer(id, data, {
 //#region Data Manager
 
 let auditData = [];
+let auditFeatures = [];
 let communityData = [];
 const _filterBroadcast = new BroadcastChannel('audit-filters');
 
@@ -227,6 +228,8 @@ async function loadAuditData() {
                 };
             })
     };
+
+    auditFeatures = geojson.features;
 
     // Green if _validation_status = yes, otherwise orange
     const validatedColor = ['case', ['==', ['get', '_validation_status'], 'yes'], '#00c853', '#ff6b35'];
@@ -309,7 +312,7 @@ async function loadAuditData() {
         insertAfter: '#corp-filter',
     });
 
-    const defaultFeature = geojson.features.find(f => f.properties._index === '20');
+    const defaultFeature = geojson.features.find(f => f.properties._index === '177');
     if (defaultFeature) {
         updatePanels(defaultFeature.properties);
         setHighlight(defaultFeature);
@@ -651,6 +654,22 @@ class DownloadControl {
             collapsed: true,
         });
         map.addControl(layerLegend, 'bottom-left');
+
+        map.addControl({
+            onAdd() {
+                this._el = document.createElement('div');
+                this._el.className = 'maplibregl-ctrl maplibregl-ctrl-group point-nav-ctrl';
+                this._el.innerHTML = `
+                    <wa-button id="nav-prev" size="small" title="Previous audit point (← arrow key)"><wa-icon name="arrow-left"></wa-icon></wa-button>
+                    <wa-button id="nav-next" size="small" title="Next audit point (→ arrow key)"><wa-icon name="arrow-right"></wa-icon></wa-button>
+                `;
+                const [prev, next] = this._el.querySelectorAll('wa-button');
+                prev.addEventListener('click', () => next_point(-1));
+                next.addEventListener('click', () => next_point(1));
+                return this._el;
+            },
+            onRemove() { this._el.remove(); }
+        }, 'bottom-left');
 
         map.addControl(new UploadControl(), 'top-left');
         map.addControl(new DownloadControl(), 'top-left');
@@ -1132,6 +1151,34 @@ function updatePanels(props) {
 function setHighlight(feature) {
     map.getSource('audit-point-highlight').setData({ type: 'FeatureCollection', features: [feature] });
 }
+
+function next_point(direction) {
+    const currentOrder = parseInt(_lastAuditProps?.order, 10);
+    if (isNaN(currentOrder)) return;
+
+    const valid = auditFeatures
+        .filter(f => f.properties._validation_status !== 'no')
+        .sort((a, b) => parseInt(a.properties.order, 10) - parseInt(b.properties.order, 10));
+
+    let idx = valid.findIndex(f => parseInt(f.properties.order, 10) === currentOrder);
+    if (idx === -1) idx = 0;
+
+    let nextIdx = idx + direction;
+    if (direction === 1 && nextIdx >= valid.length) nextIdx = 0;
+    if (nextIdx < 0 || nextIdx >= valid.length) return;
+
+    const next = valid[nextIdx];
+    updatePanels(next.properties);
+    setHighlight(next);
+    map.flyTo({ center: next.geometry.coordinates, speed: 1.5 });
+    auditPopup.remove();
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') next_point(1);
+    if (e.key === 'ArrowLeft')  next_point(-1);
+});
+
 
 map.on('click', 'audit-points', (e) => {
     e.preventDefault();
