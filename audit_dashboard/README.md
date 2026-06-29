@@ -16,7 +16,10 @@ audit_dashboard/
 │   │   ├── form-2.csv          ← Water quality & solid waste data
 │   │   └── form-3.csv          ← Community interview data
 │   └── media/
-│       └── form-1/images/      ← Audit photos (auto-organised by submission UUID)
+│       ├── form-1/images/      ← Form-1 photos (downloaded from KoboToolbox)
+│       │   └── <uuid>/
+│       │       └── <filename>.jpg
+│       └── form-2/images/      ← Form-2 photos (downloaded from KoboToolbox)
 │           └── <uuid>/
 │               └── <filename>.jpg
 ├── index.html
@@ -56,7 +59,6 @@ The map filters out submissions where `_validation_status = no` (i.e., rejected 
 - **Green dot** = `_validation_status: yes` (validated)
 - **Orange/pink dot** = submitted but not yet validated
 
-To validate a submission, do it in KoboToolbox, then re-export the CSV.
 
 ---
 
@@ -85,7 +87,7 @@ Each panel on the right covers one category. The dropdown inside each panel cont
 
 ## Photos — How They Are Stored and Loaded
 
-Photos are **not stored in the repository**. They are served from Cloudflare R2 storage at:
+Photos are served from Cloudflare R2 storage at:
 
 ```
 https://pub-4d67c97c1d2843adbeffa3b98cd45d19.r2.dev/form-<N>/images/<uuid>/<filename>
@@ -98,7 +100,18 @@ Where:
 
 If a photo fails to load (e.g., the UUID changed between exports), the dashboard automatically tries the alternate UUID field (`_uuid`) before giving up.
 
-A local copy of form-1 photos is also kept in `data/media/form-1/images/` as a backup, but the live dashboard reads from R2.
+### Photo Upload Workflow
+
+When new submissions come in with photos, follow these steps:
+
+1. **Download from KoboToolbox** — export media files and place them into:
+   - `data/media/form-1/images/` — for Form-1 photos
+   - `data/media/form-2/images/` — for Form-2 photos
+2. **Compress** — run `compress_images.py` on your machine. This compresses all images and writes them to a `media_compressed/` folder. Images already compressed are skipped automatically.
+3. **Upload to Cloudflare** — run `upload_images.py`. This uploads the contents of `media_compressed/` to Cloudflare R2. Images already uploaded are skipped automatically.
+4. Both scripts print a warning for any image that could not be processed or uploaded — check these before finishing.
+
+The live dashboard reads from Cloudflare R2, not from the local `data/media/` folder.
 
 ---
 
