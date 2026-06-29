@@ -60,7 +60,7 @@ Each drain line on the map has a numeric ID in the underlying GeoJSON data:
 - **Primary drains** use the `id` property → goes in `pri_drain_id`
 - **Secondary drains** use the `sec_id` property → goes in `sec_drain_id`
 
-To find the ID of a drain, open the Audit Dashboard module and click on a drain — the popup will show its properties including the ID.
+To find the ID of a drain, open the primarydrains.geojson and secondarydrains.geojson on QGIS. the IDs are available in their attribute table. IDs are unique for each feature.
 
 You can assign **multiple drain segments to one team** by listing IDs separated by commas in the same cell:
 
