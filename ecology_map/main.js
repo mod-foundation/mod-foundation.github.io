@@ -320,7 +320,7 @@ let demTimeouts = [];
 
 //api
 mapboxgl.accessToken =
-     'pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A';
+     'pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21zbXVpZ3YwMW1mNjJ4czJ2Z2lsMzlpciJ9.x1vObmJlEmIP8yoyD83hxw';
 
 //map container
 const map = new mapboxgl.Map({

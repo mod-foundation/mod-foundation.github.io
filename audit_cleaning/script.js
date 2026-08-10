@@ -7,7 +7,7 @@ const osm = {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 };
 
-const MAPBOX_TOKEN = 'pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A';
+const MAPBOX_TOKEN = 'pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21zbXVpZ3YwMW1mNjJ4czJ2Z2lsMzlpciJ9.x1vObmJlEmIP8yoyD83hxw';
 
 const satellite = {
     name: "Satellite",
@@ -656,7 +656,7 @@ document.getElementById('reset-filters-btn')?.addEventListener('click', resetAll
 
 window.addEventListener('load', () => {
     const searchBox = document.getElementById('search-box');
-    searchBox.accessToken = 'pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A';
+    searchBox.accessToken = 'pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21zbXVpZ3YwMW1mNjJ4czJ2Z2lsMzlpciJ9.x1vObmJlEmIP8yoyD83hxw';
     searchBox.options = {
         types: 'address,poi',
         proximity: [77.5946, 12.9716]

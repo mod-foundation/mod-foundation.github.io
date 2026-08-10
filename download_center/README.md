@@ -40,9 +40,9 @@ Most of the data has been created and analysed by MOD Foundation. Some datasets 
 | Layer | Source | Description | Link | Resource |
 |-------|--------|-------------|------|----------|
 | **DEM** | USGS Earth Explorer | Digital Elevation el (DEM) 30m resolution downloaded from Earth Explorer | [TIF](/datasets/DEM.tif) | [USGS Earth Explorer](https://earthexplorer.usgs.gov/) |
-| **Roads** | Mapbox | Click on "Copy this style into your account" | [Style Link](https://api.mapbox.com/styles/v1/foundation/cmimsj4eh00q401qw4s9b2ogt.htmltitle=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34) |
-| **Place Labels** | Mapbox | Click on "Copy this style into your account" | [Style Link](https://api.mapbox.com/styles/v1/foundation/cmimsj4eh00q401qw4s9b2ogt.htmltitle=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34) |
-| **Basemap** | Mapbox | Click on "Copy this style into your account" | [Style Link](https://api.mapbox.com/styles/v1/foundation/cmimsj4eh00q401qw4s9b2ogt.htmltitle=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21ncnNrcmx4MXdlOTJqc2FjNW85ZnR3NSJ9.0Ha_bpb4AJ-O2pvIumHu7A&zoomwheel=true&fresh=true#2/38/-34) |
+| **Roads** | Mapbox | Click on "Copy this style into your account" | [Style Link](https://api.mapbox.com/styles/v1/foundation/cmimsj4eh00q401qw4s9b2ogt.htmltitle=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21zbXVpZ3YwMW1mNjJ4czJ2Z2lsMzlpciJ9.x1vObmJlEmIP8yoyD83hxw&zoomwheel=true&fresh=true#2/38/-34) |
+| **Place Labels** | Mapbox | Click on "Copy this style into your account" | [Style Link](https://api.mapbox.com/styles/v1/foundation/cmimsj4eh00q401qw4s9b2ogt.htmltitle=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21zbXVpZ3YwMW1mNjJ4czJ2Z2lsMzlpciJ9.x1vObmJlEmIP8yoyD83hxw&zoomwheel=true&fresh=true#2/38/-34) |
+| **Basemap** | Mapbox | Click on "Copy this style into your account" | [Style Link](https://api.mapbox.com/styles/v1/foundation/cmimsj4eh00q401qw4s9b2ogt.htmltitle=copy&access_token=pk.eyJ1IjoibW9kLWZvdW5kYXRpb24iLCJhIjoiY21zbXVpZ3YwMW1mNjJ4czJ2Z2lsMzlpciJ9.x1vObmJlEmIP8yoyD83hxw&zoomwheel=true&fresh=true#2/38/-34) |
 
 ### <span style="color: #68c2fb;">Typologies</span>
 
