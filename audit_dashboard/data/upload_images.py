@@ -10,7 +10,7 @@ s3 = boto3.client(
 )
 
 BUCKET = "audit-dashboard"
-LOCAL_FOLDER = r"N:\01.DESIGN LAB\25-06_BSF SMALL GRANTS PROGRAMME\02_Implementation\04_Dashboard\Decoding Stormwater Tools\02. Github Repo - DO NOT OPEN\mod-foundation\audit_dashboard\data\media_compressed"  # use raw string for Windows paths
+LOCAL_FOLDER = r"N:\01.DESIGN LAB\25-06_BSF SMALL GRANTS PROGRAMME\02_Implementation\04_Dashboard\02. Github Repo - DO NOT OPEN\mod-foundation\audit_dashboard\data\media_compressed"  # use raw string for Windows paths
 
 def already_uploaded(r2_key, local_path):
     try:

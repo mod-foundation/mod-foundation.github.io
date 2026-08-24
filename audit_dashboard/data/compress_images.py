@@ -1,8 +1,8 @@
 from PIL import Image
 import os
 
-input_root = r"N:\01.DESIGN LAB\25-06_BSF SMALL GRANTS PROGRAMME\02_Implementation\04_Dashboard\Decoding Stormwater Tools\02. Github Repo - DO NOT OPEN\mod-foundation\audit_dashboard\data\media"
-output_root = r"N:\01.DESIGN LAB\25-06_BSF SMALL GRANTS PROGRAMME\02_Implementation\04_Dashboard\Decoding Stormwater Tools\02. Github Repo - DO NOT OPEN\mod-foundation\audit_dashboard\data\media_compressed"
+input_root = r"N:\01.DESIGN LAB\25-06_BSF SMALL GRANTS PROGRAMME\02_Implementation\04_Dashboard\02. Github Repo - DO NOT OPEN\mod-foundation\audit_dashboard\data\media"
+output_root = r"N:\01.DESIGN LAB\25-06_BSF SMALL GRANTS PROGRAMME\02_Implementation\04_Dashboard\02. Github Repo - DO NOT OPEN\mod-foundation\audit_dashboard\data\media_compressed"
 
 total = sum(
     1 for _, _, files in os.walk(input_root)
