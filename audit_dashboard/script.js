@@ -16,6 +16,13 @@ const satellite = {
     attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 };
 
+const mapboxLight = {
+    name: "Mapbox Light",
+    tiles: [`https://api.mapbox.com/styles/v1/mapbox/light-v11/tiles/256/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`],
+    maxzoom: 20,
+    attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+};
+
 const cartoLight = {
     name: "Carto Light",
     tiles: [
@@ -40,7 +47,7 @@ const cartoPositron = {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>'
 };
 
-const baseLayers = { osm, satellite, cartoLight, cartoPositron };
+const baseLayers = { osm, satellite, mapboxLight, cartoLight, cartoPositron };
 
 //#endregion
 
@@ -631,7 +638,7 @@ class DownloadControl {
         console.log('✓ Map loaded');
 
         // Add all basemap raster sources/layers at the bottom of the stack
-        const _initialBasemap = 'cartoPositron';
+        const _initialBasemap = 'mapboxLight';
         Object.entries(baseLayers).forEach(([key, bm]) => {
             map.addSource(key, {
                 type: 'raster',
@@ -660,7 +667,8 @@ class DownloadControl {
                 { id: 'gbaboundary',     name: 'GBA Boundary',         visible: true,  opacity: 0.8 },
                 { id: 'valleys',         name: 'Valleys',              visible: true,  opacity: 0.3 },
                 { id: 'typology-analysis', name: 'Typology Analysis',  visible: false, opacity: 0.9 },
-                { id: 'cartoPositron',   name: 'Base Map: Carto Positron',       visible: true,  opacity: 1.0 },
+                { id: 'mapboxLight',     name: 'Base Map: Mapbox Light',         visible: true,  opacity: 1.0 },
+                { id: 'cartoPositron',   name: 'Base Map: Carto Positron',       visible: false, opacity: 1.0 },
                 { id: 'satellite',       name: 'Base Map: Satellite',            visible: false, opacity: 1.0 },
                 { id: 'osm',             name: 'Base Map: OpenStreetMap',        visible: false, opacity: 1.0 },
             ],
