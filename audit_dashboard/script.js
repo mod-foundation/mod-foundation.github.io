@@ -16,13 +16,15 @@ const satellite = {
     attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 };
 
+const CARTO_API_KEY = 'cb1_2a9g_1_a444340f13f67a89bdd2599c';
+
 const cartoLight = {
     name: "Carto Light",
     tiles: [
-        'https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-        'https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-        'https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-        'https://d.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
+        `https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`,
+        `https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`,
+        `https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`,
+        `https://d.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`
     ],
     maxzoom: 20,
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>'
@@ -31,10 +33,10 @@ const cartoLight = {
 const cartoPositron = {
     name: "Carto Positron",
     tiles: [
-        'https://a.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',
-        'https://b.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',
-        'https://c.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',
-        'https://d.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png'
+        `https://a.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`,
+        `https://b.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`,
+        `https://c.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`,
+        `https://d.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`
     ],
     maxzoom: 20,
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>'
