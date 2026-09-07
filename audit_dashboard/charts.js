@@ -541,21 +541,6 @@ const SW_CLEAN_UP_LABELS          = { /* 'yes': 'Active', 'no': 'None' */ };
 const COMMUNITY_ENGAGEMENT_COLORS = { 'Trees': '#0d520fff', 'Plants': '#319e35ff','Park': '#7caf4cff', 'Murals': '#ffb300', 'Poster': '#ef5350', 'Idols': '#9c27b0','Benches': '#29dab3ff','Gym': '#ef50c7ff','not': '#b6b6b657','Cattle': '#e8a838','null': '#b6b6b6b4',};
 const COMMUNITY_ENGAGEMENT_LABELS = { /* 'high': 'High', 'medium': 'Medium', 'low': 'Low', 'none': 'None' */ };
 
-const FLOOD_HISTORY_COLORS   = { 'cannot': '#b6b6b6', 'yes': '#ef5350', 'no': '#4caf50',  };
-const FLOOD_HISTORY_LABELS   = { 'cannot': 'Cannot Find Info', 'yes': 'Yes', 'no': 'No',  };
-
-const FLOOD_HEIGHT_COLORS    = { 'does not': '#4caf50', 'upto': '#ffb300', '2-5': '#e8a838', '6-10': '#ef5350', 'more': '#9c27b0' };
-const FLOOD_HEIGHT_LABELS    = { 'does not': 'Does Not Flood', 'upto': 'Up to 1 inch', '2-5': '2–5 inches', '6-10': '6–10 inches', 'more': 'More than 10 inches' };
-
-const DESILTING_COLORS       = { 'every 6': '#4caf50', 'once': '#ffb300', 'do not': '#90a4ae', 'cannot': '#b6b6b6' };
-const DESILTING_LABELS       = { 'every 6': 'Every 6 Months', 'once': 'Once a Year', 'do not': 'Do Not Know', 'cannot': 'Cannot Find Info' };
-
-const LAST_CLEANED_COLORS    = { '2-6': '#ffb300', 'more': '#ef5350', 'cannot': '#b6b6b6' };
-const LAST_CLEANED_LABELS    = { '2-6': '2–6 Months Ago', 'more': 'More than 6 Months', 'cannot': 'Cannot Find Info' };
-
-const DRAIN_MAINTAINER_COLORS = { 'no one': '#ef5350', 'do not': '#90a4ae', 'cannot': '#b6b6b6' };
-const DRAIN_MAINTAINER_LABELS = {} ;
-
 function _splitSpaceValues(data, field) {
     const out = [];
     for (const row of data) {
@@ -566,15 +551,9 @@ function _splitSpaceValues(data, field) {
     return out;
 }
 
-function renderCommunityCharts(data, communityData = []) {
+function renderCommunityCharts(data) {
     const engData = _splitSpaceValues(data, 'community_engagement');
     makeBarChart({ container: 'Community Engagement', data: engData, field: 'community_engagement', colors: COMMUNITY_ENGAGEMENT_COLORS, labels: COMMUNITY_ENGAGEMENT_LABELS, ignore: 'Not Applicable' });
-
-    makePieChart({ container: 'Flood History',    data: communityData, field: 'flood_history',    colors: FLOOD_HISTORY_COLORS,    labels: FLOOD_HISTORY_LABELS,    interactive: false });
-    makeBarChart({ container: 'Flood Height',     data: communityData, field: 'flood_height',     colors: FLOOD_HEIGHT_COLORS,     labels: FLOOD_HEIGHT_LABELS,     interactive: false });
-    makePieChart({ container: 'Desilting',        data: communityData, field: 'desilting',        colors: DESILTING_COLORS,        labels: DESILTING_LABELS,        interactive: false });
-    makePieChart({ container: 'Last Cleaned',     data: communityData, field: 'last_cleaned',     colors: LAST_CLEANED_COLORS,     labels: LAST_CLEANED_LABELS,     interactive: false });
-    makeBarChart({ container: 'Drain Maintainer', data: communityData, field: 'drain_maintainer', colors: DRAIN_MAINTAINER_COLORS, labels: DRAIN_MAINTAINER_LABELS, interactive: false });
 }
 
 // #endregion Community Engagement

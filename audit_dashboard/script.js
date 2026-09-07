@@ -194,14 +194,12 @@ function addPointLayer(id, data, {
 
 let auditData = [];
 let auditFeatures = [];
-let communityData = [];
 const _filterBroadcast = new BroadcastChannel('audit-filters');
 
 async function loadAuditData() {
-    const [f1Text, f2Text, f3Text] = await Promise.all([
+    const [f1Text, f2Text] = await Promise.all([
         fetch('data/csv/form-1.csv').then(r => r.text()),
         fetch('data/csv/form-2.csv').then(r => r.text()),
-        fetch('data/csv/form-3.csv').then(r => r.text()),
     ]);
 
     const f1 = Papa.parse(f1Text, { header: true, skipEmptyLines: true }).data.slice(1);
@@ -210,13 +208,15 @@ async function loadAuditData() {
     // form-2 lookup keyed by _index_f1 (references form-1._index)
     const f2ByIndex = new Map(f2.map(row => [row._index_f1, row]));
 
-    // Joined records — form-1 fields win shared columns; _f2_rootUuid/_f2_uuid and _f2_index preserved separately
+    // Joined records — form-1 fields win shared columns; _f2_rootUuid/_f2_uuid, _f2_index and
+    // _f2_validation_status preserved separately (form-1's own _validation_status would otherwise
+    // silently overwrite form-2's on the shared column name, hiding form-2-only rejections)
     auditData = f1.map(row => {
         const f2row = f2ByIndex.get(row._index) ?? {};
-        return { ...f2row, ...row, _f2_index: f2row._index, _f2_rootUuid: f2row._rootUuid ?? null, _f2_uuid: f2row._uuid ?? null };
+        return { ...f2row, ...row, _f2_index: f2row._index, _f2_rootUuid: f2row._rootUuid ?? null, _f2_uuid: f2row._uuid ?? null, _f2_validation_status: f2row._validation_status ?? null };
     });
 
-    // GeoJSON — coordinates always from form-1; _f2_rootUuid/_f2_uuid preserved for image paths
+    // GeoJSON — coordinates always from form-1; _f2_rootUuid/_f2_uuid/_f2_validation_status preserved for image paths + filtering
     const geojson = {
         type: 'FeatureCollection',
         features: f1
@@ -226,7 +226,7 @@ async function loadAuditData() {
                 return {
                     type: 'Feature',
                     geometry: { type: 'Point', coordinates: [+r.long, +r.lat] },
-                    properties: { ...f2row, ...r, _f2_rootUuid: f2row._rootUuid ?? null, _f2_index: f2row._index ?? null, _f2_uuid: f2row._uuid ?? null }
+                    properties: { ...f2row, ...r, _f2_rootUuid: f2row._rootUuid ?? null, _f2_index: f2row._index ?? null, _f2_uuid: f2row._uuid ?? null, _f2_validation_status: f2row._validation_status ?? null }
                 };
             })
     };
@@ -236,7 +236,7 @@ async function loadAuditData() {
     // Green if _validation_status = yes, otherwise orange
     const validatedColor = ['case', ['==', ['get', '_validation_status'], 'yes'], '#00c853', '#ff6b35'];
     addPointLayer('audit-points', geojson, { color: validatedColor, radius: 6, strokeColor: '#ffffff3f', strokeWidth: 1.5 });
-    map.setFilter('audit-points', ['!=', ['get', '_validation_status'], 'no']);
+    map.setFilter('audit-points', ['all', ['!=', ['get', '_validation_status'], 'no'], ['!=', ['get', '_f2_validation_status'], 'no']]);
 
     // Form-2 records with no matching form-1 entry — plot using form-2 coordinates
     const f1IndexSet = new Set(f1.map(r => r._index));
@@ -268,29 +268,14 @@ async function loadAuditData() {
         }
     );
 
-    const f3Raw = Papa.parse(f3Text, { header: true, skipEmptyLines: true, transformHeader: h => h.trim() }).data;
-    // f3Raw[0] is KoboToolbox's sub-header row (long question text) — skip it
-    communityData = f3Raw.slice(1).map(row => ({
-        team_code:        row['team_code']?.trim(),
-        _drain:           row['_drain']?.trim(),
-        _secondarydrain:  row['_secondarydrain']?.trim(),
-        flood_history:    row['flood_history']?.trim(),
-        flood_height:     row['flood_height']?.trim(),
-        desilting:        row['desiliting']?.trim(),    // CSV col is 'desiliting'
-        last_cleaned:     row['last_cleaned']?.trim(),
-        drain_maintainer: row['maintenance']?.trim(),   // CSV col is 'maintenance'
-        _rootUuid:            row['_rootUuid'],
-        _validation_status: row['_validation_status'],
-    })).filter(r => r._drain);
-
-    console.log(`✓ Loaded ${auditData.length} audit records (${geojson.features.length} with coordinates, ${geojsonF2.features.length} form-2 only), ${communityData.length} community interviews`);
+    console.log(`✓ Loaded ${auditData.length} audit records (${geojson.features.length} with coordinates, ${geojsonF2.features.length} form-2 only)`);
 
     window._dropdownFilters = {};
     window._chartFilters = {};
     window._applyChartFilters = buildAndApplyFilter;
-    renderInfrastructureCharts(auditData);
-    renderWaterQualityCharts(auditData);
-    renderCommunityCharts(auditData, communityData);
+    renderInfrastructureCharts(getFilteredAuditData());
+    renderWaterQualityCharts(getFilteredAuditData());
+    renderCommunityCharts(getFilteredAuditData());
 
     makeFilterDropdown({ 
         id: 'team-filter', 
@@ -777,17 +762,9 @@ function makeFilterDropdown({ id, placeholder, fields, insertAfter, el: existing
 
 const teamSelect = document.getElementById('team-filter');
 
-function getFilteredCommunityData() {
-    return communityData.filter(row => {
-        for (const { fields, values } of Object.values(window._dropdownFilters || {})) {
-            if (values.size > 0 && !fields.some(f => values.has(row[f]))) return false;
-        }
-        return true;
-    });
-}
-
 function getFilteredAuditData() {
     return auditData.filter(row => {
+        if (row._validation_status === 'no' || row._f2_validation_status === 'no') return false;
         for (const { fields, values } of Object.values(window._dropdownFilters || {})) {
             if (values.size > 0 && !fields.some(f => values.has(row[f]))) return false;
         }
@@ -819,7 +796,7 @@ function refreshDropdownOptions() {
 }
 
 function buildAndApplyFilter() {
-    const base = ['!=', ['get', '_validation_status'], 'no'];
+    const base = ['all', ['!=', ['get', '_validation_status'], 'no'], ['!=', ['get', '_f2_validation_status'], 'no']];
     const parts = [base];
     for (const { fields, values } of Object.values(window._dropdownFilters || {})) {
         if (values.size > 0) {
@@ -865,7 +842,7 @@ function buildAndApplyFilter() {
     const filtered = getFilteredAuditData();
     renderInfrastructureCharts(filtered);
     renderWaterQualityCharts(filtered);
-    renderCommunityCharts(filtered, getFilteredCommunityData());
+    renderCommunityCharts(filtered);
     refreshDropdownOptions();
 
 
@@ -1050,7 +1027,7 @@ const PANEL_CONFIG = {
     },
     'cat-street': {
         defaultField: 'community_engagement',
-        renderFn: () => renderCommunityCharts(getFilteredAuditData(), communityData),
+        renderFn: () => renderCommunityCharts(getFilteredAuditData()),
         fieldPicMap: {
             community_engagement: [
                 { picField: 'community_engagement_pic', uuidField: '_f2_rootUuid', form: 2 },
