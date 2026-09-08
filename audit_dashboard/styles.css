@@ -482,7 +482,7 @@ mapbox-search-box [class*="--Input"] {
         }
 
         .stats-subtext {
-            font-size: 12px;
+            font-size: 10px;
             font-style: italic;
             color: #9ca3af;
             margin-top: 1px;
