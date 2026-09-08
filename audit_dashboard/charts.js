@@ -634,9 +634,13 @@ const COMMUNITY_ENGAGEMENT_CHOICES = [
     'Other (please specify)', 'Not applicable',
 ];
 
+const TREES_COLORS = { 'yes': '#4caf50', 'no': '#b6b6b6' };
+const TREES_LABELS = { 'yes': 'Yes', 'no': 'No' };
+
 function renderCommunityCharts(data) {
     const engData = _splitKnownChoices(data, 'community_engagement', COMMUNITY_ENGAGEMENT_CHOICES);
     makeBarChart({ container: 'Community Engagement', data: engData, field: 'community_engagement', colors: COMMUNITY_ENGAGEMENT_COLORS, labels: COMMUNITY_ENGAGEMENT_LABELS, ignore: 'Not Applicable' });
+    makePieChart({ container: 'Trees Along Drain',    data, field: 'trees', colors: TREES_COLORS, labels: TREES_LABELS, title: 'Row of trees planted along the SWD' });
 }
 
 // #endregion Community Engagement
@@ -669,6 +673,7 @@ const _FIELD_COLORS = {
     sw_outside:           SW_OUTSIDE_COLORS,
     sw_outside_type:      SW_OUTSIDE_TYPE_COLORS,
     community_engagement: COMMUNITY_ENGAGEMENT_COLORS,
+    trees:                TREES_COLORS,
 };
 
 /**
@@ -709,6 +714,7 @@ const _FIELD_LABELS = {
     sw_outside:           SW_OUTSIDE_LABELS,
     sw_outside_type:      SW_OUTSIDE_TYPE_LABELS,
     community_engagement: COMMUNITY_ENGAGEMENT_LABELS,
+    trees:                TREES_LABELS,
 };
 
 function getValueLabel(field, value) {

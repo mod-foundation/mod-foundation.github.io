@@ -1033,9 +1033,11 @@ const PANEL_CONFIG = {
                 { picField: 'community_engagement_pic', uuidField: '_f2_rootUuid', form: 2 },
                 { picField: 'street_pic',               uuidField: '_rootUuid',    form: 1 },
             ],
+            trees: [{ picField: 'street_pic', uuidField: '_rootUuid', form: 1 }],
         },
         fieldChartLabel: {
             community_engagement: 'Community Participation',
+            trees: 'Trees Along Drain',
         },
     },
 };
