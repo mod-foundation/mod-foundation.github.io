@@ -71,6 +71,49 @@ function _createCanvas(container) {
 }
 
 /**
+ * Splits a Kobo select-multiple field into one row per selected choice.
+ *
+ * Kobo exports these fields as the selected choices' full text LABELS
+ * (not short codes), space-joined when more than one is selected — e.g.
+ * "Plants Murals" means both "Plants" and "Murals" were picked. That's
+ * ambiguous whenever a choice's own label contains a space (e.g. "Not
+ * applicable", "Other (please specify)"), since a naive whitespace split
+ * would tear a single choice into fake fragments. This instead matches
+ * the longest known choice text first at each position, so multi-word
+ * choices survive intact; any leftover text it can't recognise falls
+ * back to a single whitespace-delimited token rather than being dropped.
+ *
+ * @param {object[]} data          Row objects from PapaParse
+ * @param {string}   field         Field name holding the joined choices
+ * @param {string[]} knownChoices  Every valid choice's exact label text
+ */
+function _splitKnownChoices(data, field, knownChoices) {
+    const sorted = [...knownChoices].sort((a, b) => b.length - a.length);
+    const out = [];
+    for (const row of data) {
+        let val = String(row[field] ?? '').trim();
+        if (!val) continue;
+        val = val.replace(/\s*\|\s*/g, ' '); // normalise the stray "|" delimiter seen in a handful of rows
+        let i = 0;
+        while (i < val.length) {
+            let matched = null;
+            for (const choice of sorted) {
+                if (val.startsWith(choice, i)) {
+                    const after = i + choice.length;
+                    if (after === val.length || val[after] === ' ') { matched = choice; break; }
+                }
+            }
+            const token = matched || (val.slice(i).match(/^\S+/) || [null])[0];
+            if (!token) break;
+            out.push({ ...row, [field]: token });
+            i += token.length;
+            while (val[i] === ' ') i++;
+        }
+    }
+    return out;
+}
+
+/**
  * Counts occurrences of each unique value for `field` across `data`.
  * Null / undefined / empty-string values are skipped.
  * Returns { value: count, ... } sorted by count descending.
@@ -146,6 +189,38 @@ function _filterIgnored(rawKeys, ignore) {
     return rawKeys.filter(k => !list.includes(String(k).toLowerCase()));
 }
 
+/**
+ * Builds the {labels, values, colors} series for a pie/bar chart, merging any
+ * raw values that resolve to the same display label into a single slice/bar
+ * (e.g. two differently-worded raw answers both labelled "Clear Path" become
+ * one summed bar instead of two identically-captioned ones). `groups[i]` is
+ * the list of original raw values folded into `labels[i]`, needed so
+ * click-to-filter can still filter on the underlying raw field values.
+ */
+function _buildChartSeries(data, field, { colors, labels: labelMap, ignore } = {}) {
+    const counts = _countValues(data, field);
+    const rawKeys = _filterIgnored(Object.keys(counts), ignore);
+    const resolvedLabels = _resolveLabels(rawKeys, labelMap);
+    const resolvedColors = _resolveColors(rawKeys, colors);
+
+    const byLabel = new Map();
+    rawKeys.forEach((key, i) => {
+        const label = resolvedLabels[i];
+        if (!byLabel.has(label)) byLabel.set(label, { value: 0, color: resolvedColors[i], rawKeys: [] });
+        const entry = byLabel.get(label);
+        entry.value += counts[key];
+        entry.rawKeys.push(key);
+    });
+
+    const labels = [...byLabel.keys()].sort((a, b) => byLabel.get(b).value - byLabel.get(a).value);
+    return {
+        labels,
+        values: labels.map(l => byLabel.get(l).value),
+        colors: labels.map(l => byLabel.get(l).color),
+        groups: labels.map(l => byLabel.get(l).rawKeys),
+    };
+}
+
 function _setChartFilter(field, visibleRawKeys, allRawKeys) {
     if (visibleRawKeys.length === allRawKeys.length) {
         delete window._chartFilters[field];
@@ -189,11 +264,7 @@ function makePieChart({ container, data, field, colors, labels: labelMap, title,
     el.appendChild(canvasWrap);
     el.appendChild(legendDiv);
 
-    const counts = _countValues(data, field);
-    const rawKeys = _filterIgnored(Object.keys(counts), ignore);
-    const labels = _resolveLabels(rawKeys, labelMap);
-    const values = rawKeys.map(k => counts[k]);
-    const bgColors = _resolveColors(rawKeys, colors);
+    const { labels, values, colors: bgColors, groups } = _buildChartSeries(data, field, { colors, labels: labelMap, ignore });
     const total = values.reduce((a, b) => a + b, 0);
 
     const htmlLegendPlugin = {
@@ -221,8 +292,8 @@ function makePieChart({ container, data, field, colors, labels: labelMap, title,
                         const wasVisible = chart.getDataVisibility(idx);
                         chart.toggleDataVisibility(idx);
                         chart.update();
-                        const visible = rawKeys.filter((_, i) => i === idx ? !wasVisible : chart.getDataVisibility(i));
-                        _setChartFilter(field, visible, rawKeys);
+                        const visibleGroups = groups.filter((_, i) => i === idx ? !wasVisible : chart.getDataVisibility(i));
+                        _setChartFilter(field, visibleGroups.flat(), groups.flat());
                     });
                 }
 
@@ -265,8 +336,8 @@ function makePieChart({ container, data, field, colors, labels: labelMap, title,
                     const wasVisible = chart.getDataVisibility(idx);
                     chart.toggleDataVisibility(idx);
                     chart.update();
-                    const visible = rawKeys.filter((_, i) => i === idx ? !wasVisible : chart.getDataVisibility(i));
-                    _setChartFilter(field, visible, rawKeys);
+                    const visibleGroups = groups.filter((_, i) => i === idx ? !wasVisible : chart.getDataVisibility(i));
+                    _setChartFilter(field, visibleGroups.flat(), groups.flat());
                 },
             }),
         },
@@ -292,11 +363,7 @@ function makeBarChart({ container, data, field, colors, labels: labelMap, title,
     const el = _resolveContainer(container);
     if (!el) return;
     const canvas = _createCanvas(el);
-    const counts = _countValues(data, field);
-    const rawKeys = _filterIgnored(Object.keys(counts), ignore);
-    const labels = _resolveLabels(rawKeys, labelMap);
-    const values = rawKeys.map(k => counts[k]);
-    const bgColors = _resolveColors(rawKeys, colors);
+    const { labels, values, colors: bgColors, groups } = _buildChartSeries(data, field, { colors, labels: labelMap, ignore });
 
     const chart = new Chart(canvas, {
         type: 'bar',
@@ -326,19 +393,19 @@ function makeBarChart({ container, data, field, colors, labels: labelMap, title,
                 onClick(e, elements, chart) {
                     if (!elements.length) return;
                     const idx = elements[0].index;
-                    const key = rawKeys[idx];
-                    if (chart._hiddenKeys.has(key)) chart._hiddenKeys.delete(key);
-                    else chart._hiddenKeys.add(key);
-                    chart.data.datasets[0].backgroundColor = rawKeys.map((k, i) =>
-                        chart._hiddenKeys.has(k) ? 'rgba(180,180,180,0.35)' : bgColors[i]
+                    if (chart._hiddenIdx.has(idx)) chart._hiddenIdx.delete(idx);
+                    else chart._hiddenIdx.add(idx);
+                    chart.data.datasets[0].backgroundColor = labels.map((_, i) =>
+                        chart._hiddenIdx.has(i) ? 'rgba(180,180,180,0.35)' : bgColors[i]
                     );
                     chart.update();
-                    _setChartFilter(field, rawKeys.filter(k => !chart._hiddenKeys.has(k)), rawKeys);
+                    const visibleGroups = groups.filter((_, i) => !chart._hiddenIdx.has(i));
+                    _setChartFilter(field, visibleGroups.flat(), groups.flat());
                 },
             }),
         },
     });
-    chart._hiddenKeys = new Set();
+    chart._hiddenIdx = new Set();
     canvas._chartInstance = chart;
 }
 
@@ -439,8 +506,18 @@ const BRIDGE_TYPE_LABELS     = { 'vehicular': 'Vehicular', 'pedestrian': 'Pedest
 const BRIDGE_CONDITION_COLORS = { 'intact': '#4caf50', 'path': '#e97d7bff', 'wall': '#ef5350', 'not': '#b6b6b638' };
 const BRIDGE_CONDITION_LABELS = { 'intact': 'Intact', 'wall': 'Broken wall', 'path': 'Broken path', 'not': 'No Bridge' };
 
-const BRIDGE_WALKABLE_COLORS  = { 'clear': '#4caf50', 'parking': '#e97d7bff', 'solid': '#ef5350' , 'not': '#b6b6b638'};
-const BRIDGE_WALKABLE_LABELS  = { 'clear': 'Clear Path', 'parking': 'Obstructed Path (Parking)' , 'solid': 'Obstructed Path (Solid Waste)', 'not': 'No Bridge' };
+const BRIDGE_WALKABLE_COLORS  = { 'clear': '#4caf50', 'parking': '#e97d7bff', 'solid': '#ef5350' , 'not': '#b6b6b638', 'other': '#9575cd' };
+const BRIDGE_WALKABLE_LABELS  = { 'clear': 'Clear Path', 'parking': 'Obstructed Path (Parking)' , 'solid': 'Obstructed Path (Solid Waste)', 'not': 'No Bridge', 'other': 'Obstructed Path (Other)' };
+
+// See COMMUNITY_ENGAGEMENT_CHOICES above — same reasoning, this field is
+// select-multiple too and its choices are multi-word text ("clear" alone
+// covers two distinct raw phrasings — "Safe to walk (clear path)" and
+// "Unobstructed (clear path)" — both intentionally shown as one category)
+const BRIDGE_WALKABLE_CHOICES = [
+    'Safe to walk (clear path)', 'Unobstructed (clear path)',
+    'Obstructed path (solid waste)', 'Obstructed path (parking)',
+    'Obstructed path (other)', 'Not applicable',
+];
 
 const PIERS_CONDITION_COLORS = { 'yes': '#ef5350', 'not': '#b6b6b638', 'no': '#4caf50',};
 const PIERS_CONDITION_LABELS = { 'yes': 'Yes', 'applicable': 'No Bridge', 'no': 'No', };
@@ -467,7 +544,7 @@ function renderInfrastructureCharts(data) {
     // Bridge
     makePieChart({ container: 'Bridge Type',      data, field: 'bridge_type',      colors: BRIDGE_TYPE_COLORS,       labels: BRIDGE_TYPE_LABELS,       title: 'Bridge Type',        ignore:'Not applicable ' });
     makePieChart({ container: 'Bridge Condition', data, field: 'bridge_condition', colors: BRIDGE_CONDITION_COLORS,  labels: BRIDGE_CONDITION_LABELS,  title: 'Bridge Condition',   ignore:'Not applicable' });
-    makePieChart({ container: 'Walkable',         data, field: 'bridge_walkable',  colors: BRIDGE_WALKABLE_COLORS,   labels: BRIDGE_WALKABLE_LABELS,   title: 'Walkable',           ignore:'Not applicable' });
+    makePieChart({ container: 'Walkable',         data: _splitKnownChoices(data, 'bridge_walkable', BRIDGE_WALKABLE_CHOICES), field: 'bridge_walkable',  colors: BRIDGE_WALKABLE_COLORS,   labels: BRIDGE_WALKABLE_LABELS,   title: 'Walkable',           ignore:'Not applicable' });
     makePieChart({  container: 'Piers Condition', data, field: 'piers_condition',  colors: PIERS_CONDITION_COLORS,   labels: PIERS_CONDITION_LABELS,   title: 'Piers Condition',    ignore:'Not applicable' });                
     makeBarChart({  container: 'Piers Count',     data, field: 'piers_num',        colors: PIERS_NUM_COLORS,         labels: PIERS_NUM_LABELS,   title: 'Number of Piers',          ignore:'Not applicable' });
 
@@ -494,6 +571,13 @@ const WATER_STAGNANT_LABELS      = { 'flowing': 'Flowing', 'stagnant': 'Stagnant
 const WATER_CONTAMINATION_COLORS = { 'black': '#546e7a', 'clear': '#b3e5fc', 'solid': '#8d6e63', 'froth': '#4caf50', 'cannot': '#b6b6b6' };
 const WATER_CONTAMINATION_LABELS = { 'black': 'Black/ Grey', 'clear': 'Clear', 'solid': 'Particles/Oily_Film', 'froth': 'Froth/ Foam', 'cannot': 'Cannot See' };
 
+// See COMMUNITY_ENGAGEMENT_CHOICES above — same reasoning, this field is
+// select-multiple too and two of its choices are multi-word text
+const WATER_CONTAMINATION_CHOICES = [
+    'Black or grey water', 'Solid particles or oily film on water',
+    'Froth or foam visible', 'Cannot see', 'Clear',
+];
+
 const WATER_COLOUR_COLORS        = { 'clear': '#b3e5fc', 'black': '#546e7a', 'green': '#4caf50', 'cannot': '#b6b6b6', 'other': '#8c5ec9ff' , 'milky': '#90a4ae', 'yellow': '#ffb300'};
 const WATER_COLOUR_LABELS        = { /* 'clear': 'Clear', 'brown': 'Brown', 'green': 'Green', 'grey': 'Grey' */ };
 
@@ -519,7 +603,7 @@ function renderWaterQualityCharts(data) {
     makePieChart({ container: 'Authorised Inlets',           data, field: 'inlets',              colors: INLETS_COLORS,              labels: INLETS_LABELS,              });
     makePieChart({ container: 'Unauthorised Inlets',         data, field: 'unauthorised_inlets', colors: UNAUTHORISED_INLETS_COLORS, labels: UNAUTHORISED_INLETS_LABELS, });
     makePieChart({ container: 'Water Flow',                  data, field: 'water_stagnant',      colors: WATER_STAGNANT_COLORS,      labels: WATER_STAGNANT_LABELS,      });
-    makePieChart({ container: 'Water Contamination',         data, field: 'water_contamination', colors: WATER_CONTAMINATION_COLORS, labels: WATER_CONTAMINATION_LABELS, });
+    makePieChart({ container: 'Water Contamination',         data: _splitKnownChoices(data, 'water_contamination', WATER_CONTAMINATION_CHOICES), field: 'water_contamination', colors: WATER_CONTAMINATION_COLORS, labels: WATER_CONTAMINATION_LABELS, });
     makePieChart({ container: 'Water Colour',                data, field: 'water_colour',        colors: WATER_COLOUR_COLORS,        labels: WATER_COLOUR_LABELS,        });
     makePieChart({ container: 'Water Turbidity',             data, field: 'water_turbidity',     colors: WATER_TURBIDITY_COLORS,     labels: WATER_TURBIDITY_LABELS,     });
     makePieChart({ container: 'Water Smell',                 data, field: 'water_smell',         colors: WATER_SMELL_COLORS,         labels: WATER_SMELL_LABELS,         });
@@ -541,18 +625,17 @@ const SW_CLEAN_UP_LABELS          = { /* 'yes': 'Active', 'no': 'None' */ };
 const COMMUNITY_ENGAGEMENT_COLORS = { 'Trees': '#0d520fff', 'Plants': '#319e35ff','Park': '#7caf4cff', 'Murals': '#ffb300', 'Poster': '#ef5350', 'Idols': '#9c27b0','Benches': '#29dab3ff','Gym': '#ef50c7ff','not': '#b6b6b657','Cattle': '#e8a838','null': '#b6b6b6b4',};
 const COMMUNITY_ENGAGEMENT_LABELS = { /* 'high': 'High', 'medium': 'Medium', 'low': 'Low', 'none': 'None' */ };
 
-function _splitSpaceValues(data, field) {
-    const out = [];
-    for (const row of data) {
-        const val = String(row[field] ?? '').trim();
-        if (!val || /not applicable/i.test(val)) { out.push(row); continue; }
-        for (const token of val.split(/\s+/)) out.push({ ...row, [field]: token });
-    }
-    return out;
-}
+// Every choice's exact label text, as KoboToolbox exports it — required so
+// _splitKnownChoices can tell a single multi-word choice ("Not applicable")
+// apart from two separate choices joined by a space ("Trees Murals")
+const COMMUNITY_ENGAGEMENT_CHOICES = [
+    'Trees', 'Plants', 'Park', 'Murals', 'Poster', 'Idols', 'Benches', 'Gym',
+    'Cattle', 'Storage', 'Carts', 'Parking', 'Clothes', 'Potted plants',
+    'Other (please specify)', 'Not applicable',
+];
 
 function renderCommunityCharts(data) {
-    const engData = _splitSpaceValues(data, 'community_engagement');
+    const engData = _splitKnownChoices(data, 'community_engagement', COMMUNITY_ENGAGEMENT_CHOICES);
     makeBarChart({ container: 'Community Engagement', data: engData, field: 'community_engagement', colors: COMMUNITY_ENGAGEMENT_COLORS, labels: COMMUNITY_ENGAGEMENT_LABELS, ignore: 'Not Applicable' });
 }
 
