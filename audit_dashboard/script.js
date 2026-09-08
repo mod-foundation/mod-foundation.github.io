@@ -795,9 +795,24 @@ function refreshDropdownOptions() {
     }
 }
 
-function buildAndApplyFilter() {
+// Fields where a missing value shouldn't be shown as a map point at all —
+// only "trees" for now, at the user's request, rather than every attribute
+// color field (most other fields' fallback colour is fine to keep showing)
+const HIDE_MISSING_DATA_FOR_FIELDS = new Set(['trees']);
+
+/**
+ * Builds and applies the audit-points / audit-points-f2 filter: validation
+ * status, dropdown filters, chart filters, and — for fields listed in
+ * HIDE_MISSING_DATA_FOR_FIELDS — hides points with no value for the
+ * currently active colour field, rather than showing them in the color
+ * scheme's fallback colour as if they were a real answer.
+ */
+function applyPointFilter() {
     const base = ['all', ['!=', ['get', '_validation_status'], 'no'], ['!=', ['get', '_f2_validation_status'], 'no']];
     const parts = [base];
+    if (_activeColorField && HIDE_MISSING_DATA_FOR_FIELDS.has(_activeColorField)) {
+        parts.push(['all', ['has', _activeColorField], ['!=', ['get', _activeColorField], '']]);
+    }
     for (const { fields, values } of Object.values(window._dropdownFilters || {})) {
         if (values.size > 0) {
             const exprs = [...values].flatMap(v => fields.map(f => ['==', ['get', f], v]));
@@ -819,6 +834,10 @@ function buildAndApplyFilter() {
     const filter = parts.length === 1 ? parts[0] : ['all', ...parts];
     if (map.getLayer('audit-points'))    map.setFilter('audit-points', filter);
     if (map.getLayer('audit-points-f2')) map.setFilter('audit-points-f2', filter);
+}
+
+function buildAndApplyFilter() {
+    applyPointFilter();
 
     // Filter drain + corporation layers by valley and/or corporation selection
     const valleyVals = window._dropdownFilters?.['valley-filter']?.values;
@@ -901,6 +920,7 @@ function applyAttributeColor(field = _activeColorField) {
     }
     if (map.getLayer('audit-points'))    map.setPaintProperty('audit-points',    'circle-color', expr);
     if (map.getLayer('audit-points-f2')) map.setPaintProperty('audit-points-f2', 'circle-color', expr);
+    applyPointFilter();
 }
 
 
