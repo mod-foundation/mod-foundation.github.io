@@ -481,6 +481,12 @@ mapbox-search-box [class*="--Input"] {
             line-height: 1.1;
         }
 
+        .stats-subtext {
+            font-size: 10px;
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
     /* #endregion */
 
     /* #region Category */
