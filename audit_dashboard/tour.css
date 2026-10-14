@@ -36,13 +36,6 @@
     background: #f5f5f5;
 }
 
-/* Set the icon's colour directly — the slotted <svg> is a normal light-DOM
-   element, so this targets it unambiguously regardless of how currentColor
-   would otherwise inherit through the wa-button's shadow DOM. */
-#tour-btn svg {
-    color: var(--text-secondary);
-}
-
 /* #endregion */
 
 /* #region Driver.js overlay + popover */
