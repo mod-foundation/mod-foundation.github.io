@@ -27,6 +27,12 @@
 
         <link rel="stylesheet" href="styles.css" />
 
+        <!-- TOUR: Driver.js (CDN, no build step) -->
+        <link href="https://cdn.jsdelivr.net/npm/driver.js@1.9.0/dist/driver.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/driver.js@1.9.0/dist/driver.js.iife.js"></script>
+        <link rel="stylesheet" href="tour.css" />
+        <!-- /TOUR -->
+
         <!-- Web Awesome -->
         <script src="https://kit.webawesome.com/12f6b474bd1f41e1.js" crossorigin="anonymous"></script>
 
@@ -36,7 +42,7 @@
     <body>
             <div id="dashboard-title">
                 <span class="dashboard-title-main">Stormwater Drain Audit Dashboard</span>
-        
+
                 <button id="info-toggle-btn" title="Toggle info panel">
                     <wa-icon name="chevron-down" id="info-toggle-icon"></wa-icon>
                 </button>
@@ -105,7 +111,13 @@
                             </div>
                         </div>
                     </div>
-                    <div id="bar-right"></div>
+                    <div id="bar-right">
+                        <!-- TOUR -->
+                        <wa-button id="tour-btn" size="small" appearance="plain" title="Take the tour">
+                            <wa-icon slot="prefix" name="circle-question"></wa-icon>
+                        </wa-button>
+                        <!-- /TOUR -->
+                    </div>
                 </div>
             </div>
 
@@ -321,5 +333,9 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
         <script src="charts.js"></script>
         <script src="script.js"></script>
+
+        <!-- TOUR -->
+        <script src="tour.js"></script>
+        <!-- /TOUR -->
     </body>
 </html>
