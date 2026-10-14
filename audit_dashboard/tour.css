@@ -1,0 +1,115 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   tour.css — Styles for the Driver.js guided tour (see tour.js).
+
+   Kept entirely separate from styles.css by design: every rule needed to
+   remove the tour lives in this one file, so deleting it (plus tour.js and
+   the <!-- TOUR --> blocks in index.html) fully reverts the change.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* #region "Take the tour" button (title bar) */
+
+#tour-btn {
+    /* #dashboard-title is a flex row with justify-content: space-between;
+       margin-left: auto pulls this button to sit right before the existing
+       info-toggle button without touching that element or its layout. */
+    margin-left: auto;
+    margin-right: 8px;
+}
+
+#tour-btn::part(base) {
+    color: var(--header);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    background: transparent;
+    font-family: 'Barlow', sans-serif;
+    font-size: 11px;
+    height: 26px;
+    min-height: unset;
+    padding-inline: 8px;
+}
+
+#tour-btn::part(base):hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* #endregion */
+
+/* #region Driver.js overlay + popover */
+
+/* Driver.js's own CSS already sets the popover's z-index extremely high
+   (1e9), but the overlay SVG only gets 10000 inline — raise both here
+   (the overlay needs !important to beat that inline style) so the tour
+   reliably sits above MapLibre's controls and Web Awesome's hoisted
+   (position: fixed, appended to <body>) dropdown listboxes. */
+.driver-overlay {
+    z-index: 2147483000 !important;
+}
+
+.driver-popover.audit-tour-popover {
+    z-index: 2147483001 !important;
+    font-family: 'Barlow', sans-serif;
+    border-radius: 6px;
+    max-width: 320px;
+}
+
+.driver-popover.audit-tour-popover .driver-popover-title {
+    color: var(--primary-blue);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.01em;
+}
+
+.driver-popover.audit-tour-popover .driver-popover-description {
+    color: var(--primary-grey);
+    font-size: 12.5px;
+    line-height: 1.45;
+}
+
+.driver-popover.audit-tour-popover .driver-popover-progress-text {
+    font-family: 'Barlow', sans-serif;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.driver-popover.audit-tour-popover .driver-popover-footer-btn {
+    font-family: 'Barlow', sans-serif;
+    font-size: 12px;
+    border-radius: 4px;
+}
+
+/* "Next" — black filled button */
+.driver-popover.audit-tour-popover .driver-popover-next-btn {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+    font-weight: 500;
+    text-shadow: none;
+}
+
+.driver-popover.audit-tour-popover .driver-popover-next-btn:hover {
+    background: #222;
+    border-color: #222;
+}
+
+/* "Back" — plain text, no fill/border */
+.driver-popover.audit-tour-popover .driver-popover-prev-btn {
+    background: transparent;
+    color: var(--primary-grey);
+    border-color: transparent;
+    text-shadow: none;
+}
+
+.driver-popover.audit-tour-popover .driver-popover-prev-btn:hover {
+    background: transparent;
+    color: var(--primary-blue);
+    text-decoration: underline;
+}
+
+.driver-popover.audit-tour-popover .driver-popover-close-btn {
+    color: var(--text-secondary);
+}
+
+.driver-popover.audit-tour-popover .driver-popover-close-btn:hover {
+    color: var(--primary-grey);
+}
+
+/* #endregion */
