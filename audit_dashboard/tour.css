@@ -6,29 +6,34 @@
    the <!-- TOUR --> blocks in index.html) fully reverts the change.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* #region "Take the tour" button (title bar) */
+/* #region "Take the tour" button (map control column) */
 
+/* Lives as a static child of #bar-right, alongside MapLibre's own
+   zoom/geolocate controls — those are moved into #bar-right at runtime
+   (script.js, inside map.on('load')) and get appended *after* this static
+   button, so `order` forces this one to render last (below them) in the
+   #bar-right flex column regardless of that DOM append order. */
 #tour-btn {
-    /* #dashboard-title is a flex row with justify-content: space-between;
-       margin-left: auto pulls this button to sit right before the existing
-       info-toggle button without touching that element or its layout. */
-    margin-left: auto;
-    margin-right: 8px;
+    order: 999;
 }
 
 #tour-btn::part(base) {
-    color: var(--header);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    background: transparent;
-    font-family: 'Barlow', sans-serif;
-    font-size: 11px;
-    height: 26px;
+    width: 29px;
+    height: 29px;
     min-height: unset;
-    padding-inline: 8px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ctrl-bg);
+    border: var(--ctrl-border);
+    border-radius: var(--ctrl-radius);
+    box-shadow: var(--ctrl-shadow);
+    color: #333;
 }
 
 #tour-btn::part(base):hover {
-    background: rgba(255, 255, 255, 0.5);
+    background: #f5f5f5;
 }
 
 /* #endregion */
