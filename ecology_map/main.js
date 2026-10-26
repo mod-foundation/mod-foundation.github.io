@@ -598,10 +598,16 @@ function highlightFeature(feature) {
     const props = feature.properties;
 
     // Build a unique filter based on available properties
-    // Priority: fid > id_dup > Drain num > OBJECTID > feature.id
+    // Drains: highlight every segment sharing the Drain num (full stretch);
+    // segments without a drain number fall through to a single-segment highlight.
+    // Otherwise priority: fid > id_dup > Drain num > OBJECTID > feature.id
     let filter;
+    const drainNum = props['Drain num'];
+    const isDrainLayer = layerId.includes('drains');
 
-    if (props.fid !== undefined) {
+    if (isDrainLayer && drainNum !== undefined && drainNum !== null && drainNum !== '') {
+        filter = ['==', ['get', 'Drain num'], drainNum];
+    } else if (props.fid !== undefined) {
         filter = ['==', ['get', 'fid'], props.fid];
     } else if (props.id_dup !== undefined) {
         filter = ['==', ['get', 'id_dup'], props.id_dup];

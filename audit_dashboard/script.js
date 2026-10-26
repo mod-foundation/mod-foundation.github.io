@@ -316,6 +316,14 @@ function addLayers() {
     const statusColor = ['match', ['get', 'Status'], 1, '#ff222267', '#0d6aff'];
     addLineLayer('primarydrains', `${DATA_ROOT}/json/primarydrains.geojson`, { color: statusColor, width: 1.5, opacity: 0.8 });
     addLineLayer('secondarydrains', `${DATA_ROOT}/json/secondarydrains.geojson`, { color: statusColor, width: 1, opacity: 0.8 });
+    DRAIN_LAYERS.forEach(id => map.addLayer({
+        id: `${id}-highlight`,
+        type: 'line',
+        source: id,
+        filter: ['boolean', false],
+        paint: { 'line-color': '#82f984', 'line-width': 5, 'line-opacity': 1 },
+        layout: { 'line-cap': 'round', 'line-join': 'round' }
+    }));
     addLineLayer('gbaboundary', `${DATA_ROOT}/json/gba_boundary.geojson`, { color: '#575757ff', width: 1, opacity: 0.8 });
     addLineLayer('gbacorporations', `${DATA_ROOT}/json/gba_corporations.geojson`, { color: '#7a7a7aff', width: 0.5, opacity: 0.8 });
     addLineLayer('valleys', `${DATA_ROOT}/json/valley.geojson`, { color: '#8a4343ff', width: 0.5, opacity: 0.3 });
@@ -343,6 +351,27 @@ function addLayers() {
 
 //#region Drain Interactivity
 
+const DRAIN_LAYERS = ['primarydrains', 'secondarydrains'];
+
+/**
+ * Highlight the full stretch of a clicked drain: every segment sharing its
+ * Drain num. Segments without a drain number highlight on their own (by fid).
+ */
+function highlightDrain(layerId, props) {
+    clearDrainHighlight();
+    const num = props['Drain num'];
+    const filter = (num !== undefined && num !== null && num !== '')
+        ? ['==', ['get', 'Drain num'], num]
+        : ['==', ['get', 'fid'], props.fid];
+    map.setFilter(`${layerId}-highlight`, filter);
+}
+
+function clearDrainHighlight() {
+    DRAIN_LAYERS.forEach(id => {
+        if (map.getLayer(`${id}-highlight`)) map.setFilter(`${id}-highlight`, ['boolean', false]);
+    });
+}
+
 /**
  * Add hover + click popup interactivity to a line layer.
  * @param {string} layerId
@@ -357,6 +386,7 @@ function addLineInteractivity(layerId, attrs) {
     map.on('click', layerId, (e) => {
         e.preventDefault();
         const p = e.features[0].properties;
+        if (DRAIN_LAYERS.includes(layerId)) highlightDrain(layerId, p);
         const vals = attrs.map(({ key, format, bold }) => {
             const raw = p[key] ?? '';
             const display = format ? format(raw) : raw;
@@ -380,6 +410,9 @@ addLineInteractivity('secondarydrains', [
     { key: 'Drain num', bold: true },
     { key: 'Status', format: v => Number(v) === 0 ? 'Visible' : 'Not Visible' }
 ]);
+
+// Clicking empty map (not a drain) clears the drain highlight
+map.on('click', (e) => { if (!e.defaultPrevented) clearDrainHighlight(); });
 //#endregion
 
 //#region Upload Control
