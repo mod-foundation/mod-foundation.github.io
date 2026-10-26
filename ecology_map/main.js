@@ -2493,7 +2493,7 @@ function setupInteraction() {
         }
 
         // Check if the clicked layer is visible
-        const visibleFeatures = features.filter(f => {
+        const visibleFeatures = dedupeFeatures(features).filter(f => {
             // For uploaded layers, use the actual layer ID (don't remove -interaction)
             const isUploadedLayer = f.layer.id.includes('uploaded-layer');
             const baseLayerId = isUploadedLayer ? f.layer.id : f.layer.id.replace('-interaction', '');
@@ -4863,6 +4863,24 @@ map.addControl(
 //#endregion
 
 //#region interactive pop ups and selectors
+// Collapse repeats from a click query: drain segments sharing a Drain num become
+// one entry (the click highlights the full stretch anyway), and features split
+// across tile boundaries appear once.
+function dedupeFeatures(features) {
+    const seen = new Set();
+    return features.filter(f => {
+        const p = f.properties;
+        const drainNum = p['Drain num'];
+        const id = f.layer.id.includes('drains') && drainNum !== undefined && drainNum !== null && drainNum !== ''
+            ? `drain:${drainNum}`
+            : p.fid ?? f.id ?? JSON.stringify(p);
+        const key = `${f.layer.id}|${id}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+}
+
 // Show selector for multiple features
 function showSelector(features, lngLat) {
     // Close any existing popup before opening a new one
