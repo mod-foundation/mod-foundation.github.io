@@ -4724,6 +4724,9 @@ function addBoundaryLayers() {
 }
 
 function addGreens() {
+    // Draw greens beneath the drains (and their halos) so they don't cover them
+    const belowDrains = map.getLayer('Secondary Drains Halo') ? 'Secondary Drains Halo' : undefined;
+
     // Add parks layer
     map.addSource('parks-source', {
         type: 'vector',
@@ -4739,7 +4742,7 @@ function addGreens() {
             'fill-color': '#2f6833',
             'fill-opacity': 0.5
         }
-    });
+    }, belowDrains);
 
     // Add wetlands layer
     map.addSource('wetlands-source', {
@@ -4756,7 +4759,7 @@ function addGreens() {
             'fill-color': '#2f6833',
             'fill-opacity': 0.3
         }
-    });
+    }, belowDrains);
 }
 
 //#endregion
@@ -4863,19 +4866,29 @@ map.addControl(
 //#endregion
 
 //#region covered drains
-// Draw covered drains (Status 1) in red and 2px thicker; open drains keep the style's look.
+// While the Primary / Secondary Drains panel is open, its covered drains (Status 1)
+// draw in red and 2px thicker. Otherwise drains keep the style's plain blue.
 const COVERED_DRAIN_COLOR = '#ff4545';
 const COVERED_DRAIN_EXTRA_WIDTH = 2;
+const DRAIN_LINE_LAYERS = ['primary-drains', 'secondary-drains'];
+const drainBasePaint = {};
 
-function colorCoveredDrains() {
-    ['primary-drains', 'secondary-drains'].forEach(layerId => {
+// showFor: drain layer ids to show covered drains on; all others revert to plain blue
+function showCoveredDrains(showFor = []) {
+    DRAIN_LINE_LAYERS.forEach(layerId => {
         if (!map.getLayer(layerId)) return;
+        if (!drainBasePaint[layerId]) {
+            const styleWidth = map.getPaintProperty(layerId, 'line-width');
+            drainBasePaint[layerId] = {
+                color: map.getPaintProperty(layerId, 'line-color'),
+                width: typeof styleWidth === 'number' ? styleWidth : 1 // style default
+            };
+        }
+        const { color, width } = drainBasePaint[layerId];
         const isCovered = ['==', ['to-number', ['get', 'Status'], 0], 1];
-        const openColor = map.getPaintProperty(layerId, 'line-color');
-        const styleWidth = map.getPaintProperty(layerId, 'line-width');
-        const openWidth = typeof styleWidth === 'number' ? styleWidth : 1; // style default
-        map.setPaintProperty(layerId, 'line-color', ['case', isCovered, COVERED_DRAIN_COLOR, openColor]);
-        map.setPaintProperty(layerId, 'line-width', ['case', isCovered, openWidth + COVERED_DRAIN_EXTRA_WIDTH, openWidth]);
+        const show = showFor.includes(layerId);
+        map.setPaintProperty(layerId, 'line-color', show ? ['case', isCovered, COVERED_DRAIN_COLOR, color] : color);
+        map.setPaintProperty(layerId, 'line-width', show ? ['case', isCovered, width + COVERED_DRAIN_EXTRA_WIDTH, width] : width);
     });
 }
 
@@ -5598,6 +5611,9 @@ function resetMap() {
     //reset filters
     resetAllFilters();
 
+    // Drains back to plain blue
+    showCoveredDrains([]);
+
     // Close typology panel and open default panel (e.g., primary-detail)
     const typologyDetail = document.getElementById('typology-detail');
     if (typologyDetail && typologyDetail.open) {
@@ -6258,7 +6274,6 @@ map.on('load', () => {
     addTypLayers();
     addBoundaryLayers();
     addGreens();
-    colorCoveredDrains();
     console.log('✅ Layers added!');
 
     storeOriginalLayerProperties();
@@ -6488,6 +6503,13 @@ document.querySelectorAll('#panel sl-details').forEach(detail => {
 
         removeAllCallouts();
 
+        // Covered drains show in red only while their drains panel is open
+        showCoveredDrains(
+            selectedId === 'drains-detail' ? ['primary-drains']
+            : selectedId === 'secondary-drains-detail' ? ['secondary-drains']
+            : []
+        );
+
         // Stop timelines when switching panels
         if (isBasinPlaying) {
             stopBasinTimeline();
@@ -6578,6 +6600,20 @@ if (typologyDetail) {
         clearTypologyMarkers();
     });
 }
+
+// Closing a drains panel returns its drains to plain blue. Re-check which panel is
+// open, since switching panels can fire the old panel's sl-hide after the new sl-show.
+const drainPanels = { 'drains-detail': 'primary-drains', 'secondary-drains-detail': 'secondary-drains' };
+Object.keys(drainPanels).forEach(id => {
+    document.getElementById(id)?.addEventListener('sl-hide', e => {
+        if (e.target.id !== id) return; // ignore sl-hide bubbling from nested components
+        setTimeout(() => showCoveredDrains(
+            Object.entries(drainPanels)
+                .filter(([panelId]) => panelId !== id && document.getElementById(panelId)?.open)
+                .map(([, layerId]) => layerId)
+        ));
+    });
+});
 
 // 🔥 NEW: Listen for valleys panel HIDE to reset basin state
 const valleysDetail = document.getElementById('valleys-detail');
