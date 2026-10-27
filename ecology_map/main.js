@@ -4863,18 +4863,19 @@ map.addControl(
 //#endregion
 
 //#region covered drains
-// Draw covered drains (Status 1) in red; open drains keep the style's colour.
-const COVERED_DRAIN_COLOR = '#ff2222';
+// Draw covered drains (Status 1) in red and 2px thicker; open drains keep the style's look.
+const COVERED_DRAIN_COLOR = '#ff4545';
+const COVERED_DRAIN_EXTRA_WIDTH = 2;
 
 function colorCoveredDrains() {
     ['primary-drains', 'secondary-drains'].forEach(layerId => {
         if (!map.getLayer(layerId)) return;
+        const isCovered = ['==', ['to-number', ['get', 'Status'], 0], 1];
         const openColor = map.getPaintProperty(layerId, 'line-color');
-        map.setPaintProperty(layerId, 'line-color', [
-            'match', ['to-number', ['get', 'Status'], 0],
-            1, COVERED_DRAIN_COLOR,
-            openColor
-        ]);
+        const styleWidth = map.getPaintProperty(layerId, 'line-width');
+        const openWidth = typeof styleWidth === 'number' ? styleWidth : 1; // style default
+        map.setPaintProperty(layerId, 'line-color', ['case', isCovered, COVERED_DRAIN_COLOR, openColor]);
+        map.setPaintProperty(layerId, 'line-width', ['case', isCovered, openWidth + COVERED_DRAIN_EXTRA_WIDTH, openWidth]);
     });
 }
 
