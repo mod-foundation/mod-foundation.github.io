@@ -105,6 +105,34 @@ h6 {
     letter-spacing: 0.1em;
 }
 
+.drain-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin: 4px 0 16px;
+}
+
+.drain-stat {
+    border-left: 3px solid var(--stat-color, var(--highlight-green));
+    padding-left: 10px;
+}
+
+.drain-stat-value {
+    font-family: 'Poppins', sans-serif;
+    color: var(--stat-color, var(--highlight-green));
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+}
+
+.drain-stat-label {
+    font-family: 'Open Sans', sans-serif;
+    color: lightgrey;
+    font-size: 12px;
+    line-height: 1.3;
+}
+
 #subtitle {
     font-family: 'Open Sans', sans-serif;
     color: lightgrey;

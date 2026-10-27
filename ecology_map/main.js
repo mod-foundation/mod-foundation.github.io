@@ -4862,6 +4862,60 @@ map.addControl(
 
 //#endregion
 
+//#region covered drains
+// Draw covered drains (Status 1) in red; open drains keep the style's colour.
+const COVERED_DRAIN_COLOR = '#ff2222';
+
+function colorCoveredDrains() {
+    ['primary-drains', 'secondary-drains'].forEach(layerId => {
+        if (!map.getLayer(layerId)) return;
+        const openColor = map.getPaintProperty(layerId, 'line-color');
+        map.setPaintProperty(layerId, 'line-color', [
+            'match', ['to-number', ['get', 'Status'], 0],
+            1, COVERED_DRAIN_COLOR,
+            openColor
+        ]);
+    });
+}
+
+//#endregion
+
+//#region drain statistics
+// Length statistics for the Primary and Secondary Drains panels, measured from the
+// drain geometry in the shared download centre GeoJSONs (Status 1 = covered).
+async function loadDrainStats() {
+    try {
+        const [primary, secondary] = await Promise.all(
+            ['primarydrains', 'secondarydrains'].map(name =>
+                fetch(`../download_center/data/json/${name}.geojson`).then(r => r.json())
+            )
+        );
+        const km = features => features.reduce((sum, f) => sum + turf.length(f, { units: 'kilometers' }), 0);
+        const coveredKm = features => km(features.filter(f => Number(f.properties.Status) === 1));
+        const primaryKm = km(primary.features);
+        const secondaryKm = km(secondary.features);
+
+        // color: matches the drain's line colour on the map, so the stat doubles as a legend
+        const stat = (value, label, color) =>
+            `<div class="drain-stat"${color ? ` style="--stat-color: ${color}"` : ''}><div class="drain-stat-value">${value}</div><div class="drain-stat-label">${label}</div></div>`;
+        const render = (elId, type, features, totalKm) => {
+            const el = document.getElementById(elId);
+            if (!el) return;
+            const covered = coveredKm(features);
+            el.innerHTML =
+                stat(`${Math.round(covered)} km`, `of ${type} drains covered (${Math.round((covered / totalKm) * 100)}%)`, COVERED_DRAIN_COLOR) +
+                stat(`${Math.round(totalKm)} km`, `total ${type} drain length`);
+        };
+        render('primary-drain-stats', 'primary', primary.features, primaryKm);
+        render('secondary-drain-stats', 'secondary', secondary.features, secondaryKm);
+    } catch (err) {
+        console.warn('⚠️ Could not load drain statistics:', err);
+    }
+}
+loadDrainStats();
+
+//#endregion
+
 //#region interactive pop ups and selectors
 // Collapse repeats from a click query: drain segments sharing a Drain num become
 // one entry (the click highlights the full stretch anyway), and features split
@@ -6203,6 +6257,7 @@ map.on('load', () => {
     addTypLayers();
     addBoundaryLayers();
     addGreens();
+    colorCoveredDrains();
     console.log('✅ Layers added!');
 
     storeOriginalLayerProperties();
